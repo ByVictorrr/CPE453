@@ -304,8 +304,16 @@ void *realloc(void *ptr, size_t size){
     }
 }
 
-void *calloc(size_t nmemb, size_t size);
-
+/*========================calloc helpers====================================*/
+void *calloc(size_t nmemb, size_t size){
+    int i;
+    struct hdr *head;
+    head=(struct hdr *)malloc(size);
+    for ( i = 0; i < size; i++) {
+        head->data[i] = nmemb;
+    }
+    return head->data;
+}
 
 
 int main(){
@@ -381,10 +389,6 @@ u
                     hdr1->hdr2->hdr3->NULL
              Expected: 
                     hdr1->hdr2>hdr3->free->hdr4->NULL
-
-
-   
-   
    
    */
 
