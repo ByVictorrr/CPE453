@@ -25,16 +25,21 @@ void *pending_mem, *pending_end; // Helpers so we dont have to call sbrk every t
 
 /*======================Helper functions for malloc============================*/
 /*h1 - not free, h2 is free (has to have a valid address), size is size of h1 block*/
+size_t round_mult16(size_t numBytes){
+    return (numBytes-(numBytes%16))+16;
+}
+
 void split_hdrs(struct hdr **h1, struct hdr **h2, size_t size){
-            *h1 = *h2;
-            *h2 = *h1+sizeof(struct hdr)+size;        
-            (*h2)->data_size = (*h1)->data_size - (2*sizeof(struct hdr) + size);
-            (*h2)->isFree = TRUE;
-            (*h2)->data = (uint8_t*)(*h1) + sizeof(struct hdr);
-            (*h1)->data_size = size;
-            /*finally reassign adj next's*/
-            (*h2)->next=(*h1)->next;
-            (*h1)->next=(*h2);
+    size_t mult_16 = round_mult16(size);
+    *h1 = *h2;
+    *h2 = *h1+sizeof(struct hdr)+mult_16;        
+    (*h2)->data_size = (*h1)->data_size - (2*sizeof(struct hdr) + mult_16);
+    (*h2)->isFree = TRUE;
+    (*h2)->data = (uint8_t*)(*h1) + sizeof(struct hdr);
+    (*h1)->data_size = mult_16;
+    /*finally reassign adj next's*/
+    (*h2)->next=(*h1)->next;
+    (*h1)->next=(*h2);
 }
 
 /* Objective: checks the linked list for any open spot
@@ -109,9 +114,6 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     block->isFree = FALSE;
     //Case 1 - if its for appending
     return block->data;
-}
-size_t round_mult16(size_t numBytes){
-    return (numBytes-(numBytes%16))+16;
 }
 #define NEW_MEM_BLK 64000
 /* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
@@ -308,7 +310,7 @@ void *realloc(void *ptr, size_t size){
 void *calloc(size_t nmemb, size_t size){
     int i;
     struct hdr *head;
-    head=(struct hdr *)malloc(size);
+    head=(struct hdr *)(malloc(size) - sizeof(struct hdr));
     for ( i = 0; i < size; i++) {
         head->data[i] = nmemb;
     }
@@ -400,6 +402,7 @@ u
     *ptr2=2;
     *ptr3=3;
     ptr3 = (int*)realloc(ptr3, 100);
+    int *ptr4 = (int *)calloc(6, 100);
 
 
     
