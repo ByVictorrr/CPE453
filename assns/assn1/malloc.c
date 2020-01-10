@@ -7,42 +7,39 @@ typedef enum Bool{FALSE, TRUE} bool_t;
 
 struct hdr{
     size_t data_size;
-    struct block *next;
     bool_t isFree;
-};
-
-struct block{
-    struct hdr header;
     uintptr_t *data;
+    struct hdr *next;
 };
 
-struct block *start;
+struct hdr *start;
 /*Used for a condition to check if a relative between opening and size to be inserted to ll*/
 #define OPENING_DIFF_SIZE 100 
 
 
+#define GIVE_UP_SPACE 10000 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
 
 /*======================Helper functions for malloc============================*/
 /* Objective: checks the linked list for any open spot
     returns: NULL if start is empty | 
              no other empty spots | 
              if the size the existed was to small
-    returns: block address at which is free
+    returns: hdr address at which is free
 */
 void *check_open_spots(size_t size){
     if(start == NULL){
         return NULL;
     }
-    struct block *next = start->header.next, *prev = start;
+    struct hdr *next = start->next, *prev = start;
     size_t diff;
     while(next != NULL){
         /*checking until go to end of list if there is an openening in the list*/
         /*Thiis checks if blk is free && differnce is smaller than amount*/
-        if(prev->header.isFree && (diff=prev->header.data_size - size) < OPENING_DIFF_SIZE  && diff > 0){
+        if(prev->isFree && (diff=prev->data_size - size) < OPENING_DIFF_SIZE  && diff > 0){
             return prev;
         }
         prev = next;
-        next = next->header.next;
+        next = next->next;
     }
     return NULL;
 }
@@ -52,40 +49,37 @@ void *check_open_spots(size_t size){
 
     HELPER FUNCTION for set_blk if isNEWSPOTt
 */
-int append_new(struct block *new_blk){
+int append_new(struct hdr *new_blk){
     // Case 1 - where start doesnt have any items
     if(start == NULL){
         return 1;
     }
-    struct block *next=start->header.next,*prev = start;
+    struct hdr *next=start->next,*prev = start;
     // Case 2 - where start has at least one item
-    next = start->header.next, prev = start;
+    next = start->next, prev = start;
     while(next != NULL){
         prev = next;
-        next=next->header.next;
+        next=next->next;
     }
-    prev->header.next = new_blk;
+    prev->next = new_blk;
     return 0;
 }
 
 
 void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     // step 1 - set fields of newly allocated space
-    struct block *block = start_ptr;
+    struct hdr *block = start_ptr;
     block->data = sizeof(struct hdr) + start_ptr;
     /*Account if there is an opening opening st. block.size > size*/
     if(isNewSpot){
-        block->header.data_size = size;
-    }
-    block->header.isFree = FALSE;
-    block->header.next = NULL;
+        block->data_size = size;
+        block->next = NULL;
     // step 2 - link this to the start
-    //Case 1 - if its for appending
-   if(isNewSpot){
-    if(append_new(block)){
-        start = block;
+        if(append_new(block))
+            start = block;
     }
-   }
+    block->isFree = FALSE;
+    //Case 1 - if its for appending
     return block->data;
 }
 
@@ -124,7 +118,6 @@ void *malloc(size_t size){
 
 
 
-#define GIVE_UP_SPACE 10000 /*in bytes*/
 
 /* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
 /**/
@@ -133,31 +126,30 @@ void *malloc(size_t size){
     0.) Try to give up space if a lot is free sbrk(negative value)
 */
 void free(void *ptr){ //*ptr points to the data section
-    void * start_block, *next_block;
+    char * start_block, *next_block;
     if(ptr){
         // step 1 - free the pointer
-        start_block = ptr-sizeof(struct hdr);
-        ptr = NULL;
-        struct block *blk = start_block, *next_blk;
-        blk->header.isFree = TRUE;
+        start_block = ((char*)ptr)-sizeof(struct hdr);
+        struct hdr *blk = start_block, *next_blk;
+        blk->isFree = TRUE;
         // step 2 - see if you can merge with adjacent
 
         // Case 1 - see if next is null if so you can use sbrk with negative to take off
-        if((next_blk = blk->header.next) == NULL){
+        if((next_blk = blk->next) == NULL){
             // step 4 - check if this is a lot of data_size (free to srbk)
-            if(blk->header.data_size > GIVE_UP_SPACE){
-                sbrk((blk->header.data_size)*-1);
+            if(blk->data_size > GIVE_UP_SPACE){
+                sbrk((blk->data_size)*-1) == NULL ? fputc("Cant give mem back to os", stderr) : fputc("gave mem back to tos", stdout);
             }
         
         // Case 2 - blk isnt at the end (therefore we cant give os back data)
         }else{
             /* step 5: implied that next isnt null so check if next_blk is Free */
-            if(next_blk->header.isFree){
+            if(next_blk->isFree){
                 /*If isFree merge blk and next_blk then*/ 
-                size_t next_blk_size = next_blk->header.data_size + sizeof(struct hdr);
+                size_t next_blk_size = next_blk->data_size + sizeof(struct hdr);
                 next_block = next_blk;
                 memset(next_block,0,next_blk_size); //clear out any data saved (ereasing it)
-                blk->header.data_size +=next_blk_size;
+                blk->data_size +=next_blk_size;
             }
         }
     }else{
@@ -178,21 +170,44 @@ void free(void *ptr){ //*ptr points to the data section
 void realloc(void *ptr, size_t size);
 
 
-;
 
 int main(){
 
 
+    /*TC 1 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
+                            free(hdr2) : hdr1->free->hdr3
+             Description: because ptr4 size is 21 and hdr2's was 100 thus(0<diff < OPENING_DIFF_SIZE):
+             Expected: malloc(21) : hdr1->hdr4->hdr3
+                            
+
+    TC 2 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
+                            free(hdr2) : hdr1->free->hdr3
+             Description: because ptr4 size is 100 and hdr2's was 22 thus isnt (0<diff < OPENING_DIFF_SIZE):
+             Expected: malloc(21) : hdr1->free->hdr3->hdr4
+
+                            
+    
+    TC 3 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
+                            free(hdr2) : hdr1->free->hdr3
+             Description: because ptr4 size is 20 and hdr2's was 200 thus (diff > OPENING_DIFF_SIZE):
+             Expected: malloc(20) : hdr1->free->hdr3->hdr4
+
+                            
+    TC 4 - Testing freeing hdr1->hdr2->hdr3->hdr4
+             Description: let hdr4->size = GIVE_UP_SPACE + 20; 
+             Expected: free(ptr4) : hdr1->free->hdr3 (not there os took it)
+
     int *ptr1 = (int*)malloc(100);
-    int *ptr2 = (int*)malloc(100);
+    int *ptr2 = (int*)malloc(25);
     int *ptr3 = (int*)malloc(21);
     *ptr1 = 1;
     *ptr2 = 2;
     *ptr3 = 3;
-    //free(ptr1);
-    free(ptr2);
-    int *ptr4 = (int*)malloc(21);
+    int *ptr4 = (int*)malloc(GIVE_UP_SPACE + 20);
     *ptr4 = 4;
+    free(ptr4);
+
+    */
 
 
     return 0;
