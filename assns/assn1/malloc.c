@@ -20,6 +20,7 @@ void *pending_mem, *pending_end; // Helpers so we dont have to call sbrk every t
 
 
 #define GIVE_UP_SPACE 10000 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
+#define SPLIT_MIN 1 /*used to determine whether a free node can be split into two*/
 
 /*======================Helper functions for malloc============================*/
 /* Objective: checks the linked list for any open spot
@@ -32,16 +33,37 @@ void *check_open_spots(size_t size){
     if(start == NULL){
         return NULL;
     }
-    struct hdr *next = start->next, *prev = start;
+    struct hdr *next = start->next, *curr=start,*embedded;
     size_t diff;
-    while(next != NULL){
+    while(curr != NULL){
         /*checking until go to end of list if there is an openening in the list*/
         /*Thiis checks if blk is free && differnce is smaller than amount*/
-        if(prev->isFree && (diff=prev->data_size - size) < OPENING_DIFF_SIZE  && diff > 0){
-            return prev;
+        /*Case 1 - space for another*/
+        if(curr->isFree && (diff=curr->data_size - size) > 0){
+            /*Case 1.1 - split a existing one into two*/
+            if(diff > SPLIT_MIN){
+                // *assign the space curr needs, then make another blk above it open */
+                embedded = curr;
+                curr = curr+sizeof(struct hdr)+size;        
+                curr->data_size = embedded->data_size - (2*sizeof(struct hdr) + size);
+                curr->isFree = TRUE;
+                curr->data = (uint8_t*)curr + sizeof(struct hdr);
+                embedded->data_size = size;
+                /*finally reassign adj next's*/
+                embedded->next=curr;
+                curr->next=next;
+                return embedded;
+            /*Case 1.2 - not enough space to split*/
+            }else{
+                return curr;
+            }
         }
-        prev = next;
-        next = next->next;
+        curr=next;
+        if(next == NULL){
+            break;
+        }else{
+            next=next->next;
+        }
     }
     return NULL;
 }
@@ -66,8 +88,6 @@ int append_new(struct hdr *new_blk){
     prev->next = new_blk;
     return 0;
 }
-
-
 void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     // step 1 - set fields of newly allocated space
     struct hdr *block = start_ptr;
@@ -84,11 +104,9 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     //Case 1 - if its for appending
     return block->data;
 }
-
 size_t round_mult16(size_t numBytes){
     return (numBytes-(numBytes%16))+16;
 }
-
 #define NEW_MEM_BLK 64000
 /* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
     return: NULL if srbrk error
@@ -111,6 +129,7 @@ void *update_pending(size_t size){
         return start;
     }
 }
+
 
 
 /* Requirements:
@@ -154,7 +173,7 @@ size_t size_merged_next_open_blks(struct hdr *ptr){
    }else if(ptr->next->isFree == FALSE){
        return ret_size;
    }else{
-       return merge_next_open_blks(ptr->next) + ret_size;
+       return size_merged_next_open_blks(ptr->next) + ret_size;
    }
 }
 
@@ -178,6 +197,19 @@ struct hdr *get_last_adj_open_blk(struct hdr *ptr){
 }
 /*Finds ajacent */
 
+void gargbage_collect(){
+    /*go through the start and look merge the adj free*/
+    struct hdr *next = start->next, *prev = start;
+    while(next){
+        if(prev->isFree == TRUE && next->isFree == TRUE){
+            /*merge them*/
+            prev->data_size += next->data_size + sizeof(struct hdr);
+            prev->next = next->next;
+        }
+        prev = next;
+        next = next->next;
+    }
+}
 
 
 
@@ -203,14 +235,12 @@ void free(void *ptr){ //*ptr points to the data section
                     : fputc("gave mem back to tos", stdout);
                     pending_end=pending_mem=start_block; // TODO : CHECK OVER THIS
                 return;
-            }else{
-                int var = 0;
             }
             
         // Case 2 - blk isnt at the end (therefore we cant give os back data)
         }else{
                 // To see if the next block is free
-                if(next_open_blk->isFree){
+                if(next_open_blk->isFree && blk != next_open_blk){
                     blk->next = next_open_blk->next; // delete the in between
                     blk->data_size = size_merged_next_open_blks(blk) - sizeof(struct hdr);
                 }
@@ -219,6 +249,8 @@ void free(void *ptr){ //*ptr points to the data section
     }else{
         fputs("Cant free 0x0", stderr);
     }
+    // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
+    gargbage_collect();
 }
 
 /* Requirements:
@@ -245,16 +277,21 @@ int main(){
              Expected: malloc(21) : hdr1->hdr4->hdr3
                             
 
+
     TC 2 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
                             free(hdr2) : hdr1->free->hdr3
-             Description: because ptr4 size is 100 and hdr2's was 22 thus isnt (0<diff < OPENING_DIFF_SIZE):
+
+             Description: because ptr4 size is 100 and hdr2's was 22 thus isnt (0<diff < OPE
+
              Expected: malloc(21) : hdr1->free->hdr3->hdr4
 
-                            
-    
+
+
     TC 3 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
-                            free(hdr2) : hdr1->free->hdr3
-             Description: because ptr4 size is 20 and hdr2's was 200 thus (diff > OPENING_DIFF_SIZE):
+             free(hdr2) : hdr1->free->hdr3
+
+             Description: because ptr4 size is 20 and hdr2's was 200 thus (diff > OPENING_DI
+
              Expected: malloc(20) : hdr1->free->hdr3->hdr4
 
                             
@@ -279,17 +316,23 @@ int main(){
 
     TC 8 - testing free when ptr hdr3, then hdr4
             Description: hdr1->hdr2->hdr3->hdr4->NULL
-             Expected: hdr1->hdr2->(freed)->(free)->NULL;
+             Expected: hdr1->hdr2->(free)->NULL;
     
-    TC 8 - testing malloc(11) = ptr5, freeing hdr3, then hdr4
+    TC 9 - testing malloc(11) = ptr5, freeing hdr3, then hdr4(for 100 = bytes for ptr3)
             Description: hdr1->hdr2->hdr3->hdr4->NULL
              Expected: hdr1->hdr2->(ptr5)->(free)->NULL; 
+
+    TC 10 - testing malloc(11) = ptr5, freeing hdr3, then hdr4 (for 1000 = bytes for ptr3 (splitting))
+            Description: hdr1->hdr2->hdr3->hdr4->NULL
+             Expected: hdr1->hdr2->(ptr5)->(free)->(free)->NULL; 
+
+
     */
 
 
     int *ptr1 = (int*)malloc(100);
     int *ptr2 = (int*)malloc(25);
-    int *ptr3 = (int*)malloc(21);
+    int *ptr3 = (int*)malloc(1000);
     *ptr1 = 1;
     *ptr2 = 2;
     *ptr3 = 3;
@@ -298,8 +341,6 @@ int main(){
     free(ptr3);
     free(ptr4);
     int *ptr5 = (int*)malloc(11);
-    *ptr5 = 5;
-    free(ptr5);
 
     
 
