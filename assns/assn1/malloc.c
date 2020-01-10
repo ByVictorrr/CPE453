@@ -22,7 +22,21 @@ void *pending_mem, *pending_end; // Helpers so we dont have to call sbrk every t
 #define GIVE_UP_SPACE 10000 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
 #define SPLIT_MIN 1 /*used to determine whether a free node can be split into two*/
 
+
 /*======================Helper functions for malloc============================*/
+/*h1 - not free, h2 is free (has to have a valid address), size is size of h1 block*/
+void split_hdrs(struct hdr **h1, struct hdr **h2, size_t size){
+            *h1 = *h2;
+            *h2 = *h1+sizeof(struct hdr)+size;        
+            (*h2)->data_size = (*h1)->data_size - (2*sizeof(struct hdr) + size);
+            (*h2)->isFree = TRUE;
+            (*h2)->data = (uint8_t*)(*h1) + sizeof(struct hdr);
+            (*h1)->data_size = size;
+            /*finally reassign adj next's*/
+            (*h2)->next=(*h1)->next;
+            (*h1)->next=(*h2);
+}
+
 /* Objective: checks the linked list for any open spot
     returns: NULL if start is empty | 
              no other empty spots | 
@@ -34,7 +48,7 @@ void *check_open_spots(size_t size){
         return NULL;
     }
     struct hdr *next = start->next, *curr=start,*embedded;
-    size_t diff;
+    ssize_t diff;
     while(curr != NULL){
         /*checking until go to end of list if there is an openening in the list*/
         /*Thiis checks if blk is free && differnce is smaller than amount*/
@@ -43,15 +57,7 @@ void *check_open_spots(size_t size){
             /*Case 1.1 - split a existing one into two*/
             if(diff > SPLIT_MIN){
                 // *assign the space curr needs, then make another blk above it open */
-                embedded = curr;
-                curr = curr+sizeof(struct hdr)+size;        
-                curr->data_size = embedded->data_size - (2*sizeof(struct hdr) + size);
-                curr->isFree = TRUE;
-                curr->data = (uint8_t*)curr + sizeof(struct hdr);
-                embedded->data_size = size;
-                /*finally reassign adj next's*/
-                embedded->next=curr;
-                curr->next=next;
+               split_hdrs(&embedded, &curr,  size);
                 return embedded;
             /*Case 1.2 - not enough space to split*/
             }else{
@@ -116,7 +122,7 @@ size_t round_mult16(size_t numBytes){
 void *update_pending(size_t size){
     void *start;
     // Case 1 - if we dont have any more pending space
-    if(pending_mem == pending_end | size+pending_mem > pending_end){
+    if(pending_mem == pending_end | size + sizeof(struct hdr)+pending_mem > pending_end){
         size_t blk_size = size > NEW_MEM_BLK ? (blk_size = size) : (blk_size = NEW_MEM_BLK); //mult of 16 (how much given)
         start = sbrk(blk_size);
         pending_mem=start+size + sizeof(struct hdr); //points to the next open space
@@ -195,8 +201,7 @@ struct hdr *get_last_adj_open_blk(struct hdr *ptr){
         return prev;
     }
 }
-/*Finds ajacent */
-
+/*Finds ajacent: mergeing them together */
 void gargbage_collect(){
     /*go through the start and look merge the adj free*/
     struct hdr *next = start->next, *prev = start;
@@ -210,8 +215,6 @@ void gargbage_collect(){
         next = next->next;
     }
 }
-
-
 
 /* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
 /**/
@@ -252,7 +255,20 @@ void free(void *ptr){ //*ptr points to the data section
     // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
     gargbage_collect();
 }
+/*===============================================================*/
 
+/*========================Realloc helpers====================================*/
+
+bool_t inHeap(void *ptr){
+    struct hdr *temp = start;
+    while(temp){
+        if((void*)temp+sizeof(struct hdr) == ptr){
+            return TRUE;
+        }
+        temp=temp->next;
+    }
+    return FALSE;
+}
 /* Requirements:
     0.) Try to merge adjacent spots if possible
     1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM;
@@ -263,7 +279,32 @@ void free(void *ptr){ //*ptr points to the data section
         realloc(NULL, size) = malloc(size)
         realloc(ptr, 0) = free(ptr)
 */
-void realloc(void *ptr, size_t size);
+void *realloc(void *ptr, size_t size){
+    /*special case*/
+    if(ptr == NULL | (ptr != NULL && !inHeap(ptr))){
+        return malloc(size);
+    }else if(size == 0){
+        free(ptr);
+    /*requirements*/
+    }else{
+        /*step 1 - merge*/
+        struct hdr *p = ptr-sizeof(struct hdr), *blk_free = p;
+        size_t org = p->data_size; 
+        gargbage_collect(); // changes p's data size if there are adjspaces
+        /*Step 2- see if there is space(from an adjacent block clearing up maybe from the garbage coll*/
+        if(p->data_size >= size){
+            /*Shrink  new blk then next->blk=isFree*/
+            split_hdrs(&p, &blk_free, size);
+            return ptr;
+        /*Step 3 - no space*/
+        }else{
+            free(ptr);
+            return malloc(org+p->data_size);
+        }
+    }
+}
+
+void *calloc(size_t nmemb, size_t size);
 
 
 
@@ -271,6 +312,8 @@ int main(){
 
 
     /*
+    
+        =================== testing===============================
     TC 1 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
                             free(hdr2) : hdr1->free->hdr3
              Description: because ptr4 size is 21 and hdr2's was 100 thus(0<diff < OPENING_DIFF_SIZE):
@@ -299,13 +342,12 @@ int main(){
              Description: let hdr4->size = GIVE_UP_SPACE + 20; 
              Expected: free(ptr4) : hdr1->free->hdr3 (not there os took it)
 
-    TC 5 - Testing multiple of 16 sizes
-             Description: let hdr4->size = 10
-             Expected: size to be 16
-
-    */
-
-    /* Free test cases (with pending)
+    TC 5 - Testing multiple of 16 sizesu
+             Description: let hdr4->size = 10u
+             Expected: size to be 16u
+u
+u
+    /* Free test cases (with pending)u
     TC 6 - Testing free where ptr3 is freed before ptr2
              Description: hdr1->hdr2->hdr3->hdr4->NULL
              Expected: hdr1->[hdr2|hdr3]->hdr4->NULL;
@@ -326,21 +368,35 @@ int main(){
             Description: hdr1->hdr2->hdr3->hdr4->NULL
              Expected: hdr1->hdr2->(ptr5)->(free)->(free)->NULL; 
 
-
     */
+   /*
+         ===================realloc testing===============================u
+     TC 11 - 
+            Description: testing realloc(ptr2, 100);
+                    hdr1->hdr2->hdr3->NULL
+             Expected: 
+                    hdr1->free->hdr3->hdr4->NULL
+     TC 12 - 
+            Description: testing realloc(ptr3, 100);
+                    hdr1->hdr2->hdr3->NULL
+             Expected: 
+                    hdr1->hdr2>hdr3->free->hdr4->NULL
+
+
+   
+   
+   
+   */
 
 
     int *ptr1 = (int*)malloc(100);
     int *ptr2 = (int*)malloc(25);
     int *ptr3 = (int*)malloc(1000);
-    *ptr1 = 1;
-    *ptr2 = 2;
-    *ptr3 = 3;
-    int *ptr4 = (int*)malloc(10);
-    *ptr4 = 4;
-    free(ptr3);
-    free(ptr4);
-    int *ptr5 = (int*)malloc(11);
+    *ptr1=1;
+    *ptr2=2;
+    *ptr3=3;
+    ptr3 = (int*)realloc(ptr3, 100);
+
 
     
 
