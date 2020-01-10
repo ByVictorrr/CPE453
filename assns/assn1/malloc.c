@@ -113,7 +113,6 @@ void *update_pending(size_t size){
 }
 
 
-/*===============================================================*/
 /* Requirements:
     1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM
     2.) Returns address of starting data section
@@ -140,38 +139,82 @@ void *malloc(size_t size){
     }
 }
 
+/*===============================================================*/
+
+/*======================Helper functions for free============================*/
+size_t size_merged_next_open_blks(struct hdr *ptr){
+    /*Objective: ptr is one that we want to free (and to add up forward isFree blks)
+        Basis step: ptr->next == NULL | ptr->isFree == FALSE;
+        Inductive step: ptr = ptr->next ....ptr=NULL implies ptr+K
+    */
+   size_t ret_size = (ptr)->data_size + sizeof(struct hdr);
+
+   if(ptr->next == (struct hdr *)NULL){
+       return ret_size;
+   }else if(ptr->next->isFree == FALSE){
+       return ret_size;
+   }else{
+       return merge_next_open_blks(ptr->next) + ret_size;
+   }
+}
+
+/*Returns: consequetive free block | the last block*/
+struct hdr *get_last_adj_open_blk(struct hdr *ptr){
+    if(ptr==NULL){
+        return NULL;
+    }
+    struct hdr *next=ptr->next, *prev=ptr, *prev_prev = ptr;
+    while(prev->isFree == TRUE && next!=NULL){
+        prev_prev = prev;
+        prev = next;
+        next=next->next;
+    }
+    if(!prev->isFree){
+        return prev_prev; 
+    }
+    if(next == NULL){
+        return prev;
+    }
+}
+/*Finds ajacent */
+
+
 
 
 /* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
 /**/
-
 /* Requirements:
     0.) Try to give up space if a lot is free sbrk(negative value)
 */
 void free(void *ptr){ //*ptr points to the data section
-    char * start_block, *next_block;
+    uint8_t * start_block, *next_block;
     if(ptr){
         // step 1 - free the pointer
-        start_block = ((char*)ptr)-sizeof(struct hdr);
-        struct hdr *blk = start_block, *next_blk;
+        start_block = ((uint8_t*)ptr)-sizeof(struct hdr);
+        struct hdr *blk = start_block, *next_open_blk;
         blk->isFree = TRUE;
-        // Case 1 - see if next is null if so you can use sbrk with negative to take off
-        if((next_blk = blk->next) == NULL){
-            // step 4 - check if this is a lot of data_size (free to srbk)
-            if(blk->data_size > GIVE_UP_SPACE){
-                sbrk((blk->data_size)*-1) == NULL ? fputc("Cant give mem back to os", stderr) : fputc("gave mem back to tos", stdout);
+        size_t pending_diff = pending_end - pending_mem;
+
+        // Case 1 - indicates if we are at the top of the heap (end of linked list)
+        if((next_open_blk = get_last_adj_open_blk(blk))->next == NULL){
+            if((blk->data_size=size_merged_next_open_blks(blk)-sizeof(struct hdr)) + pending_diff > NEW_MEM_BLK){
+                sbrk((blk->data_size + pending_diff)*-1) == NULL 
+                    ?fputc("Cant give mem back to os", stderr) 
+                    : fputc("gave mem back to tos", stdout);
+                    pending_end=pending_mem=start_block; // TODO : CHECK OVER THIS
+                return;
+            }else{
+                int var = 0;
             }
-        
+            
         // Case 2 - blk isnt at the end (therefore we cant give os back data)
         }else{
-            /* step 5: implied that next isnt null so check if next_blk is Free */
-            if(next_blk->isFree){
-                /*If isFree merge blk and next_blk then*/ 
-                size_t next_blk_size = next_blk->data_size + sizeof(struct hdr);
-                next_block = next_blk;
-                memset(next_block,0,next_blk_size); //clear out any data saved (ereasing it)
-                blk->data_size +=next_blk_size;
-            }
+                // To see if the next block is free
+                if(next_open_blk->isFree){
+                    blk->next = next_open_blk->next; // delete the in between
+                    blk->data_size = size_merged_next_open_blks(blk) - sizeof(struct hdr);
+                }
+                // otherwise dont do anything because its fine by itself
         }
     }else{
         fputs("Cant free 0x0", stderr);
@@ -195,7 +238,8 @@ void realloc(void *ptr, size_t size);
 int main(){
 
 
-    /*TC 1 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
+    /*
+    TC 1 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
                             free(hdr2) : hdr1->free->hdr3
              Description: because ptr4 size is 21 and hdr2's was 100 thus(0<diff < OPENING_DIFF_SIZE):
              Expected: malloc(21) : hdr1->hdr4->hdr3
@@ -222,6 +266,26 @@ int main(){
              Description: let hdr4->size = 10
              Expected: size to be 16
 
+    */
+
+    /* Free test cases (with pending)
+    TC 6 - Testing free where ptr3 is freed before ptr2
+             Description: hdr1->hdr2->hdr3->hdr4->NULL
+             Expected: hdr1->[hdr2|hdr3]->hdr4->NULL;
+
+    TC 7 - testing free when ptr hdr4, then hdr3
+            Description: hdr1->hdr2->hdr3->hdr4->NULL
+             Expected: hdr1->hdr2->[free]->NULL;
+
+    TC 8 - testing free when ptr hdr3, then hdr4
+            Description: hdr1->hdr2->hdr3->hdr4->NULL
+             Expected: hdr1->hdr2->(freed)->(free)->NULL;
+    
+    TC 8 - testing malloc(11) = ptr5, freeing hdr3, then hdr4
+            Description: hdr1->hdr2->hdr3->hdr4->NULL
+             Expected: hdr1->hdr2->(ptr5)->(free)->NULL; 
+    */
+
 
     int *ptr1 = (int*)malloc(100);
     int *ptr2 = (int*)malloc(25);
@@ -231,9 +295,13 @@ int main(){
     *ptr3 = 3;
     int *ptr4 = (int*)malloc(10);
     *ptr4 = 4;
+    free(ptr3);
     free(ptr4);
-    */
+    int *ptr5 = (int*)malloc(11);
+    *ptr5 = 5;
+    free(ptr5);
 
+    
 
     return 0;
 }
