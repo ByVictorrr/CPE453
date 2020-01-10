@@ -96,6 +96,7 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
 */
 void *malloc(size_t size){
 
+    size_t size_mul_16;
     /* Case 1 - to check the linked list see if any 
                 spots are avail with size capacity*/
     void *free_spot, *new_spot;
@@ -103,19 +104,18 @@ void *malloc(size_t size){
         // Store in that spot
         return set_blk(free_spot, size, FALSE);
     }else{
+    size_mul_16 = (size-(size%16))+16; // so size_mul_16 rounded up to a multiple of 16
     /* Case 2 - if no spaces are availble 
                 in the linked list;*/
-        if((new_spot  = sbrk(size + sizeof(struct hdr))) == NULL){
+        if((new_spot  = sbrk(size_mul_16 + sizeof(struct hdr))) == NULL){
             /* Case 2.1 - if we cant get any more space from os*/
             return NULL;
         }else{
             // Case 2.2 - sbrk gave us our space
-            return set_blk(new_spot, size, TRUE);
+            return set_blk(new_spot, size_mul_16, TRUE);
         }
     }
 }
-
-
 
 
 
@@ -197,16 +197,20 @@ int main(){
              Description: let hdr4->size = GIVE_UP_SPACE + 20; 
              Expected: free(ptr4) : hdr1->free->hdr3 (not there os took it)
 
+    TC 5 - Testing multiple of 16 sizes
+             Description: let hdr4->size = 10
+             Expected: size to be 16
+
+
     int *ptr1 = (int*)malloc(100);
     int *ptr2 = (int*)malloc(25);
     int *ptr3 = (int*)malloc(21);
     *ptr1 = 1;
     *ptr2 = 2;
     *ptr3 = 3;
-    int *ptr4 = (int*)malloc(GIVE_UP_SPACE + 20);
+    int *ptr4 = (int*)malloc(10);
     *ptr4 = 4;
     free(ptr4);
-
     */
 
 
