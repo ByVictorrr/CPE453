@@ -13,6 +13,8 @@ struct hdr{
 };
 
 struct hdr *start;
+void *pending_mem, *pending_end; // Helpers so we dont have to call sbrk every time
+
 /*Used for a condition to check if a relative between opening and size to be inserted to ll*/
 #define OPENING_DIFF_SIZE 100 
 
@@ -83,31 +85,52 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     return block->data;
 }
 
+size_t round_mult16(size_t numBytes){
+    return (numBytes-(numBytes%16))+16;
+}
+
+#define NEW_MEM_BLK 64000
+/* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
+    return: NULL if srbrk error
+    return: new spot address normall
+    Assumption: size is mult of 16
+*/
+void *update_pending(size_t size){
+    void *start;
+    // Case 1 - if we dont have any more pending space
+    if(pending_mem == pending_end | size+pending_mem > pending_end){
+        size_t blk_size = size > NEW_MEM_BLK ? (blk_size = size) : (blk_size = NEW_MEM_BLK); //mult of 16 (how much given)
+        start = sbrk(blk_size);
+        pending_mem=start+size + sizeof(struct hdr); //points to the next open space
+        pending_end= start+blk_size; // points to end of pending
+        return start;
+    // Case 2 - if we still have space in the pending block
+    }else{
+        start = pending_mem;
+        pending_mem = pending_mem + size + sizeof(struct hdr);
+        return start;
+    }
+}
+
+
 /*===============================================================*/
-
-
-
-
-
-
 /* Requirements:
     1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM
     2.) Returns address of starting data section
 */
 void *malloc(size_t size){
 
-    size_t size_mul_16;
+    size_t size_mul_16 = round_mult16(size);
     /* Case 1 - to check the linked list see if any 
                 spots are avail with size capacity*/
     void *free_spot, *new_spot;
-    if((free_spot = check_open_spots(size))){
+    if((free_spot = check_open_spots(size_mul_16))){
         // Store in that spot
-        return set_blk(free_spot, size, FALSE);
+        return set_blk(free_spot, size_mul_16, FALSE);
     }else{
-    size_mul_16 = (size-(size%16))+16; // so size_mul_16 rounded up to a multiple of 16
-    /* Case 2 - if no spaces are availble 
-                in the linked list;*/
-        if((new_spot  = sbrk(size_mul_16 + sizeof(struct hdr))) == NULL){
+    /* Case 2 - if no spaces in between the linked list are availble or its empty;
+    */
+        if((new_spot = update_pending(size_mul_16)) == NULL){
             /* Case 2.1 - if we cant get any more space from os*/
             return NULL;
         }else{
@@ -132,8 +155,6 @@ void free(void *ptr){ //*ptr points to the data section
         start_block = ((char*)ptr)-sizeof(struct hdr);
         struct hdr *blk = start_block, *next_blk;
         blk->isFree = TRUE;
-        // step 2 - see if you can merge with adjacent
-
         // Case 1 - see if next is null if so you can use sbrk with negative to take off
         if((next_blk = blk->next) == NULL){
             // step 4 - check if this is a lot of data_size (free to srbk)
