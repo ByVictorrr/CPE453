@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 
+
 typedef enum Bool{FALSE, TRUE} bool_t;
 
 struct hdr{
@@ -12,27 +13,35 @@ struct hdr{
     struct hdr *next;
 };
 
+#define OFFSET sizeof(struct hdr)
+
 struct hdr *start;
-void *pending_mem, *pending_end; // Helpers so we dont have to call sbrk every time
+void *pending_start, *pending_end; // Helpers so we dont have to call sbrk every time
 
 /*Used for a condition to check if a relative between opening and size to be inserted to ll*/
 #define OPENING_DIFF_SIZE 100 
 
 
-#define GIVE_UP_SPACE 10000 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
-#define SPLIT_MIN 1 /*used to determine whether a free node can be split into two*/
+#define NEW_MEM_BLK 64000
+#define GIVE_UP_SPACE NEW_MEM_BLK-100 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
+#define SPLIT_MIN 100 /*used to determine whether a free node can be split into two*/
 
 
 /*======================Helper functions for malloc============================*/
 /*h1 - not free, h2 is free (has to have a valid address), size is size of h1 block*/
 size_t round_mult16(size_t numBytes){
-    return (numBytes-(numBytes%16))+16;
+    bool_t isMult16;
+    if(!(numBytes%16)){ /*if number is already mult of 16*/
+        return numBytes;
+    }else{
+        return (numBytes-(numBytes%16))+16;
+    }
 }
 
 void split_hdrs(struct hdr **h1, struct hdr **h2, size_t size){
     size_t mult_16 = round_mult16(size);
     *h1 = *h2;
-    *h2 = *h1+sizeof(struct hdr)+mult_16;        
+    *h2 = *h1+OFFSET+mult_16;        
     (*h2)->data_size = (*h1)->data_size - (2*sizeof(struct hdr) + mult_16);
     (*h2)->isFree = TRUE;
     (*h2)->data = (uint8_t*)(*h1) + sizeof(struct hdr);
@@ -115,7 +124,6 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
     //Case 1 - if its for appending
     return block->data;
 }
-#define NEW_MEM_BLK 64000
 /* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
     return: NULL if srbrk error
     return: new spot address normall
@@ -124,16 +132,16 @@ void *set_blk(void *start_ptr, size_t size, bool_t isNewSpot){
 void *update_pending(size_t size){
     void *start;
     // Case 1 - if we dont have any more pending space
-    if(pending_mem == pending_end | size + sizeof(struct hdr)+pending_mem > pending_end){
-        size_t blk_size = size > NEW_MEM_BLK ? (blk_size = size) : (blk_size = NEW_MEM_BLK); //mult of 16 (how much given)
+    if(pending_start >= pending_end | size + sizeof(struct hdr)+pending_start >= pending_end){
+        size_t blk_size = size >= NEW_MEM_BLK ? size+OFFSET : NEW_MEM_BLK; //mult of 16 (how much given)
         start = sbrk(blk_size);
-        pending_mem=start+size + sizeof(struct hdr); //points to the next open space
+        pending_start=start+size + sizeof(struct hdr); //points to the next open space
         pending_end= start+blk_size; // points to end of pending
         return start;
     // Case 2 - if we still have space in the pending block
     }else{
-        start = pending_mem;
-        pending_mem = pending_mem + size + sizeof(struct hdr);
+        start = pending_start;
+        pending_start = pending_start + size + sizeof(struct hdr);
         return start;
     }
 }
@@ -217,50 +225,18 @@ void gargbage_collect(){
         next = next->next;
     }
 }
-
-/* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
-/**/
-/* Requirements:
-    0.) Try to give up space if a lot is free sbrk(negative value)
-*/
-void free(void *ptr){ //*ptr points to the data section
-    uint8_t * start_block, *next_block;
-    if(ptr){
-        // step 1 - free the pointer
-        start_block = ((uint8_t*)ptr)-sizeof(struct hdr);
-        struct hdr *blk = start_block, *next_open_blk;
-        blk->isFree = TRUE;
-        size_t pending_diff = pending_end - pending_mem;
-
-        // Case 1 - indicates if we are at the top of the heap (end of linked list)
-        if((next_open_blk = get_last_adj_open_blk(blk))->next == NULL){
-            if((blk->data_size=size_merged_next_open_blks(blk)-sizeof(struct hdr)) + pending_diff > NEW_MEM_BLK){
-                sbrk((blk->data_size + pending_diff)*-1) == NULL 
-                    ?fputc("Cant give mem back to os", stderr) 
-                    : fputc("gave mem back to tos", stdout);
-                    pending_end=pending_mem=start_block; // TODO : CHECK OVER THIS
-                return;
-            }
-            
-        // Case 2 - blk isnt at the end (therefore we cant give os back data)
-        }else{
-                // To see if the next block is free
-                if(next_open_blk->isFree && blk != next_open_blk){
-                    blk->next = next_open_blk->next; // delete the in between
-                    blk->data_size = size_merged_next_open_blks(blk) - sizeof(struct hdr);
-                }
-                // otherwise dont do anything because its fine by itself
+/*Getting: if curr == start then returns NULL*/
+struct hdr *get_prev_give_up_space(struct hdr *curr){
+    struct hdr*temp=start,*prev;
+    while(temp){
+        if(temp == curr){
+            return prev;
         }
-    }else{
-        fputs("Cant free 0x0", stderr);
+        prev=temp;
+        temp=temp->next;
     }
-    // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
-    gargbage_collect();
+    return NULL;
 }
-/*===============================================================*/
-
-/*========================Realloc helpers====================================*/
-
 bool_t inHeap(void *ptr){
     struct hdr *temp = start;
     while(temp){
@@ -271,6 +247,67 @@ bool_t inHeap(void *ptr){
     }
     return FALSE;
 }
+size_t num_hdrs(){
+    struct hdr *temp = start;
+    size_t size=0;
+    while(temp){
+        size++;
+        temp=temp->next;
+    }
+    return size;
+}
+
+/* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
+/**/
+/* Requirements:
+    0.) Try to give up space if a lot is free sbrk(negative value)
+*/
+void free(void *ptr){ //*ptr points to the data section
+    uint8_t * start_block, *next_block;
+    if(ptr && inHeap(ptr)){
+        // step 1 - free the pointer
+        start_block = ((uint8_t*)ptr)-sizeof(struct hdr);
+        struct hdr *blk = start_block, *next_open_blk;
+        blk->isFree = TRUE;
+        size_t pending_diff = pending_end - pending_start;
+
+        // Case 1 - indicates if we are at the top of the heap (end of linked list)
+        if((next_open_blk = get_last_adj_open_blk(blk))->next == NULL){
+            if((blk->data_size=size_merged_next_open_blks(blk)-OFFSET) + pending_diff > GIVE_UP_SPACE){
+                 /*TODO: ALSO NEED TO get PREV one to set next to NULL*/
+                 if(num_hdrs()>1){
+                        struct hdr *prev = get_prev_give_up_space(blk);
+                        prev->next=(struct hdr*)NULL;
+                 }
+                 /*Add additional for infront next_open_blk to blk*/
+               pending_end=pending_start=blk; // TODO : CHECK OVER THIS
+               sbrk((blk->data_size + pending_diff + OFFSET)*-1) == NULL 
+                    ?fputc("Cant give mem back to os", stderr) 
+                    : fputc("gave mem back to tos", stdout);
+                   return;
+            }
+            
+        // Case 2 - blk isnt at the end (therefore we cant give os back data)
+        }else{
+                // To see if the next block is free
+                if(next_open_blk->isFree && blk != next_open_blk){
+                    blk->data_size = size_merged_next_open_blks(blk) - OFFSET;
+                    blk->next = next_open_blk->next; // delete the in between
+                }
+                // otherwise dont do anything because its fine by itself
+        }
+    }else{
+        fputs("Cant free ptr", stderr);
+    }
+    // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
+    gargbage_collect();
+    int var;
+}
+/*===============================================================*/
+
+/*========================Realloc helpers====================================*/
+
+
 /* Requirements:
     0.) Try to merge adjacent spots if possible
     1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM;
@@ -320,8 +357,105 @@ void *calloc(size_t nmemb, size_t size){
 
 int main(){
 
+    /* TC 1 - testing freeing big spot, then mallocing small spot(so testing the split)
+        Function Under Test: free, malloc
+        parms: 
+        Description: (1) Freeing the first hdr in the list
+                     (2) Then malloc a to test the split_hdrs parms 
+                        (hdr1.size = 200(freed)) - initally
+                        (hdr5.size = 16(not freed)), (hdr1.size=212-(16+32)(free))
+        Case: Where the first in the list is freed, then mallocing 
+              a smaller block st: (hd5.size=16) is looking for a spot
+        Expected Output: (hdr5)->(free)->hdr2->hdr3->hdr4->NULL 
 
+        After Testing: Sucess
+    
+    TC 2 - testing freeing small spot, then mallocing big spot (testing split)
+        Function Under Test: free, malloc
+        parms: 
+        Description: (1) Freeing the first hdr in the list
+                     (2) Then malloc a to test the split_hdrs parms 
+                        (hdr1.size = 16(freed)) - initally
+                        (hdr5.size = 200(not freed))
+        Case: Where the first in the list is freed, and a bigger space is to be malloced
+        Expected Output: (free)->hdr2->hdr3->hdr4->hdr5
+        After Testing: Sucess    
+
+    */
+    /* TC 3 - get more memory from sbrk
+        Under Test: pending_start, pending_end (malloc)
+        Description: Malloc a very big mem spot see if pendings will ask sbrk
+    
+        Expected Output: call sbrk after mallocing twice with two 64000 sizes (blksize=64032)
+                         pending_start=pending_end
+        After Testing: pending_start=pending_end
+    
+    */
+    /*TC 4 - get more memory from pending_start
+        Under Test: pending_start, pending_end (malloc)
+        Parmaters: malloc(10->16), malloc(3200)
+        Description: Malloc two very small sizes and see if pending_start moves
+        Expected Output: pending_start_f - pend_start_i = (3232)
+        After Testing: 3232
+    */
+    
     /*
+     TC 5 - testing merging adj blocks(garbage collector);
+        Function Under Test: free, malloc
+        parms: hdr2.size=3200, hdr3.size=112
+        Description: Freeing hdr2 then hdr3 (freeing curr before next)
+        Case: case where freeing prev before next
+        Expected Output: (1)hdr1->(free)->hdr3->hdr4->NULL
+                         (2)hdr1->[(free)->(free)]->hdr4->NULL
+                         hdr2.size=(sizof(struct hdr)+hdr3.size+hdr2.size) =144+3200=3344
+        After Testing: Sucess    
+
+     TC 6 - testing merging adj blocks(free);
+        Function Under Test: free, malloc
+        parms: hdr2.size=3200, hdr3.size=112
+        Description: Freeing hdr3 then hdr2 (freeing next before current)
+        Case: case where freeing prev before next
+        Expected Output: (1)hdr1->hdr2->(free)->hdr4->NULL
+                         (2)hdr1->[(free)->(free)]->hdr4->NULL
+                         hdr2.size=(sizof(struct hdr)+hdr3.size+hdr2.size) =112+3232=3344
+        After Testing: Sucess    
+
+    TC 7 - testing merging and giving back to os by negative value in os;
+            Function Under Test: free, malloc
+            parms: hdr2.size = 10,000, hdr3.size=20
+            Description: They should merge from TC6 and as well as give the data back to os
+            Case: Os should recieve more data
+            Expected Output: (1)hdr1->NULL
+
+            After Testing: 
+
+
+
+
+    */
+
+    int *ptr1 = (int*)malloc(16);
+    int *ptr2 = (int*)malloc(10000);
+    int *ptr3 = (int*)malloc(20);
+    *ptr1=1;
+    *ptr2=2;
+    *ptr3=3;
+    free(ptr3);
+    free(ptr2);
+    int var;
+    malloc(13);
+
+
+
+
+
+    return 0;
+}
+
+
+
+void part1_tests(){
+  /*
     
         =================== testing===============================
     TC 1 - Testing freeing hdr1->hdr2->hdr3 (hdr2)
@@ -394,7 +528,6 @@ u
    
    */
 
-
     int *ptr1 = (int*)malloc(100);
     int *ptr2 = (int*)malloc(25);
     int *ptr3 = (int*)malloc(1000);
@@ -405,7 +538,4 @@ u
     int *ptr4 = (int *)calloc(6, 100);
 
 
-    
-
-    return 0;
 }
