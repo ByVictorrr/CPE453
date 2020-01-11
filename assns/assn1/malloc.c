@@ -258,6 +258,8 @@ size_t num_hdrs(){
     return size;
 }
 
+
+
 /* TODO: see if I need to change the contents of ptr (maybe i can use **ptr_adr = &ptr)
 /**/
 /* Requirements:
@@ -287,26 +289,24 @@ void free(void *ptr){ //*ptr points to the data section
                     fputc("giving back memory error", stderr);
                }
             }
-            
         // Case 2 - blk isnt at the end (therefore we cant give os back data)
         }else{
-                // To see if the next block is free
+                // To see if the next block is free (merge if so)
                 if(next_open_blk->isFree && blk != next_open_blk){
                     blk->data_size = size_merged_next_open_blks(blk) - OFFSET;
                     blk->next = next_open_blk->next; // delete the in between
                 }
                 // otherwise dont do anything because its fine by itself
         }
+        gargbage_collect();
     }else{
         fputs("Cant free ptr", stderr);
     }
     // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
-    gargbage_collect();
 }
 /*===============================================================*/
 
 /*========================Realloc helpers====================================*/
-
 
 /* Requirements:
     0.) Try to merge adjacent spots if possible
@@ -345,18 +345,18 @@ void *realloc(void *ptr, size_t size){
 
 /*========================calloc helpers====================================*/
 void *calloc(size_t nmemb, size_t size){
-    int i;
+    uintptr_t *ptr;
     struct hdr *head;
-    head=(struct hdr *)(malloc(size) - sizeof(struct hdr));
-    for ( i = 0; i < size; i++) {
-        head->data[i] = nmemb;
+    head=(struct hdr *)(malloc(size*nmemb) - sizeof(struct hdr));
+    for(ptr=head->data; ptr != head->data+head->data_size; ptr+=size){
+        *ptr=0;
     }
     return head->data;
 }
 
-
+/*
 int main(){
-
+*/
     /* TC 1 - testing freeing big spot, then mallocing small spot(so testing the split)
         Function Under Test: free, malloc
         parms: 
@@ -434,6 +434,7 @@ int main(){
 
     */
 
+/*
     int *ptr1 = (int*)malloc(16);
     int *ptr2 = (int*)malloc(10000);
     int *ptr3 = (int*)malloc(20);
@@ -443,7 +444,7 @@ int main(){
     free(ptr3);
     free(ptr2);
     int var;
-    malloc(13);
+    int *ptr4 = (int *)calloc(6,sizeof(int));
 
 
 
@@ -452,6 +453,7 @@ int main(){
     return 0;
 }
 
+*/
 
 
 void part1_tests(){
