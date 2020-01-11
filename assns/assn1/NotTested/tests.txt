@@ -1,0 +1,95 @@
+    /* TC 1 - testing freeing big spot, then mallocing small spot(so testing the split)
+        Function Under Test: free, malloc
+        parms: 
+        Description: (1) Freeing the first hdr in the list
+                     (2) Then malloc a to test the split_hdrs parms 
+                        (hdr1.size = 200(freed)) - initally
+                        (hdr5.size = 16(not freed)), (hdr1.size=212-(16+32)(free))
+        Case: Where the first in the list is freed, then mallocing 
+              a smaller block st: (hd5.size=16) is looking for a spot
+        Expected Output: (hdr5)->(free)->hdr2->hdr3->hdr4->NULL 
+
+        After Testing: Sucess
+    
+    TC 2 - testing freeing small spot, then mallocing big spot (testing split)
+        Function Under Test: free, malloc
+        parms: 
+        Description: (1) Freeing the first hdr in the list
+                     (2) Then malloc a to test the split_hdrs parms 
+                        (hdr1.size = 16(freed)) - initally
+                        (hdr5.size = 200(not freed))
+        Case: Where the first in the list is freed, and a bigger space is to be malloced
+        Expected Output: (free)->hdr2->hdr3->hdr4->hdr5
+        After Testing: Sucess    
+
+    */
+    /* TC 3 - get more memory from sbrk
+        Under Test: pending_start, pending_end (malloc)
+        Description: Malloc a very big mem spot see if pendings will ask sbrk
+    
+        Expected Output: call sbrk after mallocing twice with two 64000 sizes (blksize=64032)
+                         pending_start=pending_end
+        After Testing: pending_start=pending_end
+    
+    */
+    /*TC 4 - get more memory from pending_start
+        Under Test: pending_start, pending_end (malloc)
+        Parmaters: malloc(10->16), malloc(3200)
+        Description: Malloc two very small sizes and see if pending_start moves
+        Expected Output: pending_start_f - pend_start_i = (3232)
+        After Testing: 3232
+    */
+    
+    /*
+     TC 5 - testing merging adj blocks(garbage collector);
+        Function Under Test: free, malloc
+        parms: hdr2.size=3200, hdr3.size=112
+        Description: Freeing hdr2 then hdr3 (freeing curr before next)
+        Case: case where freeing prev before next
+        Expected Output: (1)hdr1->(free)->hdr3->hdr4->NULL
+                         (2)hdr1->[(free)->(free)]->hdr4->NULL
+                         hdr2.size=(sizof(struct hdr)+hdr3.size+hdr2.size) =144+3200=3344
+        After Testing: Sucess    
+
+     TC 6 - testing merging adj blocks(free);
+        Function Under Test: free, malloc
+        parms: hdr2.size=3200, hdr3.size=112
+        Description: Freeing hdr3 then hdr2 (freeing next before current)
+        Case: case where freeing prev before next
+        Expected Output: (1)hdr1->hdr2->(free)->hdr4->NULL
+                         (2)hdr1->[(free)->(free)]->hdr4->NULL
+                         hdr2.size=(sizof(struct hdr)+hdr3.size+hdr2.size) =112+3232=3344
+        After Testing: Sucess    
+
+    TC 7 - testing merging and giving back to os by negative value in os;
+            Function Under Test: free, malloc
+            parms: hdr2.size = 10,000, hdr3.size=20
+            Description: They should merge from TC6 and as well as give the data back to os
+            Case: Os should recieve more data
+            Expected Output: (1)hdr1->NULL
+
+            After Testing: 
+
+
+
+
+    */
+
+    int *ptr1 = (int*)malloc(16);
+    int *ptr2 = (int*)malloc(10000);
+    int *ptr3 = (int*)malloc(20);
+    *ptr1=1;
+    *ptr2=2;
+    *ptr3=3;
+    free(ptr3);
+    free(ptr2);
+    int var;
+    int *ptr4 = (int *)calloc(6,sizeof(int));
+
+
+
+
+
+    return 0;
+}
+
