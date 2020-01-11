@@ -166,6 +166,7 @@ void *malloc(size_t size){
     */
         if((new_spot = update_pending(size_mul_16)) == NULL){
             /* Case 2.1 - if we cant get any more space from os*/
+            fputc("cant get any more mem from os", stderr);
             return NULL;
         }else{
             // Case 2.2 - sbrk gave us our space
@@ -267,7 +268,7 @@ void free(void *ptr){ //*ptr points to the data section
     if(ptr && inHeap(ptr)){
         // step 1 - free the pointer
         start_block = ((uint8_t*)ptr)-sizeof(struct hdr);
-        struct hdr *blk = start_block, *next_open_blk;
+        struct hdr *blk = start_block, *next_open_blk, *prev;
         blk->isFree = TRUE;
         size_t pending_diff = pending_end - pending_start;
 
@@ -276,15 +277,15 @@ void free(void *ptr){ //*ptr points to the data section
             if((blk->data_size=size_merged_next_open_blks(blk)-OFFSET) + pending_diff > GIVE_UP_SPACE){
                  /*TODO: ALSO NEED TO get PREV one to set next to NULL*/
                  if(num_hdrs()>1){
-                        struct hdr *prev = get_prev_give_up_space(blk);
-                        prev->next=(struct hdr*)NULL;
+                        prev = get_prev_give_up_space(blk);
+                        (*prev).next=(struct hdr*)NULL;
                  }
                  /*Add additional for infront next_open_blk to blk*/
                pending_end=pending_start=blk; // TODO : CHECK OVER THIS
-               sbrk((blk->data_size + pending_diff + OFFSET)*-1) == NULL 
-                    ?fputc("Cant give mem back to os", stderr) 
-                    : fputc("gave mem back to tos", stdout);
-                   return;
+
+               if(!sbrk((blk->data_size + pending_diff + OFFSET)*-1)){
+                    fputc("giving back memory error", stderr);
+               }
             }
             
         // Case 2 - blk isnt at the end (therefore we cant give os back data)
@@ -301,7 +302,6 @@ void free(void *ptr){ //*ptr points to the data section
     }
     // CASE - Garbage collect (i.e) check if the curr then next pattern is being freed
     gargbage_collect();
-    int var;
 }
 /*===============================================================*/
 
