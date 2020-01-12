@@ -19,9 +19,6 @@ struct hdr{
 struct hdr *start;
 void *pending_start, *pending_end; // Helpers so we dont have to call sbrk every time
 
-/*Used for a condition to check if a relative between opening and size to be inserted to ll*/
-#define OPENING_DIFF_SIZE 100 
-
 
 #define NEW_MEM_BLK 64000
 #define GIVE_UP_SPACE NEW_MEM_BLK-100 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
@@ -160,7 +157,7 @@ size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
 */
 
 struct hdr *update_pending(size_t size){
-    void *start_helper;
+    void *start_helper, *ptr;
     size_t diff;
     // Case 1 - if pending_start plus needed size is going to exeeceed pending_end*/
     if(size + OFFSET  >= (diff=pending_end-pending_start)){
@@ -170,20 +167,18 @@ struct hdr *update_pending(size_t size){
         if(!pending_start && !pending_end){
             start_helper=safe_sbrk(NEW_MEM_BLK);
             pending_start=start_helper+size+OFFSET;
-            pending_end=pending_start+NEW_MEM_BLK;
+            pending_end=pending_start+(NEW_MEM_BLK-(size+OFFSET));
             return start_helper;
         }else{
-            safe_sbrk(extra_space);
+            ptr = safe_sbrk(extra_space);
+            //pending_end=pending_end;
         }
         // Case 1.1.1 - where the ask size is bigger than 64000
         if(size+OFFSET>=NEW_MEM_BLK){
-            /*extra_space = (size+OFFSET) - diff;*/
-            //set pend_start==pend_end
             start_helper=pending_start;
             pending_end=pending_start = pending_end+extra_space;
         }else{
             size_t needed=size+OFFSET-diff;
-            /*extra_space = NEW_MEM_BLK-(size+OFFSET);*/
             start_helper=pending_start;
             //1. set the pend_start to pend_start=size+OFFSET-diff
             pending_start=pending_end+needed;
@@ -254,7 +249,9 @@ struct hdr *get_prev_of_blk_space(struct hdr *blk){
 /*Description: will be used to give mem back to os*/
 void giveBackToOS(struct hdr *blk){
 
+    void *ptr;
     struct hdr *prev = get_prev_of_blk_space(blk);
+    size_t space_give_back;
     /*Case 1 - check to see if blk is the start*/
     if(blk == start){
         start=NULL;
@@ -262,9 +259,8 @@ void giveBackToOS(struct hdr *blk){
     }else{
         prev->next=NULL; // for setting the prev to end of list
     }
-    safe_sbrk(-(blk->data_size+OFFSET+pending_end-pending_start));
-    pending_start=pending_start=blk;
-    
+    ptr = safe_sbrk(-(pending_end-(void*)blk));
+    pending_start=pending_end =blk;
 }
 /*Description: if there are any consequtive 
                 free blocks this will merge them 
@@ -318,6 +314,7 @@ void free(void *ptr){ //*ptr points to the data section
         size_t pending_diff = pending_end - pending_start;
         // Step 1.2 - call garbage collector so it can merge before deciding isEndList
         blk->isFree = TRUE;
+        memset(blk->data,0,blk->data_size);
         /* Case 1.1 : if blk is at the end and has no merged(or else it would have
          checked to give back to os)
          */
@@ -393,14 +390,14 @@ int main(){
     int *ptr1 = (int*)malloc(1600);
     int *ptr2 = (int*)malloc(10000);
     int *ptr3 = (int*)malloc(NEW_MEM_BLK);
-    int *ptr4 = (int *)malloc(20);
 
     *ptr1=1;
     *ptr2=2;
     *ptr3=3;
 
-    free(ptr4);
     free(ptr3);
+
+    malloc(10);
 
 
     return 0;
