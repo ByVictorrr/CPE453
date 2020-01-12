@@ -216,6 +216,7 @@ void *malloc(size_t size){
 /*======================Helper functions for free============================*/
 /* Description: used for case where the freed one is the 
                 last one in the list
+                returns NULL if it has already merged 
 */
 struct hdr *get_prev_of_blk_space(struct hdr *blk){
     struct hdr*curr=start,*prev;
@@ -289,13 +290,13 @@ void free(void *ptr){ //*ptr points to the data section
         merge_adj_open_blks();
         // Case 1.1 : see if wer at the end of list or next it
         if(isEndList(blk) && isEnoughToGiveUp(blk->data_size)){
-            // Step 1.1.1 - we need to get reference before blk and set it to NULL 
+            // Step 1.1.1 - if not already done in the merge_adj_opens
             if((prev = get_prev_of_blk_space(blk))){
                 prev->next=NULL; /*protection because could have merged earlier*/
+                pending_end=pending_start=blk;
+                // Give back the data to the os (because Case 1.1)
+                safe_sbrk((blk->data_size + pending_diff + OFFSET)*-1);
             }
-            pending_end=pending_start=blk;
-            // Give back the data to the os (because Case 1.1)
-            safe_sbrk((blk->data_size + pending_diff + OFFSET)*-1);
         }
     }else{
         fputs("Cant free ptr", stderr);
