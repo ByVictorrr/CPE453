@@ -41,8 +41,19 @@ void *safe_sbrk(ssize_t size){
         return ptr;
     }
 }
-
-
+/*Description: higher level abstraction letting if blk is last*/
+bool_t isEndList(struct hdr *blk){
+    return !blk->next;
+}
+/*Description: higher level abstraction saying 
+                ok to giving OS more mem*/
+bool_t isEnoughToGiveUp(size_t size_free_blk){
+    if(size_free_blk +(pending_end-pending_start) > GIVE_UP_SPACE){
+        return TRUE;
+    }else{
+        return FALSE;
+    }
+}
 
 /*======================Helper functions for malloc============================*/
 size_t round_mult16(size_t numBytes){
@@ -203,6 +214,25 @@ void *malloc(size_t size){
 
 
 /*======================Helper functions for free============================*/
+/* Description: used for case where the freed one is the 
+                last one in the list
+*/
+struct hdr *get_prev_of_blk_space(struct hdr *blk){
+    struct hdr*curr=start,*prev;
+    while(curr){
+        // Case 1- if is start blk
+        if(start == blk){
+            return start;
+        // Case 2 - curr is that blk
+        }else if(curr==blk){
+            return prev;
+        }
+        prev=curr;
+        curr=curr->next;
+    }
+    return NULL;
+}
+
 /*Description: if there are any consequtive 
                 free blocks this will merge them */
 void merge_adj_open_blks(){
@@ -217,6 +247,14 @@ void merge_adj_open_blks(){
             temp = curr->next; // get copy before changin
             prev->next = curr->next;
             curr->next = NULL;
+            // step 3 - check if the merged block can be given to os
+            if(isEndList(curr) && isEnoughToGiveUp(prev->data_size)){
+                struct hdr *prev_prev = get_prev_of_blk_space(prev);
+                prev_prev->next=NULL;
+                safe_sbrk(-(prev->data_size+OFFSET+pending_end-pending_start));
+                pending_start=pending_start=prev;
+                return;
+            }
         /* Case 2 - dont merge*/
         }else{
             temp = curr->next;
@@ -224,24 +262,6 @@ void merge_adj_open_blks(){
         prev = curr;
         curr = temp;
     }
-}
-/* Description: used for case where the freed one is the 
-                last one in the list
-*/
-struct hdr *get_prev_of_blk_space(struct hdr *blk){
-    struct hdr*curr=start,*prev;
-    while(curr){
-        // Case 1- if is start blk
-        if(start == curr){
-            return start;
-        // Case 2 - curr is that blk
-        }else if(curr==blk){
-            return prev;
-        }
-        prev=curr;
-        curr=curr->next;
-    }
-    return NULL;
 }
 
 bool_t inHeap(void *ptr){
@@ -254,19 +274,6 @@ bool_t inHeap(void *ptr){
         }
     }
     return FALSE;
-}
-/*Description: higher level abstraction letting if blk is last*/
-bool_t isEndList(struct hdr *blk){
-    return !blk->next;
-}
-/*Description: higher level abstraction saying 
-                ok to giving OS more mem*/
-bool_t isEnoughToGiveUp(size_t size_free_blk){
-    if(size_free_blk +(pending_end-pending_start) > GIVE_UP_SPACE){
-        return TRUE;
-    }else{
-        return FALSE;
-    }
 }
 
 void free(void *ptr){ //*ptr points to the data section
@@ -283,8 +290,9 @@ void free(void *ptr){ //*ptr points to the data section
         // Case 1.1 : see if wer at the end of list or next it
         if(isEndList(blk) && isEnoughToGiveUp(blk->data_size)){
             // Step 1.1.1 - we need to get reference before blk and set it to NULL 
-            prev = get_prev_of_blk_space(blk);
-            prev->next=NULL; /*should never have NULL->NULL because blk is in heap*/
+            if((prev = get_prev_of_blk_space(blk))){
+                prev->next=NULL; /*protection because could have merged earlier*/
+            }
             pending_end=pending_start=blk;
             // Give back the data to the os (because Case 1.1)
             safe_sbrk((blk->data_size + pending_diff + OFFSET)*-1);
@@ -350,11 +358,12 @@ int main(){
     int *ptr1 = (int*)malloc(1600);
     int *ptr2 = (int*)malloc(10000);
     int *ptr3 = (int*)malloc(20);
-    int *ptr4 = (int *)malloc(200);
+    int *ptr4 = (int *)malloc(NEW_MEM_BLK);
 
     *ptr1=1;
     *ptr2=2;
     *ptr3=3;
+
     free(ptr3);
     free(ptr4);
 
