@@ -6,9 +6,6 @@
 
 typedef enum Bool{FALSE, TRUE} bool_t;
 
-size_t abs(size_t n){
-    return n<0?-n:n;
-}
 
 struct hdr{
     size_t data_size;
@@ -155,22 +152,44 @@ uintptr_t *set_blk(struct hdr *start_ptr, size_t size, bool_t isNewSpot){
     block->isFree = FALSE;
     return block->data;
 }
+size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
 /* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
     return: NULL if srbrk error
     return: new spot address normall
     Assumption: size is mult of 16
 */
+
 struct hdr *update_pending(size_t size){
     void *start_helper;
     size_t diff;
-    // Case 1 - if we dont have any more pending space
-    if(pending_start >= pending_end| 
-       size + sizeof(struct hdr)+pending_start >= pending_end){
-        diff=abs(pending_end-pending_start);
-        size_t blk_size = size >= NEW_MEM_BLK ? size+OFFSET+diff : NEW_MEM_BLK+diff;
-        start_helper = safe_sbrk(blk_size);
-        pending_start=start_helper+size + sizeof(struct hdr); //points to the next open space
-        pending_end= start_helper+blk_size; // points to end of pending
+    // Case 1 - if pending_start plus needed size is going to exeeceed pending_end*/
+    if(size + OFFSET  >= (diff=pending_end-pending_start)){
+        // Case 1.1 - tell use if we should get one more blk or size+OFFSET more mem
+        size_t extra_space = size+OFFSET>=NEW_MEM_BLK?(size+OFFSET-diff):NEW_MEM_BLK-(size+OFFSET);
+        // Case - where its initally empty
+        if(!pending_start && !pending_end){
+            start_helper=safe_sbrk(NEW_MEM_BLK);
+            pending_start=start_helper+size+OFFSET;
+            pending_end=pending_start+NEW_MEM_BLK;
+            return start_helper;
+        }else{
+            safe_sbrk(extra_space);
+        }
+        // Case 1.1.1 - where the ask size is bigger than 64000
+        if(size+OFFSET>=NEW_MEM_BLK){
+            /*extra_space = (size+OFFSET) - diff;*/
+            //set pend_start==pend_end
+            start_helper=pending_start;
+            pending_end=pending_start = pending_end+extra_space;
+        }else{
+            size_t needed=size+OFFSET-diff;
+            /*extra_space = NEW_MEM_BLK-(size+OFFSET);*/
+            start_helper=pending_start;
+            //1. set the pend_start to pend_start=size+OFFSET-diff
+            pending_start=pending_end+needed;
+            pending_end=pending_end+(NEW_MEM_BLK-needed);
+        }
+
         return start_helper;
     // Case 2 - if we still have space in the pending block
     }else{
@@ -216,7 +235,6 @@ void *malloc(size_t size){
 /*======================Helper functions for free============================*/
 /* Description: used for case where the freed one is the 
                 last one in the list
-                returns NULL if it has already merged 
 */
 struct hdr *get_prev_of_blk_space(struct hdr *blk){
     struct hdr*curr=start,*prev;
@@ -233,10 +251,27 @@ struct hdr *get_prev_of_blk_space(struct hdr *blk){
     }
     return NULL;
 }
+/*Description: will be used to give mem back to os*/
+void giveBackToOS(struct hdr *blk){
 
+    struct hdr *prev = get_prev_of_blk_space(blk);
+    /*Case 1 - check to see if blk is the start*/
+    if(blk == start){
+        start=NULL;
+    /*Case 2 - that means its at the end but not start*/ 
+    }else{
+        prev->next=NULL; // for setting the prev to end of list
+    }
+    safe_sbrk(-(blk->data_size+OFFSET+pending_end-pending_start));
+    pending_start=pending_start=blk;
+    
+}
 /*Description: if there are any consequtive 
-                free blocks this will merge them */
-void merge_adj_open_blks(){
+                free blocks this will merge them 
+        returns: 1 - indicates that we have gave mem back to os
+                 0 - indicates we have not given mem back to os
+                */
+int merge_adj_open_blks(){
     /*go through the start and look merge the adj free*/
     struct hdr *curr = start->next, *prev = start, *temp;
     while(curr){
@@ -246,23 +281,19 @@ void merge_adj_open_blks(){
             prev->data_size += curr->data_size + sizeof(struct hdr);
             // Step 2 - merge adj ones
             temp = curr->next; // get copy before changin
+            if(isEndList(curr) && isEnoughToGiveUp(prev->data_size)){
+                giveBackToOS(prev);
+                return 1;
+            }
             prev->next = curr->next;
             curr->next = NULL;
-            // step 3 - check if the merged block can be given to os
-            if(isEndList(curr) && isEnoughToGiveUp(prev->data_size)){
-                struct hdr *prev_prev = get_prev_of_blk_space(prev);
-                prev_prev->next=NULL;
-                safe_sbrk(-(prev->data_size+OFFSET+pending_end-pending_start));
-                pending_start=pending_start=prev;
-                return;
-            }
-        /* Case 2 - dont merge*/
         }else{
             temp = curr->next;
         }
         prev = curr;
         curr = temp;
     }
+    return 0;
 }
 
 bool_t inHeap(void *ptr){
@@ -287,18 +318,14 @@ void free(void *ptr){ //*ptr points to the data section
         size_t pending_diff = pending_end - pending_start;
         // Step 1.2 - call garbage collector so it can merge before deciding isEndList
         blk->isFree = TRUE;
-        merge_adj_open_blks();
-        // Case 1.1 : see if wer at the end of list or next it
-        if(isEndList(blk) && isEnoughToGiveUp(blk->data_size)){
-            // Step 1.1.1 - if not already done in the merge_adj_opens
-            if((prev = get_prev_of_blk_space(blk))){
-                prev->next=NULL; /*protection because could have merged earlier*/
-                pending_end=pending_start=blk;
-                // Give back the data to the os (because Case 1.1)
-                safe_sbrk((blk->data_size + pending_diff + OFFSET)*-1);
-            }
+        /* Case 1.1 : if blk is at the end and has no merged(or else it would have
+         checked to give back to os)
+         */
+        if(!merge_adj_open_blks() && isEndList(blk) && isEnoughToGiveUp(blk->data_size)){
+            /*!merge_adj_open_blk() - implies that the blk wasnt merged*/
+            giveBackToOS(blk);
         }
-    }else{
+   }else{
         fputs("Cant free ptr", stderr);
     }
 }
@@ -356,17 +383,24 @@ void *calloc(size_t nmemb, size_t size){
 
 int main(){
     
+    /*TC 1 - free curr then next(is end of list)
+      Inital Expected: hdr1->hdr2->hdr3->hdr4
+      Output Expected:
+                (after free(ptr4)): hdr1->hdr2->hdr3->(free)
+                (after free(ptr3)): hdr1->hdr2->NULL
+    
+    */
     int *ptr1 = (int*)malloc(1600);
     int *ptr2 = (int*)malloc(10000);
-    int *ptr3 = (int*)malloc(20);
-    int *ptr4 = (int *)malloc(NEW_MEM_BLK);
+    int *ptr3 = (int*)malloc(NEW_MEM_BLK);
+    int *ptr4 = (int *)malloc(20);
 
     *ptr1=1;
     *ptr2=2;
     *ptr3=3;
 
-    free(ptr3);
     free(ptr4);
+    free(ptr3);
 
 
     return 0;
