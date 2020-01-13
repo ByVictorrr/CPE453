@@ -75,15 +75,14 @@ size_t round_up_mult_of_num(size_t numBytes, unsigned long num){
                 Returns: the value at which is partioned
 */
 struct hdr *split_hdrs(struct hdr *org, size_t size){
-    size_t size_mult_16 = round_up_mult_of_num(size, 16);
     struct hdr * partioned;
     partioned = org;
-    org = partioned+(OFFSET+ size_mult_16);        
+    org = partioned+(OFFSET+ size);        
     org->data_size = partioned->data_size - 
-    (OFFSET+ size_mult_16);
+    (OFFSET+ size);
     org->isFree = TRUE;
     org->data = (uint8_t*)org + sizeof(struct hdr);
-    partioned->data_size = size_mult_16;
+    partioned->data_size = size;
     /*finally reassign adj next's*/
     org->next=partioned->next;
     partioned->next=org;
@@ -385,7 +384,7 @@ void *realloc(void *ptr, size_t size){
         */
         // Step 1 - free (look for empty adj spots merge)
         // We dont want any DATA given back to os
-        if(isEndList(free_blk) && size > free_blk->data_size){
+        if(isEndList(free_blk) && round_up_mult_of_num(size,16) >= free_blk->data_size){
            ret_helper=ptr;
            update_pending(size-free_blk->data_size);
            free_blk->data_size=size;
@@ -417,23 +416,20 @@ int main(){
 
     int *ptr;
 
-/*
     size_t i=0;
     for(i=0; i < 10000; i++){
-        if(i % 2 == 0){
             ptr=malloc(i);
-        }else{
-            ptr=realloc(ptr, i);
-        }
+            realloc(ptr, i);
     }
-    */
 
+/*
     ptr=malloc(TEST1);
     for(i=0; i < TEST1/sizeof(int); i++){
         ptr[i]=i;
     }
     ptr=realloc(ptr, TEST2);
 
+    */
     int var = 0;
     
 
