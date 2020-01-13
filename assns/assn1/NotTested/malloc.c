@@ -5,7 +5,7 @@
 
 
 typedef enum Bool{FALSE, TRUE} bool_t;
-
+bool_t os_giveback_flag;
 
 struct hdr{
     size_t data_size;
@@ -25,7 +25,7 @@ void *pending_start, *pending_end;
  * helps determine if sbrk should give it up*/ 
 #define NEW_MEM_BLK 64000
 /*used to determine whether a free node can be split into two*/
-#define GIVE_UP_SPACE NEW_MEM_BLK-100 
+#define GIVE_UP_SPACE NEW_MEM_BLK-10 
 
 /* Used to Determine if the free block - size > 100*/
 #define SPLIT_MIN OFFSET+16
@@ -267,6 +267,7 @@ void giveBackToOS(struct hdr *blk){
 int merge_adj_open_blks(){
     /*go through the start and look merge the adj free*/
     struct hdr *curr = start->next, *prev = start, *temp;
+    int j=0;
     while(curr){
         /* Case 1 - indicate whether we should merge*/
         if(prev->isFree == TRUE && curr->isFree == TRUE){
@@ -274,17 +275,20 @@ int merge_adj_open_blks(){
             prev->data_size += curr->data_size + sizeof(struct hdr);
             // Step 2 - merge adj ones
             temp = curr->next; // get copy before changin
-            if(isEndList(curr) && isEnoughToGiveUp(prev->data_size)){
+            if(isEndList(curr) && isEnoughToGiveUp(prev->data_size) 
+            && os_giveback_flag){
                 giveBackToOS(prev);
                 return 1;
             }
             prev->next = curr->next;
             curr->next = NULL;
+
         }else{
             temp = curr->next;
         }
         prev = curr;
         curr = temp;
+        j++;
     }
     return 0;
 }
@@ -312,13 +316,13 @@ void free(void *ptr){ //*ptr points to the data section
         // Step 1.2 - call garbage collector so it can merge 
 		// before deciding isEndList
         blk->isFree = TRUE;
-        memset(blk->data,0,blk->data_size);
+        //memset(blk->data,0,blk->data_size);
         /* Case 1.1 : if blk is at the end and 
 		 * has no merged(or else it would have
          checked to give back to os)
          */
         if(!merge_adj_open_blks() && isEndList(blk) && 
-				isEnoughToGiveUp(blk->data_size)){
+				isEnoughToGiveUp(blk->data_size) && os_giveback_flag){
             /*!merge_adj_open_blk() - implies that the blk wasnt merged*/
             giveBackToOS(blk);
         }
@@ -363,27 +367,25 @@ void *realloc(void *ptr, size_t size){
     /*step 1 - merge*/
     struct hdr *free_blk = ptr - OFFSET;
     void *ret_helper;
+    ssize_t org_size;
     if(ptr == NULL | !inHeap(ptr)){
         return malloc(size);
     }else if(size == 0){
         free(ptr);
     /*General case: requirements*/
     }else{
-        /*step 1 - merge*/
-        merge_adj_open_blks();
-        /*Step 2- see if there is space after the merge*/
-        if(free_blk->data_size >= size){
-            /*split the bigger with newly asked*/
-            ret_helper = ((void *)split_hdrs(free_blk, size));
-            //copy contents from free_blk 
-            return ret_helper;
-        /*Step 3 - no space*/
-        }else{
-            ret_helper = malloc(size);
-            copy_contents(ptr, ret_helper, size);
-            free(ptr);
-            return ret_helper;
-        }
+        /*step 1 - check to see if enough space
+                    if we set to free and merge
+                    any open spaces
+        */
+        // Step 1 - free (look for empty adj spots merge)
+        // We dont want any DATA given back to os
+        os_giveback_flag = FALSE; 
+        free(ptr); //indicates we cant give mem back in free
+        os_giveback_flag=TRUE;
+        ret_helper = malloc(size);
+        copy_contents(ptr, ret_helper, size);
+        return ret_helper;
     }
 }
 
@@ -406,12 +408,24 @@ int main(){
 
     #define TEST1 100*sizeof(int)
     #define TEST2 1000*sizeof(int)
-    int *ptr1 = malloc(TEST1);
+    int *ptr;
     size_t i=0;
-    for(i=0; i < TEST1; i++)
-        ptr1[i]=i;
-    
-    ptr1=realloc(ptr1, TEST2);
+    /*
+    for(i=0; i < 8193; i++){
+        if(i % 2 == 0){
+            ptr=malloc(i);
+        }else{
+            ptr=realloc(ptr, i);
+        }
+    }
+    */
+
+    ptr=malloc(TEST1);
+    for(i=0; i < TEST1/sizeof(int); i++){
+        ptr[i]=i;
+    }
+    ptr=realloc(ptr, TEST2);
+    int var = 0;
     
 
     return 0;
