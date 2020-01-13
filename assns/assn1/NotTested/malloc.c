@@ -17,14 +17,18 @@ struct hdr{
 #define OFFSET sizeof(struct hdr)
 
 struct hdr *start;
-void *pending_start, *pending_end; // Helpers so we dont have to call sbrk every time
 
+// Helpers so we dont have to call sbrk every time
+void *pending_start, *pending_end; 
 
+/*in bytes: if a block is free at the end of the list this 
+ * helps determine if sbrk should give it up*/ 
 #define NEW_MEM_BLK 64000
-#define GIVE_UP_SPACE NEW_MEM_BLK-100 /*in bytes: if a block is free at the end of the list this helps determine if sbrk should give it up*/ 
-#define SPLIT_MIN 100 /*used to determine whether a free node can be split into two*/
+/*used to determine whether a free node can be split into two*/
+#define GIVE_UP_SPACE NEW_MEM_BLK-100 
 
-
+/* Used to Determine if the free block - size > 100*/
+#define SPLIT_MIN 100 
 /*Description: helper function to shrink/grow heap*/
 void *safe_sbrk(ssize_t size){
     void *ptr;
@@ -49,7 +53,7 @@ bool_t isEnoughToGiveUp(size_t size_free_blk){
     }
 }
 
-/*======================Helper functions for malloc============================*/
+/*========Helper functions for malloc=========*/
 size_t round_mult16(size_t numBytes){
     bool_t isMult16;
     if(!(numBytes%16)){ /*if number is already mult of 16*/
@@ -67,7 +71,8 @@ struct hdr *split_hdrs(struct hdr *org, size_t size){
     struct hdr * partioned;
     partioned = org;
     org = partioned+(OFFSET+ size_mult_16);        
-    org->data_size = partioned->data_size - (2*sizeof(struct hdr) + size_mult_16);
+    org->data_size = partioned->data_size - 
+		(2*sizeof(struct hdr) + size_mult_16);
     org->isFree = TRUE;
     org->data = (uint8_t*)org + sizeof(struct hdr);
     partioned->data_size = size_mult_16;
@@ -100,7 +105,8 @@ struct hdr *open_spot(size_t size){
         if(curr->isFree && (diff=curr->data_size - size) > 0){
             /*Case 2.1 - split a existing one into two*/
             if(diff > SPLIT_MIN){
-                // *assign the space curr needs, then make another blk above it open */
+                // *assign the space curr needs, 
+				// then make another blk above it open */
               return split_hdrs(curr,  size);
             /*Case 2.2 - not enough space to split*/
             }else{
@@ -150,7 +156,8 @@ uintptr_t *set_blk(struct hdr *start_ptr, size_t size, bool_t isNewSpot){
     return block->data;
 }
 size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
-/* Objective: to call sbrk as minimal as possible (that is if pend_mem == pend_end, get more mem make call to sbrk)
+/* Objective: to call sbrk as minimal as possible 
+	(that is if pend_mem == pend_end, get more mem make call to sbrk)
     return: NULL if srbrk error
     return: new spot address normall
     Assumption: size is mult of 16
@@ -159,10 +166,13 @@ size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
 struct hdr *update_pending(size_t size){
     void *start_helper, *ptr;
     size_t diff;
-    // Case 1 - if pending_start plus needed size is going to exeeceed pending_end*/
+    /* Case 1 - if pending_start plus needed 
+	 * size is going to exeeceed pending_end*/
     if(size + OFFSET  >= (diff=pending_end-pending_start)){
-        // Case 1.1 - tell use if we should get one more blk or size+OFFSET more mem
-        size_t extra_space = size+OFFSET>=NEW_MEM_BLK?(size+OFFSET-diff):NEW_MEM_BLK-(size+OFFSET);
+        // Case 1.1 - tell use if we should get 
+		// one more blk or size+OFFSET more mem
+        size_t extra_space = size+OFFSET>=NEW_MEM_BLK?
+		(size+OFFSET-diff):NEW_MEM_BLK-(size+OFFSET);
         // Case - where its initally empty
         if(!pending_start && !pending_end){
             start_helper=safe_sbrk(NEW_MEM_BLK);
@@ -195,7 +205,8 @@ struct hdr *update_pending(size_t size){
 }
 
 /* Requirements:
-    1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM
+    1.) Returns NULL, if cant allocate more space using Sbrk; 
+	also setting errno to ENOMEM
     2.) Returns address of starting data section
 */
 void *malloc(size_t size){
@@ -208,8 +219,8 @@ void *malloc(size_t size){
         // Store in that spot
         return set_blk(free_spot, size_mul_16, FALSE);
     }else{
-    /* Case 2 - if no spaces in between the linked list are availble or its empty;
-    */
+    /* Case 2 - if no spaces in between the linked 
+	 * list are availble or its empty;*/
         if((new_spot = update_pending(size_mul_16)) == NULL){
             /* Case 2.1 - if we cant get any more space from os*/
             fputc("cant get any more mem from os", stderr);
@@ -221,13 +232,13 @@ void *malloc(size_t size){
     }
 }
 
-/*===============================================================*/
+/*==============================================*/
 
 
 
 
 
-/*======================Helper functions for free============================*/
+/*==========Helper functions for free============*/
 /* Description: used for case where the freed one is the 
                 last one in the list
 */
@@ -312,13 +323,16 @@ void free(void *ptr){ //*ptr points to the data section
         start_block = ((uint8_t*)ptr)-OFFSET;
         struct hdr *blk = start_block, *next_open_blk, *prev;
         size_t pending_diff = pending_end - pending_start;
-        // Step 1.2 - call garbage collector so it can merge before deciding isEndList
+        // Step 1.2 - call garbage collector so it can merge 
+		// before deciding isEndList
         blk->isFree = TRUE;
         memset(blk->data,0,blk->data_size);
-        /* Case 1.1 : if blk is at the end and has no merged(or else it would have
+        /* Case 1.1 : if blk is at the end and 
+		 * has no merged(or else it would have
          checked to give back to os)
          */
-        if(!merge_adj_open_blks() && isEndList(blk) && isEnoughToGiveUp(blk->data_size)){
+        if(!merge_adj_open_blks() && isEndList(blk) && 
+				isEnoughToGiveUp(blk->data_size)){
             /*!merge_adj_open_blk() - implies that the blk wasnt merged*/
             giveBackToOS(blk);
         }
@@ -330,11 +344,12 @@ void free(void *ptr){ //*ptr points to the data section
 
 
 
-/*========================Realloc helpers====================================*/
+/*===========Realloc helpers==================*/
 
 /* Requirements:
     0.) Try to merge adjacent spots if possible
-    1.) Returns NULL, if cant allocate more space using Sbrk; also setting errno to ENOMEM;
+    1.) Returns NULL, if cant allocate more space using 
+		Sbrk; also setting errno to ENOMEM;
         keeping already reserved buffer.
     2.) Returns address of starting data section
 
@@ -377,46 +392,5 @@ void *calloc(size_t nmemb, size_t size){
     return head->data;
 }
 
-
-int main(){
-    
-    /*TC 1 - free curr then next(is end of list)
-      Inital Expected: hdr1->hdr2->hdr3->hdr4
-      Output Expected:
-                (after free(ptr4)): hdr1->hdr2->hdr3->(free)
-                (after free(ptr3)): hdr1->hdr2->NULL
-    
-        TC 2- free end of list(give mem back to os), then append two more
-              and free the last one then the prev one
-        Inital Expected:
-                (after free(ptr3)): hdr1->hdr2->NULL
-                (after malloc(64k)): hdr1->hdr2->hdr4
-                (after malloc(200)): hdr1->hdr2->hdr4->hdr5->null
-        Ouput Expected
-                (after free(ptr4)): hdr1->hdr2->(free)->hdr5->null
-                (after free(ptr4)): hdr1->hdr2->null
-
-    
-    */
-    int *ptr1 = (int*)malloc(1600);
-    int *ptr2 = (int*)malloc(10000);
-    int *ptr3 = (int*)malloc(NEW_MEM_BLK);
-
-    *ptr1=1;
-    *ptr2=2;
-    *ptr3=3;
-
-    free(ptr3);
-
-    int *ptr4 = malloc(NEW_MEM_BLK);
-    int *ptr5 = malloc(200);
-
-    free(ptr4);
-    free(ptr5);
-
-    malloc(100);
-
-    return 0;
-}
 
 
