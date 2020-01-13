@@ -1,0 +1,432 @@
+=================================================
+TEST 6 (32-bit): Call malloc() a few times
+
+Test malloc() to see if it can properly allocate a few regions.
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 7 (64-bit): Call malloc() a few times
+
+Test malloc() to see if it can properly allocate a few regions.
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 8 (32-bit): Call malloc() a lot of times
+
+Test malloc() to see if it can properly allocate many regions.
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating 8192 regions, size 0..8191...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+Submitted produced no standard output.
+stderr:
+  Cant free ptrCant free ptrChild process (10221) exited due to signal (Segmentation fault).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  1d0
+  < Allocating 8192 regions, size 0..8191...ok.
+---------
+=================================================
+TEST 9 (64-bit): Call malloc() a lot of times
+
+Test malloc() to see if it can properly allocate many regions.
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating 8192 regions, size 0..8191...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+Submitted produced no standard output.
+stderr:
+  Cant free ptrCant free ptrChild process (10251) exited due to signal (Segmentation fault).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  1d0
+  < Allocating 8192 regions, size 0..8191...ok.
+---------
+=================================================
+TEST 12 (32-bit): Call realloc(NULL) a few times
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 13 (64-bit): Call realloc(NULL) a few times
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 0...ok.
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 14 (32-bit): Call malloc(), then free the memory 
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Calling malloc succeeded.
+  Successfully used the space.
+  We survived the free call.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Calling malloc succeeded.
+  Successfully used the space.
+  We survived the free call.
+stderr:
+  Cant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 15 (64-bit): Call malloc(), then free the memory 
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Calling malloc succeeded.
+  Successfully used the space.
+  We survived the free call.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Calling malloc succeeded.
+  Successfully used the space.
+  We survived the free call.
+stderr:
+  Cant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 16 (32-bit): Call malloc() a few times then free all the regions
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+  Allocating a region of size 2500...ok.
+  Free ok. Checking remaining regions...(ok.ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.)
+  Free ok. Checking remaining regions...(ok.)
+  Free ok. Checking remaining regions...()
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+  Allocating a region of size 2500...ok.
+  Free ok. Checking remaining regions...(ok.ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.)
+  Free ok. Checking remaining regions...(ok.)
+  Free ok. Checking remaining regions...()
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 17 (64-bit): Call malloc() a few times then free all the regions
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+  Allocating a region of size 2500...ok.
+  Free ok. Checking remaining regions...(ok.ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.)
+  Free ok. Checking remaining regions...(ok.)
+  Free ok. Checking remaining regions...()
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating a region of size 500...ok.
+  Allocating a region of size 1000...ok.
+  Allocating a region of size 1500...ok.
+  Allocating a region of size 2000...ok.
+  Allocating a region of size 2500...ok.
+  Free ok. Checking remaining regions...(ok.ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.ok.)
+  Free ok. Checking remaining regions...(ok.ok.)
+  Free ok. Checking remaining regions...(ok.)
+  Free ok. Checking remaining regions...()
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+---------
+=================================================
+TEST 18 (32-bit): Call malloc(), then realloc()
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  ok.
+  Contents ok after realloc.
+  Fill of reallocated space ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  ok.
+  Contents DIFFER after realloc.
+  Fill of reallocated space ok.
+Submitted produced no error output.
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  2c2
+  < Contents ok after realloc.
+  ---
+  > Contents DIFFER after realloc.
+---------
+=================================================
+TEST 19 (64-bit): Call malloc(), then realloc()
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  ok.
+  Contents ok after realloc.
+  Fill of reallocated space ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  ok.
+  Contents DIFFER after realloc.
+  Fill of reallocated space ok.
+Submitted produced no error output.
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  2c2
+  < Contents ok after realloc.
+  ---
+  > Contents DIFFER after realloc.
+---------
+=================================================
+TEST 20 (32-bit): Alternate malloc()s and realloc()s
+
+This will force realloc() to move periodically
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating 8192 regions, size 1..8192...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating 8192 regions, size 1..8192......contents not properly copied...FAILED.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  1c1
+  < Allocating 8192 regions, size 1..8192...ok.
+  ---
+  > Allocating 8192 regions, size 1..8192......contents not properly copied...FAILED.
+---------
+=================================================
+TEST 21 (64-bit): Alternate malloc()s and realloc()s
+
+This will force realloc() to move periodically
+
+=================================================
+
+----------
+Reference:
+----------
+stdout:
+  Allocating 8192 regions, size 1..8192...ok.
+Reference produced no error output.
+----------
+Submitted:
+----------
+stdout:
+  Allocating 8192 regions, size 1..8192......contents not properly copied...FAILED.
+stderr:
+  Cant free ptrCant free ptrCant free ptrCant free ptr
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+  1c1
+  < Allocating 8192 regions, size 1..8192...ok.
+  ---
+  > Allocating 8192 regions, size 1..8192......contents not properly copied...FAILED.
+---------
