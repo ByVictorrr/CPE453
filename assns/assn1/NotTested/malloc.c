@@ -386,6 +386,17 @@ int main(){
                 (after free(ptr4)): hdr1->hdr2->hdr3->(free)
                 (after free(ptr3)): hdr1->hdr2->NULL
     
+        TC 2- free end of list(give mem back to os), then append two more
+              and free the last one then the prev one
+        Inital Expected:
+                (after free(ptr3)): hdr1->hdr2->NULL
+                (after malloc(64k)): hdr1->hdr2->hdr4
+                (after malloc(200)): hdr1->hdr2->hdr4->hdr5->null
+        Ouput Expected
+                (after free(ptr4)): hdr1->hdr2->(free)->hdr5->null
+                (after free(ptr4)): hdr1->hdr2->null
+
+    
     */
     int *ptr1 = (int*)malloc(1600);
     int *ptr2 = (int*)malloc(10000);
@@ -397,8 +408,13 @@ int main(){
 
     free(ptr3);
 
-    malloc(10);
+    int *ptr4 = malloc(NEW_MEM_BLK);
+    int *ptr5 = malloc(200);
 
+    free(ptr4);
+    free(ptr5);
+
+    malloc(100);
 
     return 0;
 }
