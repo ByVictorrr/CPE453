@@ -126,8 +126,7 @@ struct hdr *open_spot(size_t size){
 }
 /* Objective: to add a new_blk onto the end of the linked list
     returns: 1 if nothing in list
-    returns: 0 if it appended new_blk onto the list
-
+    returns: 0 if it appended new_blk onto the list 
     HELPER FUNCTION for set_blk if isNewSpot
 */
 void append_new_blk(struct hdr *new_blk){
@@ -330,6 +329,23 @@ void free(void *ptr){ //*ptr points to the data section
 
 
 /*===========Realloc helpers==================*/
+/*
+souce - contents are in to be copied
+destination - where you want to copy
+size_dest - in bytes how many bytes 
+   
+*/
+void copy_contents(uint8_t *source, uint8_t *destination, size_t size_dest){
+    struct hdr *src_blk = (void*)source-OFFSET, *des_blk= (void*)destination-OFFSET;
+    size_t size_copy;
+    int i;
+    if(size_dest > src_blk->data_size){
+        size_copy = src_blk->data_size;
+    }else{
+        size_copy=size_dest;
+    }
+    memcpy(destination, source, size_copy);
+}
 
 /* Requirements:
     0.) Try to merge adjacent spots if possible
@@ -345,8 +361,9 @@ void free(void *ptr){ //*ptr points to the data section
 void *realloc(void *ptr, size_t size){
     /*special cases*/
     /*step 1 - merge*/
-    struct hdr *not_free_blk, *free_blk;
-    if(ptr == NULL | !inHeap((free_blk=ptr-sizeof(struct hdr)))){
+    struct hdr *free_blk = ptr - OFFSET;
+    void *ret_helper;
+    if(ptr == NULL | !inHeap(ptr)){
         return malloc(size);
     }else if(size == 0){
         free(ptr);
@@ -357,11 +374,15 @@ void *realloc(void *ptr, size_t size){
         /*Step 2- see if there is space after the merge*/
         if(free_blk->data_size >= size){
             /*split the bigger with newly asked*/
-            return ((void *)split_hdrs(free_blk, size))+sizeof(struct hdr);
+            ret_helper = ((void *)split_hdrs(free_blk, size));
+            //copy contents from free_blk 
+            return ret_helper;
         /*Step 3 - no space*/
         }else{
+            ret_helper = malloc(size);
+            copy_contents(ptr, ret_helper, size);
             free(ptr);
-            return malloc(size);
+            return ret_helper;
         }
     }
 }
@@ -381,9 +402,18 @@ void *calloc(size_t nmemb, size_t size){
 int main(){
 
 
-    for(i=0; i<10000; i++)
-        malloc(i);
+    //for(i=0; i<10000; i++)
+
+    #define TEST1 100*sizeof(int)
+    #define TEST2 1000*sizeof(int)
+    int *ptr1 = malloc(TEST1);
+    size_t i=0;
+    for(i=0; i < TEST1; i++)
+        ptr1[i]=i;
     
+    ptr1=realloc(ptr1, TEST2);
+    
+
     return 0;
 
 }
