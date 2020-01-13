@@ -28,7 +28,8 @@ void *pending_start, *pending_end;
 #define GIVE_UP_SPACE NEW_MEM_BLK-100 
 
 /* Used to Determine if the free block - size > 100*/
-#define SPLIT_MIN 100 
+#define SPLIT_MIN OFFSET+16
+
 /*Description: helper function to shrink/grow heap*/
 void *safe_sbrk(ssize_t size){
     void *ptr;
@@ -54,12 +55,14 @@ bool_t isEnoughToGiveUp(size_t size_free_blk){
 }
 
 /*========Helper functions for malloc=========*/
-size_t round_mult16(size_t numBytes){
+/* Rounds up to closest mult of num*/
+size_t round_up_mult_of_num(size_t numBytes, unsigned long num){
     bool_t isMult16;
-    if(!(numBytes%16)){ /*if number is already mult of 16*/
+
+    if(!(numBytes%num) && numBytes!=0){ /*if number is already mult of num*/
         return numBytes;
     }else{
-        return (numBytes-(numBytes%16))+16;
+        return (numBytes-(numBytes%num))+num;
     }
 }
 /*Description: implied => org->size > partioned->size (size)
@@ -67,12 +70,12 @@ size_t round_mult16(size_t numBytes){
                 Returns: the value at which is partioned
 */
 struct hdr *split_hdrs(struct hdr *org, size_t size){
-    size_t size_mult_16 = round_mult16(size);
+    size_t size_mult_16 = round_up_mult_of_num(size, 16);
     struct hdr * partioned;
     partioned = org;
     org = partioned+(OFFSET+ size_mult_16);        
     org->data_size = partioned->data_size - 
-		(2*sizeof(struct hdr) + size_mult_16);
+    (OFFSET+ size_mult_16);
     org->isFree = TRUE;
     org->data = (uint8_t*)org + sizeof(struct hdr);
     partioned->data_size = size_mult_16;
@@ -104,7 +107,7 @@ struct hdr *open_spot(size_t size){
                    and it has enough cap to hold new blk*/
         if(curr->isFree && (diff=curr->data_size - size) > 0){
             /*Case 2.1 - split a existing one into two*/
-            if(diff > SPLIT_MIN){
+            if(diff+OFFSET > SPLIT_MIN){
                 // *assign the space curr needs, 
 				// then make another blk above it open */
               return split_hdrs(curr,  size);
@@ -145,7 +148,7 @@ void append_new_blk(struct hdr *new_blk){
 uintptr_t *set_blk(struct hdr *start_ptr, size_t size, bool_t isNewSpot){
     // step 1 - set fields of newly allocated space
     struct hdr *block = start_ptr;
-    block->data = sizeof(struct hdr) + (void*)start_ptr;
+    block->data = OFFSET + (void*)start_ptr;
     // Case 1 - is it a new spot?
     if(isNewSpot){
         block->data_size = size;
@@ -163,43 +166,28 @@ size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
     Assumption: size is mult of 16
 */
 
+    
 struct hdr *update_pending(size_t size){
     void *start_helper, *ptr;
-    size_t diff;
+    size_t diff,
+    padded = round_up_mult_of_num(size, NEW_MEM_BLK);
     /* Case 1 - if pending_start plus needed 
 	 * size is going to exeeceed pending_end*/
-    if(size + OFFSET  >= (diff=pending_end-pending_start)){
-        // Case 1.1 - tell use if we should get 
-		// one more blk or size+OFFSET more mem
-        size_t extra_space = size+OFFSET>=NEW_MEM_BLK?
-		(size+OFFSET-diff):NEW_MEM_BLK-(size+OFFSET);
-        // Case - where its initally empty
+    if(size+OFFSET >= (diff=pending_end-pending_start)){
+        start_helper = sbrk(padded);
+        // Case 1.1 - if inital startup
         if(!pending_start && !pending_end){
-            start_helper=safe_sbrk(NEW_MEM_BLK);
-            pending_start=start_helper+size+OFFSET;
-            pending_end=pending_start+(NEW_MEM_BLK-(size+OFFSET));
-            return start_helper;
+            pending_end=start_helper+padded; 
+        // Case 1.2 - general case after iC
         }else{
-            ptr = safe_sbrk(extra_space);
-            //pending_end=pending_end;
+            pending_end= pending_end+padded;
         }
-        // Case 1.1.1 - where the ask size is bigger than 64000
-        if(size+OFFSET>=NEW_MEM_BLK){
-            start_helper=pending_start;
-            pending_end=pending_start = pending_end+extra_space;
-        }else{
-            size_t needed=size+OFFSET-diff;
-            start_helper=pending_start;
-            //1. set the pend_start to pend_start=size+OFFSET-diff
-            pending_start=pending_end+needed;
-            pending_end=pending_end+(NEW_MEM_BLK-needed);
-        }
-
+        pending_start = start_helper+size+OFFSET; 
         return start_helper;
     // Case 2 - if we still have space in the pending block
     }else{
         start_helper = pending_start;
-        pending_start = pending_start + size + sizeof(struct hdr);
+        pending_start = pending_start+size+OFFSET;
         return start_helper;
     }
 }
@@ -212,7 +200,7 @@ struct hdr *update_pending(size_t size){
 void *malloc(size_t size){
 
     /*Step 1 - round up size to mult of 16*/
-    size_t size_mul_16 = round_mult16(size);
+    size_t size_mul_16 = round_up_mult_of_num(size, 16);
     void *free_spot, *new_spot;
     /*Case 1 - there is an open spot*/
     if((free_spot = open_spot(size_mul_16))){
@@ -223,7 +211,6 @@ void *malloc(size_t size){
 	 * list are availble or its empty;*/
         if((new_spot = update_pending(size_mul_16)) == NULL){
             /* Case 2.1 - if we cant get any more space from os*/
-            fputc("cant get any more mem from os", stderr);
             return NULL;
         }else{
             // Case 2.2 - sbrk gave us our space
@@ -336,9 +323,7 @@ void free(void *ptr){ //*ptr points to the data section
             /*!merge_adj_open_blk() - implies that the blk wasnt merged*/
             giveBackToOS(blk);
         }
-   }else{
-        fputs("Cant free ptr", stderr);
-    }
+   }
 }
 
 
@@ -392,5 +377,15 @@ void *calloc(size_t nmemb, size_t size){
     return head->data;
 }
 
+    int i;
+int main(){
+
+
+    for(i=0; i<10000; i++)
+        malloc(i);
+    
+    return 0;
+
+}
 
 
