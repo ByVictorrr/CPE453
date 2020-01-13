@@ -5,7 +5,6 @@
 
 
 typedef enum Bool{FALSE, TRUE} bool_t;
-bool_t os_giveback_flag;
 
 struct hdr{
     size_t data_size;
@@ -20,6 +19,12 @@ struct hdr *start;
 
 // Helpers so we dont have to call sbrk every time
 void *pending_start, *pending_end; 
+
+/* flag to let know were in realloc and dont 
+    trying to merge realloc ptr
+    want to give mem back to os
+*/
+bool_t os_giveback_flag;
 
 /*in bytes: if a block is free at the end of the list this 
  * helps determine if sbrk should give it up*/ 
@@ -166,7 +171,7 @@ size_t abs(ssize_t diff){return diff > 0? diff : -diff;}
 */
 
     
-struct hdr *update_pending(size_t size){
+void *update_pending(size_t size){
     void *start_helper, *ptr;
     size_t diff,
     padded = round_up_mult_of_num(size, NEW_MEM_BLK);
@@ -380,38 +385,41 @@ void *realloc(void *ptr, size_t size){
         */
         // Step 1 - free (look for empty adj spots merge)
         // We dont want any DATA given back to os
-        os_giveback_flag = FALSE; 
-        free(ptr); //indicates we cant give mem back in free
-        os_giveback_flag=TRUE;
-        ret_helper = malloc(size);
-        copy_contents(ptr, ret_helper, size);
+        if(isEndList(free_blk) && size > free_blk->data_size){
+           ret_helper=ptr;
+           update_pending(size-free_blk->data_size);
+           free_blk->data_size=size;
+        }else{
+            os_giveback_flag = FALSE; 
+            free(ptr); //indicates we cant give mem back in free
+            os_giveback_flag=TRUE;
+            ret_helper = malloc(size);
+            copy_contents(ptr, ret_helper, size);
+        }
         return ret_helper;
     }
 }
 
 /*========================calloc helpers====================================*/
 void *calloc(size_t nmemb, size_t size){
-    uintptr_t *ptr;
-    struct hdr *head;
-    head=(struct hdr *)(malloc(size*nmemb) - sizeof(struct hdr));
-    for(ptr=head->data; ptr != head->data+head->data_size; ptr+=size){
-        *ptr=0;
-    }
-    return head->data;
+    void *ptr;
+    ptr=malloc(size*nmemb);
+    memset(ptr, 0, nmemb*size);
+    return ptr;
 }
 
     int i;
 int main(){
 
 
-    //for(i=0; i<10000; i++)
-
     #define TEST1 100*sizeof(int)
     #define TEST2 1000*sizeof(int)
+
     int *ptr;
+
+/*
     size_t i=0;
-    /*
-    for(i=0; i < 8193; i++){
+    for(i=0; i < 10000; i++){
         if(i % 2 == 0){
             ptr=malloc(i);
         }else{
@@ -425,6 +433,7 @@ int main(){
         ptr[i]=i;
     }
     ptr=realloc(ptr, TEST2);
+
     int var = 0;
     
 
