@@ -77,11 +77,11 @@ size_t round_up_mult_of_num(size_t numBytes, unsigned long num){
 struct hdr *split_hdrs(struct hdr *org, size_t size){
     struct hdr * partioned;
     partioned = org;
-    org = partioned+(OFFSET+ size);        
+    org = (void*)partioned+(OFFSET+ size);        
     org->data_size = partioned->data_size - 
     (OFFSET+ size);
     org->isFree = TRUE;
-    org->data = (uint8_t*)org + sizeof(struct hdr);
+    org->data = (void*)org + OFFSET;
     partioned->data_size = size;
     /*finally reassign adj next's*/
     org->next=partioned->next;
@@ -109,7 +109,7 @@ struct hdr *open_spot(size_t size){
     while(curr){ /*need to use curr because might be start*/
         /*Case 2 - Check to see if a blk isFree 
                    and it has enough cap to hold new blk*/
-        if(curr->isFree && (diff=curr->data_size - size) > 0){
+        if(curr->isFree && (diff=curr->data_size - size) > 0 ){
             /*Case 2.1 - split a existing one into two*/
             if(diff+OFFSET > SPLIT_MIN){
                 // *assign the space curr needs, 
@@ -371,7 +371,6 @@ void *realloc(void *ptr, size_t size){
     /*step 1 - merge*/
     struct hdr *free_blk = ptr - OFFSET;
     void *ret_helper;
-    ssize_t org_size;
     if(ptr == NULL | !inHeap(ptr)){
         return malloc(size);
     }else if(size == 0){
@@ -407,19 +406,23 @@ void *calloc(size_t nmemb, size_t size){
     return ptr;
 }
 
-    int i;
+   volatile int i;
 int main(){
 
 
     #define TEST1 100*sizeof(int)
     #define TEST2 1000*sizeof(int)
 
-    int *ptr;
+    int *ptr, *re_ptr;
+
 
     size_t i=0;
-    for(i=0; i < 10000; i++){
-            ptr=malloc(i);
-            realloc(ptr, i);
+    for(i=1; i < 20000; i++){
+            ptr=malloc(i+NEW_MEM_BLK);
+            *ptr=1;
+            re_ptr = realloc(ptr, i);
+            
+
     }
 
 /*
