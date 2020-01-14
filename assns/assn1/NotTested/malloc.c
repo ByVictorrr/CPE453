@@ -326,7 +326,7 @@ void free(void *ptr){ //*ptr points to the data section
          checked to give back to os)
          */
         if(!merge_adj_open_blks() && isEndList(blk) && 
-				isEnoughToGiveUp(blk->data_size) && os_giveback_flag){
+			isEnoughToGiveUp(blk->data_size) && os_giveback_flag){
             /*!merge_adj_open_blk() - implies that the blk wasnt merged*/
             giveBackToOS(blk);
         }
@@ -344,7 +344,8 @@ size_dest - in bytes how many bytes
    
 */
 void copy_contents(uint8_t *source, uint8_t *destination, size_t size_dest){
-    struct hdr *src_blk = (void*)source-OFFSET, *des_blk= (void*)destination-OFFSET;
+    struct hdr *src_blk = (void*)source-OFFSET, 
+                *des_blk= (void*)destination-OFFSET;
     size_t size_copy;
     int i;
     if(size_dest > src_blk->data_size){
@@ -383,7 +384,8 @@ void *realloc(void *ptr, size_t size){
         */
         // Step 1 - free (look for empty adj spots merge)
         // We dont want any DATA given back to os
-        if(isEndList(free_blk) && round_up_mult_of_num(size,16) >= free_blk->data_size){
+        if(isEndList(free_blk) && 
+            round_up_mult_of_num(size,16) >= free_blk->data_size){
            ret_helper=ptr;
            update_pending(size-free_blk->data_size);
            free_blk->data_size=size;
