@@ -2,13 +2,8 @@
 #define LWPH
 #include <sys/types.h>
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-#ifndef FALSE
-#define FALSE 0
-#endif
 
+enum {FALSE, TRUE} bool_t;
 
 #if defined(__x86_64)
 #include "fp.h"
@@ -38,6 +33,8 @@ registers {
 
 typedef unsigned long tid_t;
 #define NO_THREAD 0             /* an always invalid thread id */
+
+thread newThread(lwpfun, void *arg, size_t size);
 
 typedef struct threadinfo_st *thread;
 typedef struct threadinfo_st {
