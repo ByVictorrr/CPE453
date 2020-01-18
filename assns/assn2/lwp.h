@@ -34,7 +34,6 @@ registers {
 typedef unsigned long tid_t;
 #define NO_THREAD 0             /* an always invalid thread id */
 
-thread newThread(lwpfun, void *arg, size_t size);
 
 typedef struct threadinfo_st *thread;
 typedef struct threadinfo_st {

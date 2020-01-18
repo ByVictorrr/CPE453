@@ -8,7 +8,8 @@
 /**********************Shared variables***************************/
 thread current;
 // if we were to think of this process current state as a thread
-context process;
+context process ;
+
 //process.ID=
 // TODO COME BACK HERE
 /***************************************************************/
@@ -16,6 +17,8 @@ context process;
 
 //********************Scheduler**********************************//
 
+/***NULL<-[]-><-[]-><-[]->(1st one)
+ * 
 /* rr_init=NULL - this is to be called before any threads are 
 			 admitted to the scheduler. It setups up the 
 			 scheduler.
@@ -28,7 +31,11 @@ context process;
 						  schedulers pool
 */
 thread sch_tail, sch_head; // used to keep track of queue
-scheduler rr_sch = {NULL, NULL, rr_admit, rr_remove, rr_next};
+/** NULL<-[sch_head]-><-[arbitrary]-><-[sch_tail]->(points to head) 
+* 
+*		(1) 		(2)
+*/
+
 
 void rr_admit(thread new){
 	/* new - newly created thread*/
@@ -38,22 +45,22 @@ void rr_admit(thread new){
 		/* Case - nothing is in schedulers linked list*/
 		if(!sch_tail && !sch_head){
 			sch_tail=sch_head=new;
-			sch_tail->lib_one=NULL;
-			sch_tail->lib_two=NULL;
+			sch_tail->sched_one=NULL;
+			sch_tail->sched_two=NULL;
 			return;
 		/* Case - only one node in scheduler*/
 		}else if(sch_head == sch_tail){
-			sch_head->lib_two=new;
+			sch_head->sched_two=new;
 			sch_tail=new;
-			sch_tail->lib_one = new;
-			sch_tail->lib_two = sch_head;
+			sch_tail->sched_one = sch_head;
+			sch_head->sched_two=sch_tail;
 		/* Case - at least two in schedular*/
 		}else if(sch_head != sch_tail){
 			/* Just have to use the tail*/
 			last=sch_tail;
-			last->lib_two=new;
-			new->lib_one=last;
-			new->lib_two=sch_head;
+			last->sched_two=new;
+			new->sched_one=last;
+			new->sched_two=sch_head;
 		}
 	}
 }
@@ -123,20 +130,27 @@ thread rr_next(){
 	}
 	return current;
 }
+struct scheduler rr_sch_o = {NULL, NULL, rr_admit, rr_remove, rr_next};
+scheduler rr_sch = &rr_sch_o;
 
 //**************************************************************//
 //************************LWP************************************//
 
-thread lib_head;
+/***NULL<-[lib_head]-><-[arbitrary]-><-[lib_tail]->(NULL)
+ *		(1) 		(2)
+ * 
+*/
+thread lib_head, lib_tail;
 /* lwp_create: 
 			This function creates a new thread with function lwpfun
 			It returns the Thread ID
 */
 thread newThread(lwpfun fn, void *arg, size_t size){	
 
-	static size_t thread_count = 0;
+	static size_t thread_count = 1;
+	unsigned long *temp_stack;
 	thread new;
-	if(!(new=new = calloc(1, sizeof(THREAD_INFO_SIZE))) && 
+	if(!(new=calloc(1, sizeof(THREAD_INFO_SIZE))) || 
 	   !(new->stack=calloc(size, sizeof(unsigned long)))){
 		return NULL;
 	}else{
@@ -144,12 +158,26 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		new->tid=thread_count++;
 		new->stacksize = size;
 		new->lib_one=NULL;
+		new->lib_two=NULL;
 
-		/* Stack stuff */
+
+		/* Init stack */
+		temp_stack=(new->stack+new->stacksize -1); // last spot allocated
+
+		*temp_stack = lwp_exit;
+		temp_stack--;
+		*temp_stack = fn;
+		temp_stack--;
+
+		
+
+		/* Register stuff*/
 		new->state.rdi = arg;
-		new->state.rsp=(new->stack+size); // is the top os stack
-		new->state.rsp=new->stack; // Bottom of stack
+		new->state.rbp=temp_stack;
+		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
+
+
 
 		return new;
 	}
@@ -160,26 +188,27 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 				stack will be stacksize
 returns: lwp_id of the new thread OR -1 if cant be made
 				*/
-thread getTail(){
-	thread temp=lib_head;
-	while(temp->lib_one){		
-		temp=temp->lib_one;
-	}
-	return temp;
-}
 tid_t lwp_create(lwpfun fn, void *arg, size_t size){
-	thread new = newThread(fn, arg, size), tail;
+	thread new = newThread(fn, arg, size), temp;
 	/* Case 1 - is to check to see if linked list is empty*/
 	if(!lib_head){
 		lib_head=new;
+		lib_tail=lib_head;
 		lib_head->lib_one=NULL;
-    /* Case 2 - general case if theres at least one in list*/
+		lib_head->lib_two=NULL;
+	/* Case 2 - if one in the list*/
+	}else if(lib_head==lib_tail){
+		lib_head->lib_two=new;
+		new->lib_one=lib_head;
+		lib_tail=new;
+    /* Case 3 - general case if theres at least two in list*/
 	}else{
-		/* TODO : add passsed context to scheulers pool */
-		rr_sch->admit(new);
-		tail=getTail(); // case only happens if tail != head
-		tail->lib_one=new;
+		temp=lib_tail;
+		temp->lib_two=new;
+		new->lib_one=temp;
+		lib_tail=new;
 	}
+	rr_sch->admit(new);
 	return new->tid;
 }
 /*Description: Starts the LWP system. Saves the org context,
@@ -187,7 +216,6 @@ tid_t lwp_create(lwpfun fn, void *arg, size_t size){
 				If no other threads it returns to main process
 				*/
 void lwp_start(){
-
 	thread next;
 	/* Saving contents of Orginal state before LWP*/
 	/* Make a note to future self when removing check 
@@ -195,7 +223,7 @@ void lwp_start(){
 	if(!(next=rr_sch->next())){
 		lwp_exit();
 	}else{
-		swap_rfiles(&process.state, &next);
+		swap_rfiles(&process.state, &next->state);
 		current=next;
 	}
 } 
@@ -206,9 +234,8 @@ void lwp_start(){
 */
 void lwp_yeild(){
 	thread curr = current, next;
-	/*next = sch.next()*/
 	/* What is we dont have anymore thread in here*/
-	if(next){
+	if((next=rr_sch->next())){
 		swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
@@ -223,7 +250,7 @@ void lwp_stop(){
 	thread temp; 
 	/* Get current state then write org process*/
 	if(current){
-		swap_rfiles(&current->state, &process);
+		swap_rfiles(&current->state, &process.state);
 	}else{
 		swap_rfiles(NULL, &process);
 	}
@@ -239,13 +266,15 @@ void lwp_exit(){
 	/* if a current exists then*/
 	thread next;
 	if(current){
-		/* There has to be a thread left */
+		/* remove from lib list */
+		remove_from_lib_list(current);
+		/* remove from sch list */
 		rr_sch->remove(current);
 		free(current->stack);
 		free(current);
 		/* restore the org system thread */
 		if(!(next=rr_sch->next())){
-			swap_rfiles(NULL, &process);
+			swap_rfiles(NULL, &process.state);
 			current=NULL; // no more in linked list
 		/* Set next to the current thread*/
 		}else{
@@ -255,7 +284,36 @@ void lwp_exit(){
 		}
 	}
 }
+/*Description: helper function for lwp_exit;
+				This assumes current as not null*/
+void remove_from_lib_list(thread current){
+	thread right, left;
+	/* Case 1 - only one in the list*/
+	if( lib_head==lib_tail && current==lib_tail){
+		/* Implicitly saying current == head*/
+		lib_tail = lib_head=NULL;
+	/* Case 2 - if more than one in list*/
+	}else{
+		/* Case 2.1 - if current is lib_head*/
+		if(current==lib_head){
+			right=lib_head->lib_two;
+			right->lib_one=NULL;
+			lib_head=right;
+        /* Case 2.2 - if current is tail of lib*/
+		}else if(current==lib_tail){
+			left=lib_tail->lib_one;
+			left->lib_two=NULL;	
+			lib_tail=left;
+        /* Case 2.3 - if current is in the middle of list*/
+		}else{
+			right=current->lib_two;
+			left=current->lib_one;
+			right->lib_one=left;
+			left->lib_two=right;
+		}
+	}
 
+}
 
 
 thread tid2thread(tid_t id){
@@ -265,7 +323,7 @@ thread tid2thread(tid_t id){
 			if(id_temp->tid == id){
 				return id_temp;
 			}
-			id_temp=id_temp->lib_one;
+			id_temp=id_temp->lib_two;
 		}
 	}
 	return NULL;
@@ -273,15 +331,18 @@ thread tid2thread(tid_t id){
 
 //**************************************************************//
 
+void say_hi(void *arg);
 
 int main(){
 
 	#define STACK_SIZE 1000
+	process.state.fxsave=FPU_INIT;
 
 	int i;
-	for(i=0; i<2; i++)
+	for(i=0; i<4; i++)
 		lwp_create(say_hi, NULL, STACK_SIZE);
 
+	lwp_start();
 
 	return 0;
 }
@@ -291,5 +352,7 @@ void say_hi(void *arg){
 	int i;
 	for(i<0; i<4; i++){
 		printf("%d", current->tid);
+		lwp_yeild();
 	}
+  	lwp_exit();                   /* bail when done.  This should*/
 }
