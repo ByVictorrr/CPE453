@@ -79,7 +79,7 @@ void rr_remove(thread victim){
 		/* Case - where victims the head*/
 		if(victim==sch_head){
 			right = sch_head->sched_two; // right one
-			sch_tail->lib_two=right;
+			sch_tail->sched_two=right;
 			right->sched_one=NULL;
 			sch_head=right;
 		/* Case - where victims the tail*/
@@ -354,6 +354,7 @@ void say_hi(void *arg);
 
 static void indentnum(uintptr_t num);
 
+/*
 int main(){
 
 	#define STACK_SIZE 1000
@@ -364,15 +365,14 @@ int main(){
 	int j=4;
 
 	lwp_create(say_hi, &j, STACK_SIZE);
-	/*
 	for(i=0; i<4; i++)
 		lwp_create(say_hi, &j, STACK_SIZE);
-		*/
 
 	lwp_start();
 
 	return 0;
 }
+*/
 
 void say_hi(void * arg){
 
