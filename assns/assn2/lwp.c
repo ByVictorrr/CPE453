@@ -6,7 +6,7 @@
 #define THREAD_INFO_SIZE sizeof(struct threadinfo_st)
 
 /**********************Shared variables***************************/
-thread current;
+thread current = NULL;
 // if we were to think of this process current state as a thread
 context process ;
 
@@ -30,7 +30,7 @@ context process ;
  rr_admit(thread new) - this is to admit a new thread to the 
 						  schedulers pool
 */
-thread sch_tail, sch_head; // used to keep track of queue
+thread sch_tail = NULL, sch_head = NULL; // used to keep track of queue
 /** NULL<-[sch_head]-><-[arbitrary]-><-[sch_tail]->(points to head) 
 * 
 *		(1) 		(2)
@@ -53,7 +53,6 @@ void rr_admit(thread new){
 			sch_head->sched_two=new;
 			sch_tail=new;
 			sch_tail->sched_one = sch_head;
-			sch_head->sched_two=sch_tail;
 		/* Case - at least two in schedular*/
 		}else if(sch_head != sch_tail){
 			/* Just have to use the tail*/
@@ -61,6 +60,7 @@ void rr_admit(thread new){
 			last->sched_two=new;
 			new->sched_one=last;
 			new->sched_two=sch_head;
+			sch_tail=new;
 		}
 	}
 }
@@ -126,7 +126,7 @@ thread rr_next(){
 	/*Case - where currrent has been assign*/
 	}else{
 		temp=current;		
-		current=temp->lib_two;
+		current=temp->sched_two;
 	}
 	return current;
 }
@@ -140,7 +140,7 @@ scheduler rr_sch = &rr_sch_o;
  *		(1) 		(2)
  * 
 */
-thread lib_head, lib_tail;
+thread lib_head = NULL, lib_tail = NULL;
 /* lwp_create: 
 			This function creates a new thread with function lwpfun
 			It returns the Thread ID
@@ -169,12 +169,13 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		*temp_stack = fn;
 		temp_stack--;
 
+		/* After Leave: sp takes rbp and adds 8 (i.e go next space in stack)*/
+		/* After ret: sp is put into 
 		
 
 		/* Register stuff*/
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
-		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 
@@ -232,7 +233,7 @@ void lwp_start(){
 				Savesthe current lwp's context, pick the next one, restoring that 
 				threads context
 */
-void lwp_yeild(){
+void lwp_yield(){
 	thread curr = current, next;
 	/* What is we dont have anymore thread in here*/
 	if((next=rr_sch->next())){
@@ -252,7 +253,7 @@ void lwp_stop(){
 	if(current){
 		swap_rfiles(&current->state, &process.state);
 	}else{
-		swap_rfiles(NULL, &process);
+		swap_rfiles(NULL, &process.state);
 	}
 }
 
@@ -280,7 +281,7 @@ void lwp_exit(){
 		}else{
 			/* We dont care what was previous in address*/
 			current=next;
-			swap_rfiles(NULL, &current);
+			swap_rfiles(NULL, &current->state);
 		}
 	}
 }
@@ -333,26 +334,46 @@ thread tid2thread(tid_t id){
 
 void say_hi(void *arg);
 
+static void indentnum(uintptr_t num);
+
 int main(){
 
 	#define STACK_SIZE 1000
 	process.state.fxsave=FPU_INIT;
 
 	int i;
+
+	int j=4;
 	for(i=0; i<4; i++)
-		lwp_create(say_hi, NULL, STACK_SIZE);
+		lwp_create(say_hi, &j, STACK_SIZE);
 
 	lwp_start();
 
 	return 0;
 }
 
-// Prints out its tid
-void say_hi(void *arg){
-	int i;
-	for(i<0; i<4; i++){
-		printf("%d", current->tid);
-		lwp_yeild();
+void say_hi(void * arg){
+
+  int howfar,i;
+	for(i=0; i<5; i++){
+    	printf("%d\n", current->tid);
+		lwp_yield();
 	}
-  	lwp_exit();                   /* bail when done.  This should*/
+	lwp_exit();
+}
+static void indentnum(uintptr_t num) {
+  /* print the number num num times, indented by 5*num spaces
+   * Not terribly interesting, but it is instructive.
+   */
+  int howfar,i;
+
+  howfar=(int)num;              /* interpret num as an integer */
+  for(i=0;i<howfar;i++){
+    printf("%*d\n",howfar*5,howfar);
+    lwp_yield();                /* let another have a turn */
+  }
+  lwp_exit();                   /* bail when done.  This should
+                                 * be unnecessary if the stack has
+                                 * been properly prepared
+                                 */
 }

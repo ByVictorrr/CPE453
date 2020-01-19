@@ -14,3 +14,5 @@ lwp.o: lwp.c
 
 magic64.o: magic64.S
 	$(CC) $(CFLAGS) -fpic -c -o magic64.o magic64.S
+clean:
+	rm *.o main
