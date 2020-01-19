@@ -26,6 +26,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "lwp.h"
+#include <math.h>
 
 #define MAXSNAKES  100
 #define INITIALSTACK 2048
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]){
   printf("Launching LWPS\n");
 
   /* spawn a number of individual LWPs */
-  for(i=1;i<=5;i++) {
+  for(i=-1;i>-6;i--) {
     lwp_create((lwpfun)indentnum,(void*)i,INITIALSTACK);
   }
 
@@ -58,11 +59,13 @@ static void indentnum(uintptr_t num) {
   /* print the number num num times, indented by 5*num spaces
    * Not terribly interesting, but it is instructive.
    */
-  int howfar,i;
+  int howfar,i, abs_val;
 
   howfar=(int)num;              /* interpret num as an integer */
-  for(i=0;i<howfar;i++){
-    printf("%*d\n",howfar*5,howfar);
+
+  abs_val=abs(howfar);
+  for(i=-6;i<howfar;i++){
+    printf("%*d\n",abs_val*5,abs_val);
     lwp_yield();                /* let another have a turn */
   }
   lwp_exit();                   /* bail when done.  This should

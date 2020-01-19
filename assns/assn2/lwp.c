@@ -86,6 +86,7 @@ void rr_remove(thread victim){
 		}else if( victim == sch_tail){
 			left= sch_tail->sched_one;//left one
 			left->sched_two=sch_head;
+			sch_tail=left;
 		/* Case -general case in the middle*/
 		}else{
 			left=victim->sched_one;
