@@ -45,20 +45,29 @@ int main(int argc, char *argv[]){
 
   printf("Launching LWPS\n");
 
-  for(i=1;i<6;i++) {
-    lwp_create((lwpfun)test14,(void*)i,INITIALSTACK);
+  int j=1;
+/*
+  for(i=-1;i>-6;i--) {
+    lwp_create((lwpfun)indentnum,(void*)i,INITIALSTACK);
   }
-  lwp_start();                     /* returns when the last lwp exits */
+
+*/
+for(j=1;j<5;j++){
+    lwp_create((lwpfun)test14,(void*)j,INITIALSTACK);
+  }
+  
+
+  lwp_start();                     
 
   //printf("First round complete. Restarting with NO q")
 
-  int j=1;
-  for(;j<6;j++){
+/*
+  for(j=1;j<6;j++){
     lwp_create((lwpfun)test14,(void*)j,INITIALSTACK);
   }
-
-  lwp_start();                     /* returns when the last lwp exits */
+  */
   
+  lwp_start();                     
 
   printf("Back from LWPS.\n");
   return 0;
@@ -78,15 +87,11 @@ static void indentnum(uintptr_t num) {
 
   howfar=(int)num;              /* interpret num as an integer */
 
-/*
   abs_val=abs(howfar);
   for(i=-6;i<howfar;i++){
     printf("%*d\n",abs_val*5,abs_val);
     lwp_yield();                
   abs_val=abs(howfar);
-  for(i=0;i<howfar;i++){
-    printf("%*d\n",abs_val*5,abs_val);
   }
-  */
 }
 

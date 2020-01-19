@@ -34,7 +34,6 @@ void rr_admit(thread new){
 			sch_tail=sch_head=new;
 			sch_tail->sched_one=NULL;
 			sch_tail->sched_two=new;
-			current=sch_head;
 			return;
 		/* Case - only one node in scheduler*/
 		}else if(sch_head == sch_tail){
@@ -106,7 +105,7 @@ thread rr_next(){
 	thread temp;
 	/* Case - empty pool*/
 	if(!sch_head && !sch_tail){
-		return NULL;
+		current=NULL;
 	}
 
 	/*Case - at least one in pool*/
