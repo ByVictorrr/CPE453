@@ -34,6 +34,7 @@ void rr_admit(thread new){
 			sch_tail=sch_head=new;
 			sch_tail->sched_one=NULL;
 			sch_tail->sched_two=new;
+			current=sch_head;
 			return;
 		/* Case - only one node in scheduler*/
 		}else if(sch_head == sch_tail){
@@ -140,8 +141,9 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 	static size_t thread_count = 1;
 	unsigned long *temp_stack;
 	thread new;
-	if(!(new=calloc(1, sizeof(THREAD_INFO_SIZE))) || 
-	   !(new->stack=calloc(size, sizeof(unsigned long)))){
+	if(!(new=calloc(1, THREAD_INFO_SIZE))){
+	   	return NULL;
+	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
 		return NULL;
 	}else{
 		/*Set the new thread*/
@@ -161,10 +163,10 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 		/* After Leave: sp takes rbp 
 		 * and adds 8 (i.e go next space in stack)*/
-		/* After ret: sp is put into 
+		/* After ret: sp is put into */
 		
 
-		/* Register stuff*/
+		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
 		new->state.fxsave=FPU_INIT;
@@ -249,36 +251,6 @@ void lwp_stop(){
 		swap_rfiles(NULL, &process.state);
 	}
 }
-
-
-/*Description: Terminates the current process and frees 
-				its resource(i.e. its stack). 
-				Calls sched->next()
-				to get next thread, if no other threads,
-				restores the orginal system thread
-				*/
-void lwp_exit(){
-	/* if a current exists then*/
-	thread next;
-	if(current){
-		/* remove from lib list */
-		remove_from_lib_list(current);
-		/* remove from sch list */
-		sched->remove(current);
-		free(current->stack);
-		free(current);
-		/* restore the org system thread */
-		if(!(next=sched->next())){
-			swap_rfiles(NULL, &process.state);
-			current=NULL; // no more in linked list
-		/* Set next to the current thread*/
-		}else{
-			/* We dont care what was previous in address*/
-			current=next;
-			swap_rfiles(NULL, &current->state);
-		}
-	}
-}
 /*Description: helper function for lwp_exit;
 				This assumes current as not null*/
 void remove_from_lib_list(thread current){
@@ -310,6 +282,36 @@ void remove_from_lib_list(thread current){
 
 }
 
+
+
+/*Description: Terminates the current process and frees 
+				its resource(i.e. its stack). 
+				Calls sched->next()
+				to get next thread, if no other threads,
+				restores the orginal system thread
+				*/
+void lwp_exit(){
+	/* if a current exists then*/
+	thread next;
+	if(current){
+		/* remove from lib list */
+		remove_from_lib_list(current);
+		/* remove from sch list */
+		sched->remove(current);
+		free(current->stack);
+		free(current);
+		/* restore the org system thread */
+		if(!(next=sched->next())){
+			swap_rfiles(NULL, &process.state);
+			current=NULL; // no more in linked list
+		/* Set next to the current thread*/
+		}else{
+			/* We dont care what was previous in address*/
+			current=next;
+			swap_rfiles(NULL, &current->state);
+		}
+	}
+}
 
 thread tid2thread(tid_t id){
 	thread id_temp = lib_head;
@@ -379,7 +381,7 @@ void say_hi(void * arg){
 
   int howfar,i;
 	printf("%s", "Greetings from Thread ");
-	printf("%d\n", current->tid);
+	printf("%ld\n", current->tid);
 	lwp_yield();
 	printf("%s","IM still avlive" );
 	lwp_exit();
