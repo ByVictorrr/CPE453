@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "lwp.h"
+#include "../lwp.h"
 
 #define MAXSNAKES  100
 #define INITIALSTACK 2048

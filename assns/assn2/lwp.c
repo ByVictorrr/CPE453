@@ -17,19 +17,6 @@ context process ;
 
 //********************Scheduler**********************************//
 
-/***NULL<-[]-><-[]-><-[]->(1st one)
- * 
-/* rr_init=NULL - this is to be called before any threads are 
-			 admitted to the scheduler. It setups up the 
-			 scheduler.
-
-		void rr_init();
- 	(rr_shutdown = NULL) - 	this is to be called when the lwp lib is
-									done with a scheduler to allow it to clean up.
-									void rr_shutdown();
- rr_admit(thread new) - this is to admit a new thread to the 
-						  schedulers pool
-*/
 thread sch_tail = NULL, sch_head = NULL; // used to keep track of queue
 /** NULL<-[sch_head]-><-[arbitrary]-><-[sch_tail]->(points to head) 
 * 
@@ -46,13 +33,14 @@ void rr_admit(thread new){
 		if(!sch_tail && !sch_head){
 			sch_tail=sch_head=new;
 			sch_tail->sched_one=NULL;
-			sch_tail->sched_two=NULL;
+			sch_tail->sched_two=new;
 			return;
 		/* Case - only one node in scheduler*/
 		}else if(sch_head == sch_tail){
 			sch_head->sched_two=new;
 			sch_tail=new;
 			sch_tail->sched_one = sch_head;
+			sch_tail->sched_two=sch_head;
 		/* Case - at least two in schedular*/
 		}else if(sch_head != sch_tail){
 			/* Just have to use the tail*/
@@ -63,6 +51,17 @@ void rr_admit(thread new){
 			sch_tail=new;
 		}
 	}
+}
+/* Description: helper function to remove*/
+int isInPool(thread victim){
+	thread temp = sch_head;
+	while(temp){
+		if(temp==victim){
+			return TRUE;
+		}
+		temp=temp->sched_two;
+	}
+	return FALSE;
 }
 /* Description: Removes the passwed context from the scheduler's pool*/
 void rr_remove(thread victim){
@@ -97,17 +96,7 @@ void rr_remove(thread victim){
 	}
 
 }
-/* Description: helper function to remove*/
-int isInPool(thread victim){
-	thread temp = sch_head;
-	while(temp){
-		if(temp==victim){
-			return TRUE;
-		}
-		temp=temp->lib_two;
-	}
-	return FALSE;
-}
+
 
 /* Description: Retursn the next thread to be run or 
 				NULL if there isnt one*/
@@ -130,8 +119,8 @@ thread rr_next(){
 	}
 	return current;
 }
-struct scheduler rr_sch_o = {NULL, NULL, rr_admit, rr_remove, rr_next};
-scheduler rr_sch = &rr_sch_o;
+struct scheduler rr_sched = {NULL, NULL, rr_admit, rr_remove, rr_next};
+scheduler sched = &rr_sched;
 
 //**************************************************************//
 //************************LWP************************************//
@@ -162,14 +151,15 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 
 		/* Init stack */
-		temp_stack=(new->stack+new->stacksize -1); // last spot allocated
+		temp_stack=(new->stack+new->stacksize -1);
 
 		*temp_stack = lwp_exit;
 		temp_stack--;
 		*temp_stack = fn;
 		temp_stack--;
 
-		/* After Leave: sp takes rbp and adds 8 (i.e go next space in stack)*/
+		/* After Leave: sp takes rbp 
+		 * and adds 8 (i.e go next space in stack)*/
 		/* After ret: sp is put into 
 		
 
@@ -209,7 +199,7 @@ tid_t lwp_create(lwpfun fn, void *arg, size_t size){
 		new->lib_one=temp;
 		lib_tail=new;
 	}
-	rr_sch->admit(new);
+	sched->admit(new);
 	return new->tid;
 }
 /*Description: Starts the LWP system. Saves the org context,
@@ -221,22 +211,24 @@ void lwp_start(){
 	/* Saving contents of Orginal state before LWP*/
 	/* Make a note to future self when removing check 
 		to if list empty if so point head to NULL*/
-	if(!(next=rr_sch->next())){
+	if(!(next=sched->next())){
 		lwp_exit();
 	}else{
 		swap_rfiles(&process.state, &next->state);
-		current=next;
+		//current=next;
 	}
 } 
 
-/*Description: Yields control to another lwp. WHich one depends on the schuler. 
-				Savesthe current lwp's context, pick the next one, restoring that 
-				threads context
+/*Description: Yields control to another lwp. 
+ *				Which one depends on the schuler. 
+ *				Saves the current lwp's context, 
+ *				pick the next one, restoring that 
+ *				threads context
 */
 void lwp_yield(){
 	thread curr = current, next;
 	/* What is we dont have anymore thread in here*/
-	if((next=rr_sch->next())){
+	if((next=sched->next())){
 		swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
@@ -259,7 +251,8 @@ void lwp_stop(){
 
 
 /*Description: Terminates the current process and frees 
-				its resource(i.e. its stack). Calls sched->next()
+				its resource(i.e. its stack). 
+				Calls sched->next()
 				to get next thread, if no other threads,
 				restores the orginal system thread
 				*/
@@ -270,11 +263,11 @@ void lwp_exit(){
 		/* remove from lib list */
 		remove_from_lib_list(current);
 		/* remove from sch list */
-		rr_sch->remove(current);
+		sched->remove(current);
 		free(current->stack);
 		free(current);
 		/* restore the org system thread */
-		if(!(next=rr_sch->next())){
+		if(!(next=sched->next())){
 			swap_rfiles(NULL, &process.state);
 			current=NULL; // no more in linked list
 		/* Set next to the current thread*/
@@ -330,6 +323,31 @@ thread tid2thread(tid_t id){
 	return NULL;
 }
 
+tid_t lwp_gettid(){
+	if(current){
+		return current->tid;
+	}else{
+		return NO_THREAD;
+	}
+}
+/* Description: Casues the LWP package to use the given
+				scheduler to choose the next process to run
+				Transfers all threads from the old scheduler
+				to the new one in next() order. If scheduler 
+				is NULL the library should return to 
+				round-robin scheduling*/
+void lwp_set_scheduler(scheduler sch){
+	if(sch){
+		sched=sch;
+	}else{
+		sched=&rr_sched;
+	}	
+}
+
+/* Description: Returns the pointer to the current scheduler*/
+scheduler lwp_get_scheduler(){
+	return sched;
+}
 //**************************************************************//
 
 void say_hi(void *arg);
@@ -344,8 +362,12 @@ int main(){
 	int i;
 
 	int j=4;
+
+	lwp_create(say_hi, &j, STACK_SIZE);
+	/*
 	for(i=0; i<4; i++)
 		lwp_create(say_hi, &j, STACK_SIZE);
+		*/
 
 	lwp_start();
 
@@ -355,10 +377,10 @@ int main(){
 void say_hi(void * arg){
 
   int howfar,i;
-	for(i=0; i<5; i++){
-    	printf("%d\n", current->tid);
-		lwp_yield();
-	}
+	printf("%s", "Greetings from Thread ");
+	printf("%d\n", current->tid);
+	lwp_yield();
+	printf("%s","IM still avlive" );
 	lwp_exit();
 }
 static void indentnum(uintptr_t num) {

@@ -2,8 +2,15 @@
 #define LWPH
 #include <sys/types.h>
 
+#ifndef FALSE
+#define FALSE 0
+#endif
 
-enum {FALSE, TRUE} bool_t;
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+
 
 #if defined(__x86_64)
 #include "fp.h"
