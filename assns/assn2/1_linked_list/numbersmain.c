@@ -31,6 +31,7 @@
 #define MAXSNAKES  100
 #define INITIALSTACK 2048
 
+extern thread current;
 typedef void (*sigfun)(int signum);
 static void indentnum(uintptr_t num);
 
@@ -66,7 +67,9 @@ for(i=1;i<6;i++){
 
 void test13(void *ptr){
   static int i=0;
+  printf("Greetings from Thread %ld Yielding\n", current->tid);
   lwp_yield();
+  printf("I (%ld)am still alive\n", current->tid);
   lwp_exit();
 }
 
@@ -74,9 +77,10 @@ void test13_call(){
   int j,i;
   /*for(j=0; j<100; j++){*/
     for(i=0;i<10;i++){
-      lwp_create((lwpfun)test13,(void*)i,INITIALSTACK);
+      lwp_create((lwpfun)test13,(void*)i,10000000000000);
     }
     lwp_start();
+    lwp_exit();
 }
 
 

@@ -142,6 +142,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 	if(!(new=calloc(1, THREAD_INFO_SIZE))){
 	   	return NULL;
 	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
+		free(new->stack);
 		return NULL;
 	}else{
 		/*Set the new thread*/
@@ -181,8 +182,12 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 returns: lwp_id of the new thread OR -1 if cant be made
 				*/
 tid_t lwp_create(lwpfun fn, void *arg, size_t size){
-	thread new = newThread(fn, arg, size);
-	sched->admit(new);
+	thread new;
+	if((new= newThread(fn, arg, size))){
+		sched->admit(new);
+	}else{
+		return -1;
+	}
 	return new->tid;
 }
 /*Description: Starts the LWP system. Saves the org context,
