@@ -12,65 +12,155 @@
 
 \begin{document}
 \hfill\vbox{\hbox{Delaplaine, Victor}
-		\hbox{Cpe 453, Section 02}	
+		\hbox{Cpe 453, Section 01}	
 		\hbox{Lab 2}	
 		\hbox{\today}}\par
 
 \bigskip
 \centerline{\Large\bf Lab 2: Minix Scavenger Hunt}\par
-\bigskip
+\bigskip 
 
-This is the template I passed out in the lab (well, slightly 
-modified).  It works reasonably well to have each step of the
-lab be a {\textbackslash section} and each component below it
-a {\textbackslash subsection}.  For the ``problem set'' labs
-an {\tt enumerate} environment is probably more appropriate.
-
+Hello, for this laboratory I will be using \Latex for my choice of document prepartion. 
+I also have chosen to use \tt VirtualBox for hosting Minix 3.1.8 on.
 
 \setcounter{section}{1} % make the first section, section 2(see below)
 \section{Logging in}
 
-This example is actually the second step in this lab so I had
-to change the section number to match.  If you want to
-set section numbers, you can do so with 
-\verb+\setcounter{section}{+$n${\tt \}}.  Set $n$ to be one less
-than you want it to be.
+
+\subsection{Approach}
+
+I was prompted immedately with:
+
+{\tt\begin{tabbing}
+\# login: \\
+\end{tabbing}}
+
+For a long time I was typing in my Cal Poly username "vdelapla":
+
+{\tt\begin{tabbing}
+\# login: vdelapla\\
+\\ Password: *****\\
+\end{tabbing}}
+
+
+\subsection{Problems Encountered}
+  Each time I would enter my username I would get a login error.
+
+\subsection{Solutions}
+  After getting a lot of "Login incorrect" messages, I realized it was time to 
+read the manual. It said that to login with the name "root" and continue with 
+the following steps.
+
+
+\subsection{Lessons Learned}
+  In this section I learned to read things more closely.
+
+\setcounter{section}{2} % make the first section, section 2(see below)
+\section{Create a user account}
 
 
 \subsection{Approach}
-  The login procedure is to enter the username at the ``{\tt login:}''
-prompt followed by the password at the ``{\tt password:}'' prompt.
-The username for the user account I created is ``{\tt pnico}''.  The
-password is not recorded here for obvious reasons.
+
+  The create a user account section consists creating a new 
+username and setting a password for that username. 
+The user account I created is "victor", its group is "operator", 
+and home directory is "/home/victor".
 
 \subsection{Problems Encountered}
 
-  I was distracted and hit too many returns to wake up the terminal, 
-ended up entering the login name at the password prompt, and typing
-my password at the following login prompt:
+  When it was time to create a password for my login name "victor", 
+I typed in the shell "passwd" while logged in as root. This prompted 
+me to change the password for root:
 
 {\tt\begin{tabbing}
-login:\\
-password: pnico\\
-\\
-login: $<${\it password withheld}$>$\\
-password:
+\# passwd\\
+Changing the shadow password of root\\
+New pasword:\\
 \end{tabbing}}
 
 \subsection{Solutions}
 
-  The solution was to re-enter my login name and password at the
-  appropriate prompts.  I also checked to see if the bad login
-  had been logged to {\tt /usr/adm/log}, because that would have
-  been a security risk.  On this system bad logins are not logged,
-  so there was no breach.
+   The solution was to exit "passwd" by hitting CTRL-C, 
+and then to read the man page for "passwd". In the man page, I came across
+an optional argument, that changes the password/set of an existing user. This command
+otherwise defaults to the signed-in user.
 
 \subsection{Lessons Learned}
+  In this section, I learned to not assume anything about the functionality of a program, 
+and always go back to read the man page if im not sure what it does.
 
-  In this section I learned to pay attention while logging in to
-the machine.  I also learned how hard it is to come up with bogus
-problems having to do with logging in.  (Forgetting that {\sc Unix} is
-case sensitive is more likely.  Still more likely is ``none'' for
-this particular task.)
+
+\setcounter{section}{3} % make the first section, section 2(see below)
+\section{Create a Minix disk image and use it to store data}
+
+\subsection{Approach}
+
+  I needed to create an empty disk image file, 
+so I issued the "dd if=/dev/zero of=testFloppy.img bs=1024 count=1440" 
+command. Then went on the \tt {Virtual Box} settings and configured 
+the "testFloppy.img" to be used for Minix's drive. After coniguring the above, 
+I then formated the floppy drive, made the file system, mounted the floppy, 
+and finally unmounted it. Below shows the commands after attatching the 
+floppy drive in \tt{Virtual Box}.
+
+{\tt\begin{tabbing}
+format /dev/fd0 1440\\
+mkfs /dev/fd0\\
+mkdir /mnt/Floppy\\
+mount /dev/fd0 /mnt/Floppy\\
+umount /mnt/Floppy
+\end{tabbing}}
+
+\subsection{Problems Encountered}
+
+  When, I was trying to un mount the floppy drive using the above 
+command. I issued it before making a directory called "Floppy" and got an 
+error that said:
+
+{\tt\begin{tabbing}
+mount: Can't mount /dev/fd0 on /mnt/Floppy/: No such file or directory
+\end{tabbing}}
+
+\subsection{Solutions}
+
+The solution was to create an empty folder named "Floppy" by using "mkdir /mnt/Floppy".
+
+\subsection{Lessons Learned}
+  Again, I learned that you cannot assume that a program does something.
+
+		
+\setcounter{section}{4} % make the first section, section 2(see below)
+\section{Acessing your data from outside Minix}
+
+\subsection{Approach}
+
+  I configured the network for Minix by first using netconf and using the recommened 
+network card. After this I shut down the Minix machine, went into VirtualBox settings and selected 
+the bridge connection option. Finally, 
+after this I restarted Minix looked up its ip address, then ran:
+
+{\tt\begin{tabbing}
+scp -P 22 victor@<ip address>:/home/victor/.ashrc .
+\end{tabbing}}
+
+  On my local machine that I ran this command I was able to get the file ".ashrc" onto my
+current working directory.
+
+
+\subsection{Problems Encountered}
+
+  I tried to run "scp" as "ssh" where you just provide the <hostname>@<ip address>,
+because I thought it was going to give me a shell like "ftp".
+
+
+\subsection{Solutions}
+
+  I looked at the man page for "scp"; it said that after the target ip address to put the 
+file name you want, and where you want to place it.
+
+\subsection{Lessons Learned}
+ I have learned that to read the man page, before assumptions are made.
+  
+  
 
 \end{document}
