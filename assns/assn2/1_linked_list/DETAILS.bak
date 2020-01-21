@@ -1,175 +1,172 @@
 =================================================
-TEST 8: Five threads, variable iters, exit from front
+TEST 7: Five lwps, calling lwp_yield(), then lwp_exit()
 
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after its number of iterations
-
-
+This test spawns five LWPs, each of which yields once,
+then calls lwp_exit() the second time.
 ----------
 Reference:
 ----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-         2
-              3
-                   4
-                        5
-              3
-                   4
-                        5
-                   4
-                        5
-                        5
-Back from LWPS.
+Greetings from Thread 0.  Yielding...
+Greetings from Thread 1.  Yielding...
+Greetings from Thread 2.  Yielding...
+Greetings from Thread 3.  Yielding...
+Greetings from Thread 4.  Yielding...
+I (0) am still alive.  Goodbye.
+I (1) am still alive.  Goodbye.
+I (2) am still alive.  Goodbye.
+I (3) am still alive.  Goodbye.
+I (4) am still alive.  Goodbye.
+LWPs have ended.
 ----------
 Submitted:
 ----------
-Child process (24903) exited due to signal (Segmentation fault).
+Child process (20031) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1,17c1
-< Launching LWPS
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<          2
-<               3
-<                    4
-<                         5
-<               3
-<                    4
-<                         5
-<                    4
-<                         5
-<                         5
-< Back from LWPS.
+1,11c1
+< Greetings from Thread 0.  Yielding...
+< Greetings from Thread 1.  Yielding...
+< Greetings from Thread 2.  Yielding...
+< Greetings from Thread 3.  Yielding...
+< Greetings from Thread 4.  Yielding...
+< I (0) am still alive.  Goodbye.
+< I (1) am still alive.  Goodbye.
+< I (2) am still alive.  Goodbye.
+< I (3) am still alive.  Goodbye.
+< I (4) am still alive.  Goodbye.
+< LWPs have ended.
 ---
-> Child process (24903) exited due to signal (Segmentation fault).
+> Child process (20031) exited due to signal (Segmentation fault).
 ---------
 =================================================
-TEST 9: Five threads, variable iters, exit from back
+TEST 12: Ten lwps, yields, and returns
 
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after N minus its number of iterations.
-The effect is to always have the last process call lwp_exit().
-
+This test spawns several threads that prints a message, yields
+to itself, then returns
 
 ----------
 Reference:
 ----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-    1
-         2
-              3
-    1
-         2
-    1
-Back from LWPS.
+Greetings from Thread 0.  Yielding...
+Greetings from Thread 1.  Yielding...
+Greetings from Thread 2.  Yielding...
+Greetings from Thread 3.  Yielding...
+Greetings from Thread 4.  Yielding...
+Greetings from Thread 5.  Yielding...
+Greetings from Thread 6.  Yielding...
+Greetings from Thread 7.  Yielding...
+Greetings from Thread 8.  Yielding...
+Greetings from Thread 9.  Yielding...
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+I'm still alive.  Goodbye
+After thread termination
 ----------
 Submitted:
 ----------
-Child process (24935) exited due to signal (Segmentation fault).
+Child process (20187) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1,17c1
-< Launching LWPS
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<     1
-<          2
-<               3
-<                    4
-<     1
-<          2
-<               3
-<     1
-<          2
-<     1
-< Back from LWPS.
+1,21c1
+< Greetings from Thread 0.  Yielding...
+< Greetings from Thread 1.  Yielding...
+< Greetings from Thread 2.  Yielding...
+< Greetings from Thread 3.  Yielding...
+< Greetings from Thread 4.  Yielding...
+< Greetings from Thread 5.  Yielding...
+< Greetings from Thread 6.  Yielding...
+< Greetings from Thread 7.  Yielding...
+< Greetings from Thread 8.  Yielding...
+< Greetings from Thread 9.  Yielding...
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< I'm still alive.  Goodbye
+< After thread termination
 ---
-> Child process (24935) exited due to signal (Segmentation fault).
+> Child process (20187) exited due to signal (Segmentation fault).
 ---------
 =================================================
-TEST 10: Five threads, AlwaysZero scheduling
+TEST 13: Three lwps.  Stop, then restart
 
-This is the numbersmain program distributed with the assignment,
-but with the scheduler changed to always run the head of the queue.
-Each thread (1..5) exits after its number of iterations.
+This test spawns a three threads each of which stops and restarts
+several times.
 
 
 ----------
 Reference:
 ----------
-Launching LWPS
-    1
-         2
-         2
-              3
-              3
-              3
-                   4
-                   4
-                   4
-                   4
-                        5
-                        5
-                        5
-                        5
-                        5
-Back from LWPS.
+Starting LWPs...
+Test
+Test
+Test
+Test2
+Test2
+Test2
+Test3
+Test3
+Test3
+Test4
+Test4
+Test4
+Test5
+Test5
+Test5
+Test6
+Test6
+Test6
+Done.
 ----------
 Submitted:
 ----------
-Child process (24967) exited due to signal (Segmentation fault).
+Child process (20218) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1,17c1
-< Launching LWPS
-<     1
-<          2
-<          2
-<               3
-<               3
-<               3
-<                    4
-<                    4
-<                    4
-<                    4
-<                         5
-<                         5
-<                         5
-<                         5
-<                         5
-< Back from LWPS.
+1,20c1
+< Starting LWPs...
+< Test
+< Test
+< Test
+< Test2
+< Test2
+< Test2
+< Test3
+< Test3
+< Test3
+< Test4
+< Test4
+< Test4
+< Test5
+< Test5
+< Test5
+< Test6
+< Test6
+< Test6
+< Done.
 ---
-> Child process (24967) exited due to signal (Segmentation fault).
+> Child process (20218) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 14: Five lwps, all exit, recreate then call start
@@ -206,7 +203,7 @@ LWPs have ended.
 ----------
 Submitted:
 ----------
-Child process (25068) exited due to signal (Segmentation fault).
+Child process (20249) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -237,7 +234,234 @@ Differences (< reference > output)
 < I (4) am still alive.  Goodbye.
 < LWPs have ended.
 ---
-> Child process (25068) exited due to signal (Segmentation fault).
+> Child process (20249) exited due to signal (Segmentation fault).
+---------
+=================================================
+TEST 16: Two Lwps. spawn then exits 50 times.
+
+Two threads creates new ones, then exits.
+
+
+
+----------
+Reference:
+----------
+Counter is 50.  Exiting
+Counter is 50.  Exiting
+Counter is 49.  Exiting
+Counter is 49.  Exiting
+Counter is 48.  Exiting
+Counter is 48.  Exiting
+Counter is 47.  Exiting
+Counter is 47.  Exiting
+Counter is 46.  Exiting
+Counter is 46.  Exiting
+Counter is 45.  Exiting
+Counter is 45.  Exiting
+Counter is 44.  Exiting
+Counter is 44.  Exiting
+Counter is 43.  Exiting
+Counter is 43.  Exiting
+Counter is 42.  Exiting
+Counter is 42.  Exiting
+Counter is 41.  Exiting
+Counter is 41.  Exiting
+Counter is 40.  Exiting
+Counter is 40.  Exiting
+Counter is 39.  Exiting
+Counter is 39.  Exiting
+Counter is 38.  Exiting
+Counter is 38.  Exiting
+Counter is 37.  Exiting
+Counter is 37.  Exiting
+Counter is 36.  Exiting
+Counter is 36.  Exiting
+Counter is 35.  Exiting
+Counter is 35.  Exiting
+Counter is 34.  Exiting
+Counter is 34.  Exiting
+Counter is 33.  Exiting
+Counter is 33.  Exiting
+Counter is 32.  Exiting
+Counter is 32.  Exiting
+Counter is 31.  Exiting
+Counter is 31.  Exiting
+Counter is 30.  Exiting
+Counter is 30.  Exiting
+Counter is 29.  Exiting
+Counter is 29.  Exiting
+Counter is 28.  Exiting
+Counter is 28.  Exiting
+Counter is 27.  Exiting
+Counter is 27.  Exiting
+Counter is 26.  Exiting
+Counter is 26.  Exiting
+Counter is 25.  Exiting
+Counter is 25.  Exiting
+Counter is 24.  Exiting
+Counter is 24.  Exiting
+Counter is 23.  Exiting
+Counter is 23.  Exiting
+Counter is 22.  Exiting
+Counter is 22.  Exiting
+Counter is 21.  Exiting
+Counter is 21.  Exiting
+Counter is 20.  Exiting
+Counter is 20.  Exiting
+Counter is 19.  Exiting
+Counter is 19.  Exiting
+Counter is 18.  Exiting
+Counter is 18.  Exiting
+Counter is 17.  Exiting
+Counter is 17.  Exiting
+Counter is 16.  Exiting
+Counter is 16.  Exiting
+Counter is 15.  Exiting
+Counter is 15.  Exiting
+Counter is 14.  Exiting
+Counter is 14.  Exiting
+Counter is 13.  Exiting
+Counter is 13.  Exiting
+Counter is 12.  Exiting
+Counter is 12.  Exiting
+Counter is 11.  Exiting
+Counter is 11.  Exiting
+Counter is 10.  Exiting
+Counter is 10.  Exiting
+Counter is 9.  Exiting
+Counter is 9.  Exiting
+Counter is 8.  Exiting
+Counter is 8.  Exiting
+Counter is 7.  Exiting
+Counter is 7.  Exiting
+Counter is 6.  Exiting
+Counter is 6.  Exiting
+Counter is 5.  Exiting
+Counter is 5.  Exiting
+Counter is 4.  Exiting
+Counter is 4.  Exiting
+Counter is 3.  Exiting
+Counter is 3.  Exiting
+Counter is 2.  Exiting
+Counter is 2.  Exiting
+Counter is 1.  Exiting
+Counter is 1.  Exiting
+Bye
+Bye
+----------
+Submitted:
+----------
+Child process (20303) exited due to signal (Segmentation fault).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+1,102c1
+< Counter is 50.  Exiting
+< Counter is 50.  Exiting
+< Counter is 49.  Exiting
+< Counter is 49.  Exiting
+< Counter is 48.  Exiting
+< Counter is 48.  Exiting
+< Counter is 47.  Exiting
+< Counter is 47.  Exiting
+< Counter is 46.  Exiting
+< Counter is 46.  Exiting
+< Counter is 45.  Exiting
+< Counter is 45.  Exiting
+< Counter is 44.  Exiting
+< Counter is 44.  Exiting
+< Counter is 43.  Exiting
+< Counter is 43.  Exiting
+< Counter is 42.  Exiting
+< Counter is 42.  Exiting
+< Counter is 41.  Exiting
+< Counter is 41.  Exiting
+< Counter is 40.  Exiting
+< Counter is 40.  Exiting
+< Counter is 39.  Exiting
+< Counter is 39.  Exiting
+< Counter is 38.  Exiting
+< Counter is 38.  Exiting
+< Counter is 37.  Exiting
+< Counter is 37.  Exiting
+< Counter is 36.  Exiting
+< Counter is 36.  Exiting
+< Counter is 35.  Exiting
+< Counter is 35.  Exiting
+< Counter is 34.  Exiting
+< Counter is 34.  Exiting
+< Counter is 33.  Exiting
+< Counter is 33.  Exiting
+< Counter is 32.  Exiting
+< Counter is 32.  Exiting
+< Counter is 31.  Exiting
+< Counter is 31.  Exiting
+< Counter is 30.  Exiting
+< Counter is 30.  Exiting
+< Counter is 29.  Exiting
+< Counter is 29.  Exiting
+< Counter is 28.  Exiting
+< Counter is 28.  Exiting
+< Counter is 27.  Exiting
+< Counter is 27.  Exiting
+< Counter is 26.  Exiting
+< Counter is 26.  Exiting
+< Counter is 25.  Exiting
+< Counter is 25.  Exiting
+< Counter is 24.  Exiting
+< Counter is 24.  Exiting
+< Counter is 23.  Exiting
+< Counter is 23.  Exiting
+< Counter is 22.  Exiting
+< Counter is 22.  Exiting
+< Counter is 21.  Exiting
+< Counter is 21.  Exiting
+< Counter is 20.  Exiting
+< Counter is 20.  Exiting
+< Counter is 19.  Exiting
+< Counter is 19.  Exiting
+< Counter is 18.  Exiting
+< Counter is 18.  Exiting
+< Counter is 17.  Exiting
+< Counter is 17.  Exiting
+< Counter is 16.  Exiting
+< Counter is 16.  Exiting
+< Counter is 15.  Exiting
+< Counter is 15.  Exiting
+< Counter is 14.  Exiting
+< Counter is 14.  Exiting
+< Counter is 13.  Exiting
+< Counter is 13.  Exiting
+< Counter is 12.  Exiting
+< Counter is 12.  Exiting
+< Counter is 11.  Exiting
+< Counter is 11.  Exiting
+< Counter is 10.  Exiting
+< Counter is 10.  Exiting
+< Counter is 9.  Exiting
+< Counter is 9.  Exiting
+< Counter is 8.  Exiting
+< Counter is 8.  Exiting
+< Counter is 7.  Exiting
+< Counter is 7.  Exiting
+< Counter is 6.  Exiting
+< Counter is 6.  Exiting
+< Counter is 5.  Exiting
+< Counter is 5.  Exiting
+< Counter is 4.  Exiting
+< Counter is 4.  Exiting
+< Counter is 3.  Exiting
+< Counter is 3.  Exiting
+< Counter is 2.  Exiting
+< Counter is 2.  Exiting
+< Counter is 1.  Exiting
+< Counter is 1.  Exiting
+< Bye
+< Bye
+---
+> Child process (20303) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
@@ -254,7 +478,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (25145) exited due to signal (Segmentation fault).
+Child process (20335) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -264,7 +488,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (25145) exited due to signal (Segmentation fault).
+> Child process (20335) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 18: 1024 threads, random exit.
@@ -283,7 +507,7 @@ Done.  Count is 50000. (Yielded 406869 times)
 ----------
 Submitted:
 ----------
-Child process (25182) exited due to signal (Segmentation fault).
+Child process (20366) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -293,7 +517,7 @@ Differences (< reference > output)
 < Spawining 4096 threads.
 < Done.  Count is 50000. (Yielded 406869 times)
 ---
-> Child process (25182) exited due to signal (Segmentation fault).
+> Child process (20366) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 19: Ping pong with semaphores
@@ -332,7 +556,7 @@ Done.
 ----------
 Submitted:
 ----------
-Child process (25224) exited due to signal (Segmentation fault).
+Child process (20402) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -362,7 +586,7 @@ Differences (< reference > output)
 <    Ping...pong.
 < Done.
 ---
-> Child process (25224) exited due to signal (Segmentation fault).
+> Child process (20402) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 20: Dine with semaphores
@@ -584,7 +808,7 @@ Reference:
 ----------
 Submitted:
 ----------
-Child process (25255) exited due to signal (Segmentation fault).
+Child process (20433) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -797,7 +1021,7 @@ Differences (< reference > output)
 < | -----       | -----       | -----       | -----       | -----       |
 < |=============|=============|=============|=============|=============|
 ---
-> Child process (25255) exited due to signal (Segmentation fault).
+> Child process (20433) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 21: Transfer threads between schedulers (stopped)
@@ -1066,7 +1290,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (25365) exited due to signal (Segmentation fault).
+Child process (20542) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1173,7 +1397,7 @@ Differences (< reference > output)
 < (second->next())
 < Back from LWPS.
 ---
-> Child process (25365) exited due to signal (Segmentation fault).
+> Child process (20542) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 26: Does tid2thread return the right thread?
@@ -1580,7 +1804,7 @@ Checking thread IDs...
 ----------
 Submitted:
 ----------
-Child process (25421) exited due to signal (Segmentation fault).
+Child process (20596) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1976,7 +2200,7 @@ Differences (< reference > output)
 < Checking thread IDs...
 < ...done.
 ---
-> Child process (25421) exited due to signal (Segmentation fault).
+> Child process (20596) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 27: Tid2thread() returns NULL given a bad tid?
@@ -1993,7 +2217,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (25454) exited due to signal (Segmentation fault).
+Child process (20627) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -2003,7 +2227,7 @@ Differences (< reference > output)
 < Launching LWPS
 < Back from LWPS.
 ---
-> Child process (25454) exited due to signal (Segmentation fault).
+> Child process (20627) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -2232,7 +2456,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (25485) exited due to signal (Segmentation fault).
+Child process (20659) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -2452,5 +2676,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (25485) exited due to signal (Segmentation fault).
+> Child process (20659) exited due to signal (Segmentation fault).
 ---------

@@ -104,9 +104,9 @@ void rr_remove(thread victim){
 
 
 /* Description: Retursn the next thread to be run or 
-				NULL if there isnt one*/
+				NULL if there isnt one(used to assign curent)*/
 thread rr_next(){
-	thread temp;
+	thread temp, next;
 	/* Case - empty pool*/
 	if(!head && !tail){
 		return NULL;
@@ -116,13 +116,13 @@ thread rr_next(){
 
 	/*Case - where current hasnt been assigned*/
 	if(!current){
-		current=head;
+		next=head;
 	/*Case - where currrent has been assign*/
 	}else{
-		temp=current;		
-		current=temp->sched_two;
+		temp=current;
+		next=temp->sched_two;
 	}
-	return current;
+	return next;
 }
 struct scheduler rr_sched = {NULL, NULL, rr_admit, rr_remove, rr_next};
 scheduler sched = &rr_sched;
@@ -168,6 +168,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
+		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 
@@ -217,6 +218,7 @@ void lwp_yield(){
 	thread curr = current, next;
 	/* What is we dont have anymore thread in here*/
 	if((next=sched->next())){
+		current=next;
 		swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
@@ -233,7 +235,8 @@ void lwp_stop(){
 	if(current){
 		swap_rfiles(&current->state, &process.state);
 	}else{
-		swap_rfiles(NULL, &process.state);
+		//swap_rfiles(NULL, &process.state);
+		return;
 	}
 }
 
@@ -246,22 +249,24 @@ void lwp_stop(){
 				*/
 void lwp_exit(){
 	/* if a current exists then*/
-	thread next;
+	thread next, free1, free2;
 	if(current){
+		free1=current->stack;
+		free2=current;
 		/* remove from sch list */
 		sched->remove(current);
-		free(current->stack);
-		free(current);
-		/* restore the org system thread */
+		free(free1);
+		free(free2);
+	/* restore the org system thread */
 		if(!(next=sched->next())){
-			current=NULL; // no more in linked list
 			swap_rfiles(NULL, &process.state);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
 			current=next;
-			swap_rfiles(NULL, &current->state);
+			swap_rfiles(NULL, &next->state);
 		}
+
 	}
 }
 
