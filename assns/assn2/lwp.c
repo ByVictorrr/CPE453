@@ -105,7 +105,7 @@ thread rr_next(){
 	thread temp;
 	/* Case - empty pool*/
 	if(!sch_head && !sch_tail){
-		current=NULL;
+		return NULL;
 	}
 
 	/*Case - at least one in pool*/
@@ -216,8 +216,8 @@ void lwp_start(){
 	if(!(next=sched->next())){
 		lwp_exit();
 	}else{
+		current=next;
 		swap_rfiles(&process.state, &next->state);
-		//current=next;
 	}
 } 
 
@@ -301,8 +301,8 @@ void lwp_exit(){
 		free(current);
 		/* restore the org system thread */
 		if(!(next=sched->next())){
-			swap_rfiles(NULL, &process.state);
 			current=NULL; // no more in linked list
+			swap_rfiles(NULL, &process.state);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/

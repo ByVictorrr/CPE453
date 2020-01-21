@@ -35,6 +35,8 @@ typedef void (*sigfun)(int signum);
 static void indentnum(uintptr_t num);
 
 void test14(uintptr_t ptr);
+
+void test13_call();
 int main(int argc, char *argv[]){
   long i;
 
@@ -45,38 +47,47 @@ int main(int argc, char *argv[]){
 
   printf("Launching LWPS\n");
 
-  int j=1;
 /*
-  for(i=-1;i>-6;i--) {
-    lwp_create((lwpfun)indentnum,(void*)i,INITIALSTACK);
-  }
+for(i=1;i<6;i++){
+    lwp_create((lwpfun)test14,(void*)i,INITIALSTACK);
 
-*/
-for(j=1;j<5;j++){
-    lwp_create((lwpfun)test14,(void*)j,INITIALSTACK);
-  }
-  
-
-  lwp_start();                     
-
-  //printf("First round complete. Restarting with NO q")
-
-/*
-  for(j=1;j<6;j++){
-    lwp_create((lwpfun)test14,(void*)j,INITIALSTACK);
   }
   */
   
-  lwp_start();                     
+
+  test13_call();
+
+  
 
   printf("Back from LWPS.\n");
   return 0;
 }
 
+
+void test13(void *ptr){
+  static int i=0;
+  lwp_yield();
+  lwp_exit();
+}
+
+void test13_call(){
+  int j,i;
+  /*for(j=0; j<100; j++){*/
+    for(i=0;i<10;i++){
+      lwp_create((lwpfun)test13,(void*)i,10000000000000000000);
+    }
+    lwp_start();
+}
+
+
+
+
+
+
 void test14(uintptr_t ptr){
   printf("Greetings from ThreadYielding\n");
   lwp_yield();
-  printf("I  still alive. Goodbye.\n");
+  //printf("I  still alive. Goodbye.\n");
   lwp_exit();
 }
 static void indentnum(uintptr_t num) {
@@ -88,10 +99,10 @@ static void indentnum(uintptr_t num) {
   howfar=(int)num;              /* interpret num as an integer */
 
   abs_val=abs(howfar);
-  for(i=-6;i<howfar;i++){
+  for(i=0;i<howfar;i++){
     printf("%*d\n",abs_val*5,abs_val);
     lwp_yield();                
-  abs_val=abs(howfar);
   }
+  lwp_exit();
 }
 

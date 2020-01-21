@@ -38,52 +38,28 @@ static void indentnum(uintptr_t num);
 void test14(uintptr_t ptr);
 
 void test13_call();
-int main(int argc, char *argv[]){
-  long i;
-
-  for (i=1;i<argc;i++) {                /* check options */
-    fprintf(stderr,"%s: unknown option\n",argv[i]);
-    exit(-1);
-  }
-
-  printf("Launching LWPS\n");
-
-/*
-for(i=1;i<6;i++){
-    lwp_create((lwpfun)test14,(void*)i,INITIALSTACK);
-
-  }
-  */
-  
-
-  test13_call();
-
-  
-
-  printf("Back from LWPS.\n");
-  return 0;
-}
-
 
 void test13(void *ptr){
   static int i=0;
+
+
   printf("Greetings from Thread %ld Yielding\n", current->tid);
   lwp_yield();
   printf("I (%ld)am still alive\n", current->tid);
   lwp_exit();
 }
 
+/*
 void test13_call(){
   int j,i;
-  /*for(j=0; j<100; j++){*/
+  for(j=0; j<100; j++){
     for(i=0;i<10;i++){
       lwp_create((lwpfun)test13,(void*)i,10000000000000);
     }
     lwp_start();
     lwp_exit();
 }
-
-
+*/
 
 
 
@@ -98,15 +74,25 @@ static void indentnum(uintptr_t num) {
   /* print the number num num times, indented by 5*num spaces
    * Not terribly interesting, but it is instructive.
    */
-  int howfar,i, abs_val;
-
-  howfar=(int)num;              /* interpret num as an integer */
-
-  abs_val=abs(howfar);
-  for(i=0;i<howfar;i++){
-    printf("%*d\n",abs_val*5,abs_val);
-    lwp_yield();                
-  }
+  int id;
+  id = (int)num;
+  printf("Greetings from Thread %d.  Yielding...\n",id);
+  lwp_yield();
+  printf("I (%d) am still alive.  Goodbye.\n",id);
   lwp_exit();
+}
+
+
+int main(int argc, char *argv[]){
+  long i;
+
+  /* spawn a number of individual LWPs */
+  for(i=0;i<5;i++)
+    lwp_create((lwpfun)indentnum,(void*)i,INITIALSTACK);
+
+  lwp_start();
+
+  printf("LWPs have ended.\n");
+  return 0;
 }
 

@@ -77,6 +77,7 @@ void rr_remove(thread victim){
 	/* Case - when one or more in list*/
 	/* Case - where one is in the list*/
 	if(head==tail && tail && head){
+		current=NULL;
 		head=tail=NULL;
 	/* Case - where at least two in list*/
 	}else{
@@ -142,7 +143,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 	if(!(new=calloc(1, THREAD_INFO_SIZE))){
 	   	return NULL;
 	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
-		free(new->stack);
+		free(new);
 		return NULL;
 	}else{
 		/*Set the new thread*/
@@ -153,7 +154,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 
 		/* Init stack */
-		temp_stack=(new->stack+new->stacksize -1);
+		temp_stack=((new->stack+new->stacksize) -1);
 
 		*temp_stack = lwp_exit;
 		temp_stack--;
@@ -204,7 +205,7 @@ void lwp_start(){
 		lwp_exit();
 	}else{
 		current=next;
-		swap_rfiles(&process.state, &next->state);
+		swap_rfiles(&(process.state), &(next->state));
 	}
 } 
 
@@ -219,7 +220,8 @@ void lwp_yield(){
 	/* What is we dont have anymore thread in here*/
 	if((next=sched->next())){
 		current=next;
-		swap_rfiles(&curr->state, &next->state);
+
+		//swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
 	}
