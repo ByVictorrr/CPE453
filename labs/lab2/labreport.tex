@@ -20,8 +20,8 @@
 \centerline{\Large\bf Lab 2: Minix Scavenger Hunt}\par
 \bigskip 
 
-Hello, for this laboratory I will be using \Latex for my choice of document prepartion. 
-I also have chosen to use \tt VirtualBox for hosting Minix 3.1.8 on.
+Hello, for this laboratory I will be using {\LaTeX} for my choice of document prepartion. 
+I also have chosen to use {\tt VirtualBox} for hosting Minix 3.1.8 on.
 
 \setcounter{section}{1} % make the first section, section 2(see below)
 \section{Logging in}
@@ -97,11 +97,11 @@ and always go back to read the man page if im not sure what it does.
 
   I needed to create an empty disk image file, 
 so I issued the "dd if=/dev/zero of=testFloppy.img bs=1024 count=1440" 
-command. Then went on the \tt {Virtual Box} settings and configured 
+command. Then went on the {\tt Virtual Box} settings and configured 
 the "testFloppy.img" to be used for Minix's drive. After coniguring the above, 
 I then formated the floppy drive, made the file system, mounted the floppy, 
 and finally unmounted it. Below shows the commands after attatching the 
-floppy drive in \tt{Virtual Box}.
+floppy drive in {\tt Virtual Box}.
 
 {\tt\begin{tabbing}
 format /dev/fd0 1440\\
