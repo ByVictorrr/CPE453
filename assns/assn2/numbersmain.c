@@ -37,22 +37,21 @@ static void indentnum(uintptr_t num);
 void test14(uintptr_t ptr);
 
 void test13_call();
+/*
 int main(int argc, char *argv[]){
   long i;
 
-  for (i=1;i<argc;i++) {                /* check options */
+  for (i=1;i<argc;i++) {               
     fprintf(stderr,"%s: unknown option\n",argv[i]);
     exit(-1);
   }
 
   printf("Launching LWPS\n");
 
-/*
 for(i=1;i<6;i++){
     lwp_create((lwpfun)test14,(void*)i,INITIALSTACK);
 
   }
-  */
   
 
   test13_call();
@@ -63,6 +62,7 @@ for(i=1;i<6;i++){
   return 0;
 }
 
+*/
 
 void test13(void *ptr){
   static int i=0;

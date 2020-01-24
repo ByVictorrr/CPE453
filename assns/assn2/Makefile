@@ -3,8 +3,8 @@ CFLAGS = -Wall -g
 LD = gcc
 LDFLAGS = -Wall -g -L.
    
-main: lwp.o magic64.o numbersmain.o
-	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o numbersmain.o
+main: lwp.o magic64.o
+	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o 
 
 #liblwp.so: lwp.o magic64.o 
 	#$(CC) $(CFLAGS) -fPIC -shared -o $@ lwp.o magic64.o

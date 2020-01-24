@@ -151,25 +151,23 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		new->lib_one=NULL;
 		new->lib_two=NULL;
 
-
 		/* Init stack */
 		temp_stack=(new->stack+new->stacksize -1);
-
-		*temp_stack = lwp_exit;
+ 
+		*temp_stack = lwp_exit; // return address 2
 		temp_stack--;
-		*temp_stack = fn;
+		*temp_stack = fn; // return address 1
 		temp_stack--;
 
 		/* After Leave: sp takes rbp 
 		 * and adds 8 (i.e go next space in stack)*/
 		/* After ret: sp is put into */
 		
-
 		/* Register stuff */
-		new->state.rdi = arg;
-		new->state.rbp=temp_stack;
-		new->state.fxsave=FPU_INIT;
 
+		new->state.rbp=temp_stack;
+		new->state.rdi = arg;
+		new->state.fxsave=FPU_INIT;
 
 
 		return new;
@@ -231,6 +229,23 @@ void lwp_yield(){
 	thread curr = current, next;
 	/* What is we dont have anymore thread in here*/
 	if((next=sched->next())){
+		if (next->tid==1){
+
+			next->state.r15=0;
+			next->state.r14=0;
+			next->state.r13=0;
+			next->state.r12=0;
+			next->state.r11=0;
+			next->state.r10=0;
+			next->state.r9=0;
+			next->state.r8=0;
+			next->state.rax=0;
+			next->state.rbx=0;
+			next->state.rcx=0;
+			next->state.rdx=0;
+			next->state.rdi=0;
+			next->state.rsi=0;
+		}
 		swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
@@ -356,7 +371,6 @@ void say_hi(void *arg);
 
 static void indentnum(uintptr_t num);
 
-/*
 int main(){
 
 	#define STACK_SIZE 1000
@@ -366,23 +380,44 @@ int main(){
 
 	int j=4;
 
-	lwp_create(say_hi, &j, STACK_SIZE);
-	for(i=0; i<4; i++)
+	for(i=0; i<2; i++)
 		lwp_create(say_hi, &j, STACK_SIZE);
 
 	lwp_start();
 
 	return 0;
 }
-*/
+void arr_print(int *arr, int size){
+	for(int i=0; i < size; i++){
+		printf("%d", arr[i]);
+	}
+		printf("\n");
+}
 
 void say_hi(void * arg){
 
-  int howfar,i;
+  int howfar,i, local[20] = {0};
+	for (int i = 1; i < 10; i++){
+		if (current->tid == 1){
+			local[i] = i;
+		}else{
+			local[i+10] = i+10;
+		}
+	}
+
+	// PRE CONTEXT SWITCH
 	printf("%s", "Greetings from Thread ");
 	printf("%ld\n", current->tid);
+	arr_print(local, 10);
+	arr_print(local+10, 10);
 	lwp_yield();
-	printf("%s","IM still avlive" );
+	printf("%s", "Greetings from Thread ");
+	printf("%ld\n", current->tid);	
+	printf("%s", "POST YIELD\n");
+	// POST CONTEXT SWITCH
+	arr_print(local, 10);
+	arr_print(local+10, 10);
+
 	lwp_exit();
 }
 static void indentnum(uintptr_t num) {

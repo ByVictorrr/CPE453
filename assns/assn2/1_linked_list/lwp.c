@@ -8,21 +8,16 @@
 /**********************Shared variables***************************/
 thread current = NULL;
 // if we were to think of this process current state as a thread
-context process ;
 
-//process.ID=
-// TODO COME BACK HERE
+register_t orginal;
 /***************************************************************/
 
 
 //********************Scheduler**********************************//
-
 thread tail = NULL, head = NULL; // used to keep track of queue
 /** NULL<-[head]-><-[arbitrary]-><-[tail]->(points to head) 
-* 
 *		(1) 		(2)
 */
-
 
 void rr_admit(thread new){
 	/* new - newly created thread*/
@@ -158,21 +153,14 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 		*temp_stack = lwp_exit;
 		temp_stack--;
-		*temp_stack = fn;
+		*temp_stack = fn; /* Why is the func added to the stack?, this is equivilant to adding two return adresses to the stack*/
 		temp_stack--;
 
-		/* After Leave: sp takes rbp 
-		 * and adds 8 (i.e go next space in stack)*/
-		/* After ret: sp is put into */
-		
 
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
-		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
-
-
 
 		return new;
 	}
@@ -205,7 +193,7 @@ void lwp_start(){
 		lwp_exit();
 	}else{
 		current=next;
-		swap_rfiles(&(process.state), &(next->state));
+		swap_rfiles(&orginal, &(next->state));
 	}
 } 
 
@@ -220,8 +208,7 @@ void lwp_yield(){
 	/* What is we dont have anymore thread in here*/
 	if((next=sched->next())){
 		current=next;
-
-		//swap_rfiles(&curr->state, &next->state);
+		swap_rfiles(&curr->state, &next->state);
 	}else{
 		lwp_stop();
 	}
@@ -235,7 +222,7 @@ void lwp_stop(){
 	thread temp; 
 	/* Get current state then write org process*/
 	if(current){
-		swap_rfiles(&current->state, &process.state);
+		swap_rfiles(&current->state, &orginal);
 	}else{
 		//swap_rfiles(NULL, &process.state);
 		return;
@@ -261,7 +248,7 @@ void lwp_exit(){
 		free(free2);
 	/* restore the org system thread */
 		if(!(next=sched->next())){
-			swap_rfiles(NULL, &process.state);
+			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
