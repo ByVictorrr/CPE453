@@ -9,7 +9,7 @@
 thread current = NULL;
 // if we were to think of this process current state as a thread
 
-register_t orginal;
+rfile orginal;
 /***************************************************************/
 
 
@@ -72,7 +72,7 @@ void rr_remove(thread victim){
 	/* Case - when one or more in list*/
 	/* Case - where one is in the list*/
 	if(head==tail && tail && head){
-		current=NULL;
+		//current=NULL;
 		head=tail=NULL;
 	/* Case - where at least two in list*/
 	}else{
@@ -138,7 +138,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 	if(!(new=calloc(1, THREAD_INFO_SIZE))){
 	   	return NULL;
 	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
-		free(new);
+		(new);
 		return NULL;
 	}else{
 		/*Set the new thread*/
@@ -153,13 +153,14 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 		*temp_stack = lwp_exit;
 		temp_stack--;
-		*temp_stack = fn; /* Why is the func added to the stack?, this is equivilant to adding two return adresses to the stack*/
+		*temp_stack = fn; 		
 		temp_stack--;
 
 
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
+		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 		return new;
@@ -230,7 +231,7 @@ void lwp_stop(){
 }
 
 
-/*Description: Terminates the current process and frees 
+/*Description: Terminates the current process and s 
 				its resource(i.e. its stack). 
 				Calls sched->next()
 				to get next thread, if no other threads,
@@ -238,21 +239,28 @@ void lwp_stop(){
 				*/
 void lwp_exit(){
 	/* if a current exists then*/
-	thread next, free1, free2;
+	thread next, curr;
+	unsigned long *stack;
+	printf("here");
 	if(current){
-		free1=current->stack;
-		free2=current;
-		/* remove from sch list */
 		sched->remove(current);
-		free(free1);
-		free(free2);
+		SetSP(orginal.rsp);
+		stack=current->stack;
+		curr=current;
+		/* remove from sch list */
+	
 	/* restore the org system thread */
 		if(!(next=sched->next())){
+			current=NULL;
+			(stack);
+			(curr);
 			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
 			current=next;
+			//(_stack);
+			//(_curr);
 			swap_rfiles(NULL, &next->state);
 		}
 
@@ -306,52 +314,3 @@ scheduler lwp_get_scheduler(){
 }
 //**************************************************************//
 
-void say_hi(void *arg);
-
-static void indentnum(uintptr_t num);
-
-/*
-int main(){
-
-	#define STACK_SIZE 1000
-	process.state.fxsave=FPU_INIT;
-
-	int i;
-
-	int j=4;
-
-	lwp_create(say_hi, &j, STACK_SIZE);
-	for(i=0; i<4; i++)
-		lwp_create(say_hi, &j, STACK_SIZE);
-
-	lwp_start();
-
-	return 0;
-}
-*/
-
-void say_hi(void * arg){
-
-  int howfar,i;
-	printf("%s", "Greetings from Thread ");
-	printf("%ld\n", current->tid);
-	lwp_yield();
-	printf("%s","IM still avlive" );
-	lwp_exit();
-}
-static void indentnum(uintptr_t num) {
-  /* print the number num num times, indented by 5*num spaces
-   * Not terribly interesting, but it is instructive.
-   */
-  int howfar,i;
-
-  howfar=(int)num;              /* interpret num as an integer */
-  for(i=0;i<howfar;i++){
-    printf("%*d\n",howfar*5,howfar);
-    lwp_yield();                /* let another have a turn */
-  }
-  lwp_exit();                   /* bail when done.  This should
-                                 * be unnecessary if the stack has
-                                 * been properly prepared
-                                 */
-}
