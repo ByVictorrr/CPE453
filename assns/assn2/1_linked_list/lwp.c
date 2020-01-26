@@ -135,7 +135,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 	static size_t thread_count = 1;
 	unsigned long *temp_stack;
 	thread new;
-	if(!(new=calloc(1, THREAD_INFO_SIZE))){
+	if(!(new=calloc(1, sizeof(struct threadinfo_st)))){
 	   	return NULL;
 	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
 		(new);
@@ -160,7 +160,6 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
-		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 		return new;

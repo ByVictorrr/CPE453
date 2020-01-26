@@ -23,11 +23,7 @@ Building the application: "make liblwp.so"
 ------------------------------------
 
 make liblwp.so
-gcc -Wall -g  -fpic -c -o lwp.o lwp.c
-#gcc -Wall -g  -fpic -c -o fiveprocsmain.o fiveprocsmain.c
-gcc -Wall -g  -fpic -c -o magic64.o magic64.S
-#gcc -Wall -g  -fpic -c -o numbersmain.o numbersmain.c
-gcc -Wall -g  -fPIC -shared -o liblwp.so lwp.o magic64.o
+make: `liblwp.so' is up to date.
 
 ---------------
 checking for liblwp.so
@@ -78,11 +74,15 @@ FAILURE. (24/28 passed)
 
 
 ----------------------------
-4 Corefile(s) Present:
-    core.9440
-    core.9661
-    core.9692
-    core.9726
+8 Corefile(s) Present:
+    core.10376
+    core.10626
+    core.10658
+    core.10689
+    core.9582
+    core.9802
+    core.9833
+    core.9867
 ----------------------------
 
 
@@ -104,7 +104,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (9440) exited due to signal (Segmentation fault).
+Child process (10376) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -114,7 +114,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (9440) exited due to signal (Segmentation fault).
+> Child process (10376) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 26: Does tid2thread return the right thread?
@@ -844,7 +844,7 @@ Launching LWPS
                              6
                                             9
                              6
-Child process (9661) exited due to signal (Segmentation fault).
+Child process (10626) exited due to signal (Segmentation fault).
                                   7
 ---------------------------------
 Differences (< reference > output)
@@ -917,7 +917,7 @@ Differences (< reference > output)
 < Checking thread IDs...
 < ...done.
 ---
-> Child process (9661) exited due to signal (Segmentation fault).
+> Child process (10626) exited due to signal (Segmentation fault).
 >                                   7
 \ No newline at end of file
 ---------
@@ -936,7 +936,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (9692) exited due to signal (Segmentation fault).
+Child process (10658) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -946,7 +946,7 @@ Differences (< reference > output)
 < Launching LWPS
 < Back from LWPS.
 ---
-> Child process (9692) exited due to signal (Segmentation fault).
+> Child process (10658) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -1175,7 +1175,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (9726) exited due to signal (Segmentation fault).
+Child process (10689) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1395,5 +1395,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (9726) exited due to signal (Segmentation fault).
+> Child process (10689) exited due to signal (Segmentation fault).
 ---------
