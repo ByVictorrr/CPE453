@@ -25,8 +25,6 @@ Building the application: "make liblwp.so"
 make liblwp.so
 gcc -Wall -g  -fpic -c -o lwp.o lwp.c
 #gcc -Wall -g  -fpic -c -o fiveprocsmain.o fiveprocsmain.c
-gcc -Wall -g  -fpic -c -o magic64.o magic64.S
-#gcc -Wall -g  -fpic -c -o numbersmain.o numbersmain.c
 gcc -Wall -g  -fPIC -shared -o liblwp.so lwp.o magic64.o
 
 ---------------
@@ -65,24 +63,35 @@ Testing (failure details below):
         18) 1024 threads, random exit.                    ... ok.
         19) Ping pong with semaphores                     ... ok.
         20) Dine with semaphores                          ... ok.
-        21) Transfer threads between schedulers (stopped) ... ok.
-        22) Transfer threads between schedulers (live)    ... ok.
+        21) Transfer threads between schedulers (stopped) ... FAILURE.
+        22) Transfer threads between schedulers (live)    ... FAILURE.
         23) Sched->next() returns NULL to lwp_yield()     ... ok.
-        24) Transfer threads between schedulers check for ... ok.
+        24) Transfer threads between schedulers check for ... FAILURE.
         25) Check that Returned TIDs are unique           ... ok.
         26) Does tid2thread return the right thread?      ... FAILURE.
         27) Tid2thread() returns NULL given a bad tid?    ... FAILURE.
         28) Is thread library using sched_one? sched_two? ... FAILURE.
         -----
-FAILURE. (24/28 passed)
+FAILURE. (21/28 passed)
 
 
 ----------------------------
-4 Corefile(s) Present:
-    core.9440
-    core.9661
-    core.9692
-    core.9726
+15 Corefile(s) Present:
+    core.14490
+    core.14744
+    core.14779
+    core.14810
+    core.15388
+    core.15646
+    core.15678
+    core.15709
+    core.17987
+    core.18398
+    core.18429
+    core.18461
+    core.18925
+    core.19254
+    core.19285
 ----------------------------
 
 
@@ -104,7 +113,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (9440) exited due to signal (Segmentation fault).
+Child process (18925) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -114,7 +123,402 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (9440) exited due to signal (Segmentation fault).
+> Child process (18925) exited due to signal (Segmentation fault).
+---------
+=================================================
+TEST 21: Transfer threads between schedulers (stopped)
+
+Create a number of threads, then set_scheduler() and see if 
+they transfer properly.
+
+
+
+
+
+----------
+Reference:
+----------
+Creating LWPS
+Setting the scheduler.
+Launching LWPS
+    1
+         2
+              3
+                   4
+                        5
+         2
+              3
+                   4
+                        5
+              3
+                   4
+                        5
+                   4
+                        5
+                        5
+Back from LWPS.
+----------
+Submitted:
+----------
+^CParent process (19019) caught signal (Interrupt).
+Forwarding signal (Interrupt) to child.
+Child process (19027) exited due to signal (Interrupt).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+1,19c1,3
+< Creating LWPS
+< Setting the scheduler.
+< Launching LWPS
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<          2
+<               3
+<                    4
+<                         5
+<               3
+<                    4
+<                         5
+<                    4
+<                         5
+<                         5
+< Back from LWPS.
+---
+> ^CParent process (19019) caught signal (Interrupt).
+> Forwarding signal (Interrupt) to child.
+> Child process (19027) exited due to signal (Interrupt).
+---------
+=================================================
+TEST 22: Transfer threads between schedulers (live)
+
+Create a number of threads, start them running,
+then set_scheduler() and see if they transfer properly.
+
+
+
+
+
+----------
+Reference:
+----------
+Creating LWPS
+Launching LWPS
+    1
+         2
+              3
+                   4
+                        5
+    1
+         2
+              3
+                   4
+                        5
+    1
+         2
+              3
+                   4
+                        5
+Setting the scheduler.
+    1
+         2
+              3
+                   4
+                        5
+    1
+         2
+              3
+                   4
+                        5
+    1
+         2
+              3
+                   4
+                        5
+Back from LWPS.
+----------
+Submitted:
+----------
+^CParent process (19106) caught signal (Interrupt).
+Forwarding signal (Interrupt) to child.
+Child process (19114) exited due to signal (Interrupt).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+1,34c1,3
+< Creating LWPS
+< Launching LWPS
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+< Setting the scheduler.
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+< Back from LWPS.
+---
+> ^CParent process (19106) caught signal (Interrupt).
+> Forwarding signal (Interrupt) to child.
+> Child process (19114) exited due to signal (Interrupt).
+---------
+=================================================
+TEST 24: Transfer threads between schedulers check for init/shutdown
+
+Create a number of threads, start them running,
+then set_scheduler() and see if they transfer properly.
+
+
+
+
+
+----------
+Reference:
+----------
+init: called on first scheduler
+Creating LWPS
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Launching LWPS
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+Setting the scheduler.
+init: called on second scheduler
+(first->next())
+Removing thread from First scheduler
+Admitting new thread to Second scheduler
+(first->next())
+Removing thread from First scheduler
+Admitting new thread to Second scheduler
+(first->next())
+Removing thread from First scheduler
+Admitting new thread to Second scheduler
+(first->next())
+Removing thread from First scheduler
+Admitting new thread to Second scheduler
+(first->next())
+Removing thread from First scheduler
+Admitting new thread to Second scheduler
+(first->next())
+shutdown: called on first scheduler
+(second->next())
+    1
+(second->next())
+         2
+(second->next())
+              3
+(second->next())
+                   4
+(second->next())
+                        5
+(second->next())
+    1
+(second->next())
+         2
+(second->next())
+              3
+(second->next())
+                   4
+(second->next())
+                        5
+(second->next())
+    1
+(second->next())
+         2
+(second->next())
+              3
+(second->next())
+                   4
+(second->next())
+                        5
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Back from LWPS.
+----------
+Submitted:
+----------
+Creating LWPS
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Admitting new thread to First scheduler
+Launching LWPS
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+(first->next())
+    1
+(first->next())
+         2
+(first->next())
+              3
+(first->next())
+                   4
+(first->next())
+                        5
+Setting the scheduler.
+(first->next())
+Admitting new thread to Second scheduler
+Removing thread from First scheduler
+(first->next())
+(second->next())
+    1
+(second->next())
+    1
+(second->next())
+    1
+(second->next())
+Removing thread from Second scheduler
+(second->next())
+Back from LWPS.
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+1d0
+< init: called on first scheduler
+40d38
+< init: called on second scheduler
+42,51d39
+< Removing thread from First scheduler
+< Admitting new thread to Second scheduler
+< (first->next())
+< Removing thread from First scheduler
+< Admitting new thread to Second scheduler
+< (first->next())
+< Removing thread from First scheduler
+< Admitting new thread to Second scheduler
+< (first->next())
+< Removing thread from First scheduler
+53d40
+< (first->next())
+55d41
+< Admitting new thread to Second scheduler
+57d42
+< shutdown: called on first scheduler
+61,68d45
+<          2
+< (second->next())
+<               3
+< (second->next())
+<                    4
+< (second->next())
+<                         5
+< (second->next())
+71,78d47
+<          2
+< (second->next())
+<               3
+< (second->next())
+<                    4
+< (second->next())
+<                         5
+< (second->next())
+80,95d48
+< (second->next())
+<          2
+< (second->next())
+<               3
+< (second->next())
+<                    4
+< (second->next())
+<                         5
+< (second->next())
+< Removing thread from Second scheduler
+< (second->next())
+< Removing thread from Second scheduler
+< (second->next())
+< Removing thread from Second scheduler
+< (second->next())
+< Removing thread from Second scheduler
 ---------
 =================================================
 TEST 26: Does tid2thread return the right thread?
@@ -521,336 +925,335 @@ Checking thread IDs...
 ----------
 Submitted:
 ----------
-Launching LWPS
-         2
-                                            9
-                                            9
-                                  7
-              3
-    1
-         2
-                        5
-         2
-              3
-                                       8
-              3
-                                       8
-                             6
-         2
-                             6
-              3
-              3
-    1
-         2
-    1
-                                            9
-                             6
-              3
-         2
-    1
-                                            9
-                   4
-                        5
-                             6
-         2
-         2
-         2
-                        5
-    1
-                   4
-                        5
-              3
-                                  7
-                        5
-         2
-         2
-         2
-                   4
-                                            9
-                   4
-                                            9
-         2
-                   4
-                                  7
-                                            9
-    1
-         2
-    1
-                                            9
-                                            9
-                        5
-    1
-                        5
-                                            9
-                             6
-                             6
-         2
-                                       8
-    1
-                                            9
-                                  7
-    1
-                        5
-                                  7
-                                  7
-                                  7
-                                  7
-                                  7
-                                            9
-                             6
-                                       8
-                   4
-    1
-                             6
-                   4
-    1
-                                  7
-                             6
-         2
-                        5
-         2
-                   4
-              3
-                   4
-    1
-                                  7
-                             6
-                             6
-                                  7
-                                       8
-                             6
-                             6
-                                            9
-         2
-         2
-              3
-                        5
-                             6
-                        5
-                                       8
-                   4
-                             6
-              3
-              3
-    1
-              3
-    1
-              3
-         2
-              3
-                                            9
-                        5
-                             6
-         2
-                             6
-              3
-              3
-                                  7
-                   4
-                             6
-                                            9
-         2
-         2
-                             6
-                                            9
-                                  7
-              3
-                             6
-              3
-                                       8
-              3
-                        5
-    1
-              3
-                   4
-                                  7
-                                            9
-                                       8
-         2
-                   4
-                   4
-                   4
-         2
-                   4
-                                       8
-         2
-                                       8
-    1
-                             6
-                                  7
-                                            9
-                             6
-    1
-              3
-                        5
-              3
-         2
-                                  7
-                                       8
-                   4
-                        5
-                                            9
-                                       8
-              3
-                                            9
-                                  7
-              3
-         2
-                                       8
-                                       8
-                                  7
-         2
-         2
-                                            9
-                   4
-                             6
-                        5
-                             6
-         2
-                   4
-                                  7
-                        5
-                   4
-         2
-    1
-         2
-                        5
-              3
-                                       8
-    1
-                   4
-    1
-                                  7
-                                  7
-                                            9
-    1
-                                       8
-                             6
-                        5
-                                  7
-              3
-    1
-                                       8
-              3
-                             6
-                             6
-              3
-              3
-                        5
-                        5
-                                  7
-    1
-                                  7
-                                            9
-                                       8
-                   4
-                        5
-                                  7
-                                       8
-                        5
-                                  7
-                                            9
-         2
-                                            9
-              3
-                        5
-         2
-    1
-                                       8
-         2
-         2
-                             6
-                                       8
-                   4
-              3
-                             6
-         2
-                        5
-                                            9
-                        5
-                                            9
-                   4
-              3
-                   4
-    1
-                                       8
-              3
-                                            9
-                                  7
-              3
-                             6
-                        5
-              3
-                             6
-              3
-         2
-                                  7
-                                       8
-                        5
-                                  7
-              3
-                                            9
-                             6
-         2
-         2
-                        5
-                   4
-                                            9
-                             6
-                                  7
-                                            9
-                                       8
-                        5
-                   4
-                   4
-                        5
-              3
-                        5
-              3
-                             6
-                   4
-                             6
-                                       8
-              3
-                             6
-              3
-                   4
-                   4
-              3
-    1
-              3
-                        5
-                                  7
-                   4
-         2
-                   4
-                   4
-    1
-                                  7
-         2
-                                       8
-                        5
-                                            9
-              3
-                                       8
-    1
-                        5
-                             6
-                                            9
-              3
-                                       8
-                                  7
-    1
-                             6
-                                            9
-                             6
-Child process (9661) exited due to signal (Segmentation fault).
-                                  7
+^C
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-324,388c324,325
+1,388c1
+< Launching LWPS
+<          2
+<                                             9
+<                                             9
+<                                   7
+<               3
+<     1
+<          2
+<                         5
+<          2
+<               3
+<                                        8
+<               3
+<                                        8
+<                              6
+<          2
+<                              6
+<               3
+<               3
+<     1
+<          2
+<     1
+<                                             9
+<                              6
+<               3
+<          2
+<     1
+<                                             9
+<                    4
+<                         5
+<                              6
+<          2
+<          2
+<          2
+<                         5
+<     1
+<                    4
+<                         5
+<               3
+<                                   7
+<                         5
+<          2
+<          2
+<          2
+<                    4
+<                                             9
+<                    4
+<                                             9
+<          2
+<                    4
+<                                   7
+<                                             9
+<     1
+<          2
+<     1
+<                                             9
+<                                             9
+<                         5
+<     1
+<                         5
+<                                             9
+<                              6
+<                              6
+<          2
+<                                        8
+<     1
+<                                             9
+<                                   7
+<     1
+<                         5
+<                                   7
+<                                   7
+<                                   7
+<                                   7
+<                                   7
+<                                             9
+<                              6
+<                                        8
+<                    4
+<     1
+<                              6
+<                    4
+<     1
+<                                   7
+<                              6
+<          2
+<                         5
+<          2
+<                    4
+<               3
+<                    4
+<     1
+<                                   7
+<                              6
+<                              6
+<                                   7
+<                                        8
+<                              6
+<                              6
+<                                             9
+<          2
+<          2
+<               3
+<                         5
+<                              6
+<                         5
+<                                        8
+<                    4
+<                              6
+<               3
+<               3
+<     1
+<               3
+<     1
+<               3
+<          2
+<               3
+<                                             9
+<                         5
+<                              6
+<          2
+<                              6
+<               3
+<               3
+<                                   7
+<                    4
+<                              6
+<                                             9
+<          2
+<          2
+<                              6
+<                                             9
+<                                   7
+<               3
+<                              6
+<               3
+<                                        8
+<               3
+<                         5
+<     1
+<               3
+<                    4
+<                                   7
+<                                             9
+<                                        8
+<          2
+<                    4
+<                    4
+<                    4
+<          2
+<                    4
+<                                        8
+<          2
+<                                        8
+<     1
+<                              6
+<                                   7
+<                                             9
+<                              6
+<     1
+<               3
+<                         5
+<               3
+<          2
+<                                   7
+<                                        8
+<                    4
+<                         5
+<                                             9
+<                                        8
+<               3
+<                                             9
+<                                   7
+<               3
+<          2
+<                                        8
+<                                        8
+<                                   7
+<          2
+<          2
+<                                             9
+<                    4
+<                              6
+<                         5
+<                              6
+<          2
+<                    4
+<                                   7
+<                         5
+<                    4
+<          2
+<     1
+<          2
+<                         5
+<               3
+<                                        8
+<     1
+<                    4
+<     1
+<                                   7
+<                                   7
+<                                             9
+<     1
+<                                        8
+<                              6
+<                         5
+<                                   7
+<               3
+<     1
+<                                        8
+<               3
+<                              6
+<                              6
+<               3
+<               3
+<                         5
+<                         5
+<                                   7
+<     1
+<                                   7
+<                                             9
+<                                        8
+<                    4
+<                         5
+<                                   7
+<                                        8
+<                         5
+<                                   7
+<                                             9
+<          2
+<                                             9
+<               3
+<                         5
+<          2
+<     1
+<                                        8
+<          2
+<          2
+<                              6
+<                                        8
+<                    4
+<               3
+<                              6
+<          2
+<                         5
+<                                             9
+<                         5
+<                                             9
+<                    4
+<               3
+<                    4
+<     1
+<                                        8
+<               3
+<                                             9
+<                                   7
+<               3
+<                              6
+<                         5
+<               3
+<                              6
+<               3
+<          2
+<                                   7
+<                                        8
+<                         5
+<                                   7
+<               3
+<                                             9
+<                              6
+<          2
+<          2
+<                         5
+<                    4
+<                                             9
+<                              6
+<                                   7
+<                                             9
+<                                        8
+<                         5
+<                    4
+<                    4
+<                         5
+<               3
+<                         5
+<               3
+<                              6
+<                    4
+<                              6
+<                                        8
+<               3
+<                              6
+<               3
+<                    4
+<                    4
+<               3
+<     1
+<               3
+<                         5
+<                                   7
+<                    4
+<          2
+<                    4
+<                    4
+<     1
+<                                   7
+<          2
+<                                        8
+<                         5
+<                                             9
+<               3
+<                                        8
+<     1
+<                         5
+<                              6
+<                                             9
+<               3
+<                                        8
+<                                   7
+<     1
+<                              6
+<                                             9
+<                              6
 <                                   7
 <     1
 <                         5
@@ -917,8 +1320,7 @@ Differences (< reference > output)
 < Checking thread IDs...
 < ...done.
 ---
-> Child process (9661) exited due to signal (Segmentation fault).
->                                   7
+> ^C
 \ No newline at end of file
 ---------
 =================================================
@@ -936,7 +1338,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (9692) exited due to signal (Segmentation fault).
+Child process (19254) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -946,7 +1348,7 @@ Differences (< reference > output)
 < Launching LWPS
 < Back from LWPS.
 ---
-> Child process (9692) exited due to signal (Segmentation fault).
+> Child process (19254) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -1175,7 +1577,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (9726) exited due to signal (Segmentation fault).
+Child process (19285) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1395,5 +1797,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (9726) exited due to signal (Segmentation fault).
+> Child process (19285) exited due to signal (Segmentation fault).
 ---------

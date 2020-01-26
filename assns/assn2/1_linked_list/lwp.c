@@ -149,8 +149,8 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 
 
 		/* Init stack */
-		temp_stack=((new->stack+new->stacksize) -1);
-
+		temp_stack=((unsigned long*)(new->stack))+new->stacksize;
+		temp_stack--;
 		*temp_stack = lwp_exit;
 		temp_stack--;
 		*temp_stack = fn; 		
@@ -241,10 +241,8 @@ void lwp_exit(){
 	/* if a current exists then*/
 	thread next, curr;
 	unsigned long *stack;
-	printf("here");
 	if(current){
 		sched->remove(current);
-		SetSP(orginal.rsp);
 		stack=current->stack;
 		curr=current;
 		/* remove from sch list */
@@ -301,8 +299,20 @@ tid_t lwp_gettid(){
 				is NULL the library should return to 
 				round-robin scheduling*/
 void lwp_set_scheduler(scheduler sch){
-	if(sch){
-		sched=sch;
+	thread next;
+	if(sch!=NULL){
+		/* Transfer control*/
+		if(sch->init){
+			sch->init();
+		}
+		while((next=sched->next())){
+			sched->remove(next);
+			sch->admit(next);
+		}
+		if(sched->shutdown){
+			sched->shutdown();
+		}
+			sched=sch;
 	}else{
 		sched=&rr_sched;
 	}	

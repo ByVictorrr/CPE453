@@ -1,244 +1,4 @@
 =================================================
-TEST 2: start() with no threads
-
-This test calls lwp_start() without having created any threads
-
-
-----------
-Reference:
-----------
-About to call lwp_start() with no threads...ok.
-----------
-Submitted:
-----------
-About to call lwp_start() with no threads...hereok.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1c1
-< About to call lwp_start() with no threads...ok.
----
-> About to call lwp_start() with no threads...hereok.
----------
-=================================================
-TEST 5: One lwp, calling lwp_yield(), then lwp_exit()
-
-This test spawns a single thread that prints a message, yields
-to itself then calls lwp_exit() to return to main.
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-I'm still alive.  Goodbye.
-LWPs have ended.
-----------
-Submitted:
-----------
-Greetings from Thread 0.  Yielding...
-I'm still alive.  Goodbye.
-hereLWPs have ended.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-3c3
-< LWPs have ended.
----
-> hereLWPs have ended.
----------
-=================================================
-TEST 7: Five lwps, calling lwp_yield(), then lwp_exit()
-
-This test spawns five LWPs, each of which yields once,
-then calls lwp_exit() the second time.
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-LWPs have ended.
-----------
-Submitted:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-hereI (1) am still alive.  Goodbye.
-hereI (2) am still alive.  Goodbye.
-hereI (3) am still alive.  Goodbye.
-hereI (4) am still alive.  Goodbye.
-hereLWPs have ended.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-7,11c7,11
-< I (1) am still alive.  Goodbye.
-< I (2) am still alive.  Goodbye.
-< I (3) am still alive.  Goodbye.
-< I (4) am still alive.  Goodbye.
-< LWPs have ended.
----
-> hereI (1) am still alive.  Goodbye.
-> hereI (2) am still alive.  Goodbye.
-> hereI (3) am still alive.  Goodbye.
-> hereI (4) am still alive.  Goodbye.
-> hereLWPs have ended.
----------
-=================================================
-TEST 8: Five threads, variable iters, exit from front
-
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after its number of iterations
-
-
-----------
-Reference:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-         2
-              3
-                   4
-                        5
-              3
-                   4
-                        5
-                   4
-                        5
-                        5
-Back from LWPS.
-----------
-Submitted:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-here         2
-              3
-                   4
-                        5
-here              3
-                   4
-                        5
-here                   4
-                        5
-here                        5
-hereBack from LWPS.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-7,10c7
-<          2
-<               3
-<                    4
-<                         5
----
-> here         2
-13a11
-> here              3
-15a14
-> here                   4
-17c16,17
-< Back from LWPS.
----
-> here                        5
-> hereBack from LWPS.
----------
-=================================================
-TEST 9: Five threads, variable iters, exit from back
-
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after N minus its number of iterations.
-The effect is to always have the last process call lwp_exit().
-
-
-----------
-Reference:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-    1
-         2
-              3
-    1
-         2
-    1
-Back from LWPS.
-----------
-Submitted:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-here    1
-         2
-              3
-here    1
-         2
-here    1
-herehereBack from LWPS.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-11c11
-<     1
----
-> here    1
-14c14
-<     1
----
-> here    1
-16,17c16,17
-<     1
-< Back from LWPS.
----
-> here    1
-> herehereBack from LWPS.
----------
-=================================================
 TEST 10: Five threads, AlwaysZero scheduling
 
 This is the numbersmain program distributed with the assignment,
@@ -269,1167 +29,32 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Launching LWPS
-    1
-here         2
-         2
-here              3
-              3
-              3
-here                   4
-                   4
-                   4
-                   4
-here                        5
-                        5
-                        5
-                        5
-                        5
-hereBack from LWPS.
+Child process (8357) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-2a3
-> here         2
-4,5c5
+1,17c1
+< Launching LWPS
+<     1
+<          2
 <          2
 <               3
----
-> here              3
-7a8
-> here                   4
-11,12c12
+<               3
+<               3
+<                    4
+<                    4
+<                    4
 <                    4
 <                         5
----
-> here                        5
-17c17
+<                         5
+<                         5
+<                         5
+<                         5
 < Back from LWPS.
 ---
-> hereBack from LWPS.
----------
-=================================================
-TEST 11: One lwp, yields, and returns
-
-This test spawns a single thread that prints a message, yields
-to itself, then returns
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-I'm still alive.  Goodbye
-After thread termination
-----------
-Submitted:
-----------
-Greetings from Thread 0.  Yielding...
-I'm still alive.  Goodbye
-hereAfter thread termination
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-3c3
-< After thread termination
----
-> hereAfter thread termination
----------
-=================================================
-TEST 12: Ten lwps, yields, and returns
-
-This test spawns several threads that prints a message, yields
-to itself, then returns
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-Greetings from Thread 5.  Yielding...
-Greetings from Thread 6.  Yielding...
-Greetings from Thread 7.  Yielding...
-Greetings from Thread 8.  Yielding...
-Greetings from Thread 9.  Yielding...
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-After thread termination
-----------
-Submitted:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-Greetings from Thread 5.  Yielding...
-Greetings from Thread 6.  Yielding...
-Greetings from Thread 7.  Yielding...
-Greetings from Thread 8.  Yielding...
-Greetings from Thread 9.  Yielding...
-I'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereI'm still alive.  Goodbye
-hereAfter thread termination
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-12,21c12,21
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< I'm still alive.  Goodbye
-< After thread termination
----
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereI'm still alive.  Goodbye
-> hereAfter thread termination
----------
-=================================================
-TEST 13: Three lwps.  Stop, then restart
-
-This test spawns a three threads each of which stops and restarts
-several times.
-
-
-----------
-Reference:
-----------
-Starting LWPs...
-Test
-Test
-Test
-Test2
-Test2
-Test2
-Test3
-Test3
-Test3
-Test4
-Test4
-Test4
-Test5
-Test5
-Test5
-Test6
-Test6
-Test6
-Done.
-----------
-Submitted:
-----------
-Starting LWPs...
-Test
-Test
-Test
-Test2
-Test2
-Test2
-Test3
-Test3
-Test3
-Test4
-Test4
-Test4
-Test5
-Test5
-Test5
-Test6
-hereTest6
-hereTest6
-hereDone.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-18,20c18,20
-< Test6
-< Test6
-< Done.
----
-> hereTest6
-> hereTest6
-> hereDone.
----------
-=================================================
-TEST 14: Five lwps, all exit, recreate then call start
-
-Creates five lwps each of which eventually exits.  After exiting,
-main() recreates them and calls start again()
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-First round complete. Restarting with no queue
-Creating five LWPs and starting them
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-LWPs have ended.
-----------
-Submitted:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-hereI (1) am still alive.  Goodbye.
-hereI (2) am still alive.  Goodbye.
-hereI (3) am still alive.  Goodbye.
-hereI (4) am still alive.  Goodbye.
-hereFirst round complete. Restarting with no queue
-hereCreating five LWPs and starting them
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-hereI (1) am still alive.  Goodbye.
-hereI (2) am still alive.  Goodbye.
-hereI (3) am still alive.  Goodbye.
-hereI (4) am still alive.  Goodbye.
-hereLWPs have ended.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-7,12c7,12
-< I (1) am still alive.  Goodbye.
-< I (2) am still alive.  Goodbye.
-< I (3) am still alive.  Goodbye.
-< I (4) am still alive.  Goodbye.
-< First round complete. Restarting with no queue
-< Creating five LWPs and starting them
----
-> hereI (1) am still alive.  Goodbye.
-> hereI (2) am still alive.  Goodbye.
-> hereI (3) am still alive.  Goodbye.
-> hereI (4) am still alive.  Goodbye.
-> hereFirst round complete. Restarting with no queue
-> hereCreating five LWPs and starting them
-19,23c19,23
-< I (1) am still alive.  Goodbye.
-< I (2) am still alive.  Goodbye.
-< I (3) am still alive.  Goodbye.
-< I (4) am still alive.  Goodbye.
-< LWPs have ended.
----
-> hereI (1) am still alive.  Goodbye.
-> hereI (2) am still alive.  Goodbye.
-> hereI (3) am still alive.  Goodbye.
-> hereI (4) am still alive.  Goodbye.
-> hereLWPs have ended.
----------
-=================================================
-TEST 15: Lwp spawns another then exits 100 times.
-
-One thread creates a new one, then exits.
-
-
-
-----------
-Reference:
-----------
-100
-99
-98
-97
-96
-95
-94
-93
-92
-91
-90
-89
-88
-87
-86
-85
-84
-83
-82
-81
-80
-79
-78
-77
-76
-75
-74
-73
-72
-71
-70
-69
-68
-67
-66
-65
-64
-63
-62
-61
-60
-59
-58
-57
-56
-55
-54
-53
-52
-51
-50
-49
-48
-47
-46
-45
-44
-43
-42
-41
-40
-39
-38
-37
-36
-35
-34
-33
-32
-31
-30
-29
-28
-27
-26
-25
-24
-23
-22
-21
-20
-19
-18
-17
-16
-15
-14
-13
-12
-11
-10
-9
-8
-7
-6
-5
-4
-3
-2
-1
-Bye
-----------
-Submitted:
-----------
-100
-here99
-here98
-here97
-here96
-here95
-here94
-here93
-here92
-here91
-here90
-here89
-here88
-here87
-here86
-here85
-here84
-here83
-here82
-here81
-here80
-here79
-here78
-here77
-here76
-here75
-here74
-here73
-here72
-here71
-here70
-here69
-here68
-here67
-here66
-here65
-here64
-here63
-here62
-here61
-here60
-here59
-here58
-here57
-here56
-here55
-here54
-here53
-here52
-here51
-here50
-here49
-here48
-here47
-here46
-here45
-here44
-here43
-here42
-here41
-here40
-here39
-here38
-here37
-here36
-here35
-here34
-here33
-here32
-here31
-here30
-here29
-here28
-here27
-here26
-here25
-here24
-here23
-here22
-here21
-here20
-here19
-here18
-here17
-here16
-here15
-here14
-here13
-here12
-here11
-here10
-here9
-here8
-here7
-here6
-here5
-here4
-here3
-here2
-here1
-hereBye
-here
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2,101c2,102
-< 99
-< 98
-< 97
-< 96
-< 95
-< 94
-< 93
-< 92
-< 91
-< 90
-< 89
-< 88
-< 87
-< 86
-< 85
-< 84
-< 83
-< 82
-< 81
-< 80
-< 79
-< 78
-< 77
-< 76
-< 75
-< 74
-< 73
-< 72
-< 71
-< 70
-< 69
-< 68
-< 67
-< 66
-< 65
-< 64
-< 63
-< 62
-< 61
-< 60
-< 59
-< 58
-< 57
-< 56
-< 55
-< 54
-< 53
-< 52
-< 51
-< 50
-< 49
-< 48
-< 47
-< 46
-< 45
-< 44
-< 43
-< 42
-< 41
-< 40
-< 39
-< 38
-< 37
-< 36
-< 35
-< 34
-< 33
-< 32
-< 31
-< 30
-< 29
-< 28
-< 27
-< 26
-< 25
-< 24
-< 23
-< 22
-< 21
-< 20
-< 19
-< 18
-< 17
-< 16
-< 15
-< 14
-< 13
-< 12
-< 11
-< 10
-< 9
-< 8
-< 7
-< 6
-< 5
-< 4
-< 3
-< 2
-< 1
-< Bye
----
-> here99
-> here98
-> here97
-> here96
-> here95
-> here94
-> here93
-> here92
-> here91
-> here90
-> here89
-> here88
-> here87
-> here86
-> here85
-> here84
-> here83
-> here82
-> here81
-> here80
-> here79
-> here78
-> here77
-> here76
-> here75
-> here74
-> here73
-> here72
-> here71
-> here70
-> here69
-> here68
-> here67
-> here66
-> here65
-> here64
-> here63
-> here62
-> here61
-> here60
-> here59
-> here58
-> here57
-> here56
-> here55
-> here54
-> here53
-> here52
-> here51
-> here50
-> here49
-> here48
-> here47
-> here46
-> here45
-> here44
-> here43
-> here42
-> here41
-> here40
-> here39
-> here38
-> here37
-> here36
-> here35
-> here34
-> here33
-> here32
-> here31
-> here30
-> here29
-> here28
-> here27
-> here26
-> here25
-> here24
-> here23
-> here22
-> here21
-> here20
-> here19
-> here18
-> here17
-> here16
-> here15
-> here14
-> here13
-> here12
-> here11
-> here10
-> here9
-> here8
-> here7
-> here6
-> here5
-> here4
-> here3
-> here2
-> here1
-> hereBye
-> here
-\ No newline at end of file
----------
-=================================================
-TEST 16: Two Lwps. spawn then exits 50 times.
-
-Two threads creates new ones, then exits.
-
-
-
-----------
-Reference:
-----------
-Counter is 50.  Exiting
-Counter is 50.  Exiting
-Counter is 49.  Exiting
-Counter is 49.  Exiting
-Counter is 48.  Exiting
-Counter is 48.  Exiting
-Counter is 47.  Exiting
-Counter is 47.  Exiting
-Counter is 46.  Exiting
-Counter is 46.  Exiting
-Counter is 45.  Exiting
-Counter is 45.  Exiting
-Counter is 44.  Exiting
-Counter is 44.  Exiting
-Counter is 43.  Exiting
-Counter is 43.  Exiting
-Counter is 42.  Exiting
-Counter is 42.  Exiting
-Counter is 41.  Exiting
-Counter is 41.  Exiting
-Counter is 40.  Exiting
-Counter is 40.  Exiting
-Counter is 39.  Exiting
-Counter is 39.  Exiting
-Counter is 38.  Exiting
-Counter is 38.  Exiting
-Counter is 37.  Exiting
-Counter is 37.  Exiting
-Counter is 36.  Exiting
-Counter is 36.  Exiting
-Counter is 35.  Exiting
-Counter is 35.  Exiting
-Counter is 34.  Exiting
-Counter is 34.  Exiting
-Counter is 33.  Exiting
-Counter is 33.  Exiting
-Counter is 32.  Exiting
-Counter is 32.  Exiting
-Counter is 31.  Exiting
-Counter is 31.  Exiting
-Counter is 30.  Exiting
-Counter is 30.  Exiting
-Counter is 29.  Exiting
-Counter is 29.  Exiting
-Counter is 28.  Exiting
-Counter is 28.  Exiting
-Counter is 27.  Exiting
-Counter is 27.  Exiting
-Counter is 26.  Exiting
-Counter is 26.  Exiting
-Counter is 25.  Exiting
-Counter is 25.  Exiting
-Counter is 24.  Exiting
-Counter is 24.  Exiting
-Counter is 23.  Exiting
-Counter is 23.  Exiting
-Counter is 22.  Exiting
-Counter is 22.  Exiting
-Counter is 21.  Exiting
-Counter is 21.  Exiting
-Counter is 20.  Exiting
-Counter is 20.  Exiting
-Counter is 19.  Exiting
-Counter is 19.  Exiting
-Counter is 18.  Exiting
-Counter is 18.  Exiting
-Counter is 17.  Exiting
-Counter is 17.  Exiting
-Counter is 16.  Exiting
-Counter is 16.  Exiting
-Counter is 15.  Exiting
-Counter is 15.  Exiting
-Counter is 14.  Exiting
-Counter is 14.  Exiting
-Counter is 13.  Exiting
-Counter is 13.  Exiting
-Counter is 12.  Exiting
-Counter is 12.  Exiting
-Counter is 11.  Exiting
-Counter is 11.  Exiting
-Counter is 10.  Exiting
-Counter is 10.  Exiting
-Counter is 9.  Exiting
-Counter is 9.  Exiting
-Counter is 8.  Exiting
-Counter is 8.  Exiting
-Counter is 7.  Exiting
-Counter is 7.  Exiting
-Counter is 6.  Exiting
-Counter is 6.  Exiting
-Counter is 5.  Exiting
-Counter is 5.  Exiting
-Counter is 4.  Exiting
-Counter is 4.  Exiting
-Counter is 3.  Exiting
-Counter is 3.  Exiting
-Counter is 2.  Exiting
-Counter is 2.  Exiting
-Counter is 1.  Exiting
-Counter is 1.  Exiting
-Bye
-Bye
-----------
-Submitted:
-----------
-Counter is 50.  Exiting
-hereCounter is 50.  Exiting
-hereCounter is 49.  Exiting
-hereCounter is 49.  Exiting
-hereCounter is 48.  Exiting
-hereCounter is 48.  Exiting
-hereCounter is 47.  Exiting
-hereCounter is 47.  Exiting
-hereCounter is 46.  Exiting
-hereCounter is 46.  Exiting
-hereCounter is 45.  Exiting
-hereCounter is 45.  Exiting
-hereCounter is 44.  Exiting
-hereCounter is 44.  Exiting
-hereCounter is 43.  Exiting
-hereCounter is 43.  Exiting
-hereCounter is 42.  Exiting
-hereCounter is 42.  Exiting
-hereCounter is 41.  Exiting
-hereCounter is 41.  Exiting
-hereCounter is 40.  Exiting
-hereCounter is 40.  Exiting
-hereCounter is 39.  Exiting
-hereCounter is 39.  Exiting
-hereCounter is 38.  Exiting
-hereCounter is 38.  Exiting
-hereCounter is 37.  Exiting
-hereCounter is 37.  Exiting
-hereCounter is 36.  Exiting
-hereCounter is 36.  Exiting
-hereCounter is 35.  Exiting
-hereCounter is 35.  Exiting
-hereCounter is 34.  Exiting
-hereCounter is 34.  Exiting
-hereCounter is 33.  Exiting
-hereCounter is 33.  Exiting
-hereCounter is 32.  Exiting
-hereCounter is 32.  Exiting
-hereCounter is 31.  Exiting
-hereCounter is 31.  Exiting
-hereCounter is 30.  Exiting
-hereCounter is 30.  Exiting
-hereCounter is 29.  Exiting
-hereCounter is 29.  Exiting
-hereCounter is 28.  Exiting
-hereCounter is 28.  Exiting
-hereCounter is 27.  Exiting
-hereCounter is 27.  Exiting
-hereCounter is 26.  Exiting
-hereCounter is 26.  Exiting
-hereCounter is 25.  Exiting
-hereCounter is 25.  Exiting
-hereCounter is 24.  Exiting
-hereCounter is 24.  Exiting
-hereCounter is 23.  Exiting
-hereCounter is 23.  Exiting
-hereCounter is 22.  Exiting
-hereCounter is 22.  Exiting
-hereCounter is 21.  Exiting
-hereCounter is 21.  Exiting
-hereCounter is 20.  Exiting
-hereCounter is 20.  Exiting
-hereCounter is 19.  Exiting
-hereCounter is 19.  Exiting
-hereCounter is 18.  Exiting
-hereCounter is 18.  Exiting
-hereCounter is 17.  Exiting
-hereCounter is 17.  Exiting
-hereCounter is 16.  Exiting
-hereCounter is 16.  Exiting
-hereCounter is 15.  Exiting
-hereCounter is 15.  Exiting
-hereCounter is 14.  Exiting
-hereCounter is 14.  Exiting
-hereCounter is 13.  Exiting
-hereCounter is 13.  Exiting
-hereCounter is 12.  Exiting
-hereCounter is 12.  Exiting
-hereCounter is 11.  Exiting
-hereCounter is 11.  Exiting
-hereCounter is 10.  Exiting
-hereCounter is 10.  Exiting
-hereCounter is 9.  Exiting
-hereCounter is 9.  Exiting
-hereCounter is 8.  Exiting
-hereCounter is 8.  Exiting
-hereCounter is 7.  Exiting
-hereCounter is 7.  Exiting
-hereCounter is 6.  Exiting
-hereCounter is 6.  Exiting
-hereCounter is 5.  Exiting
-hereCounter is 5.  Exiting
-hereCounter is 4.  Exiting
-hereCounter is 4.  Exiting
-hereCounter is 3.  Exiting
-hereCounter is 3.  Exiting
-hereCounter is 2.  Exiting
-hereCounter is 2.  Exiting
-hereCounter is 1.  Exiting
-hereCounter is 1.  Exiting
-hereBye
-hereBye
-here
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2,102c2,103
-< Counter is 50.  Exiting
-< Counter is 49.  Exiting
-< Counter is 49.  Exiting
-< Counter is 48.  Exiting
-< Counter is 48.  Exiting
-< Counter is 47.  Exiting
-< Counter is 47.  Exiting
-< Counter is 46.  Exiting
-< Counter is 46.  Exiting
-< Counter is 45.  Exiting
-< Counter is 45.  Exiting
-< Counter is 44.  Exiting
-< Counter is 44.  Exiting
-< Counter is 43.  Exiting
-< Counter is 43.  Exiting
-< Counter is 42.  Exiting
-< Counter is 42.  Exiting
-< Counter is 41.  Exiting
-< Counter is 41.  Exiting
-< Counter is 40.  Exiting
-< Counter is 40.  Exiting
-< Counter is 39.  Exiting
-< Counter is 39.  Exiting
-< Counter is 38.  Exiting
-< Counter is 38.  Exiting
-< Counter is 37.  Exiting
-< Counter is 37.  Exiting
-< Counter is 36.  Exiting
-< Counter is 36.  Exiting
-< Counter is 35.  Exiting
-< Counter is 35.  Exiting
-< Counter is 34.  Exiting
-< Counter is 34.  Exiting
-< Counter is 33.  Exiting
-< Counter is 33.  Exiting
-< Counter is 32.  Exiting
-< Counter is 32.  Exiting
-< Counter is 31.  Exiting
-< Counter is 31.  Exiting
-< Counter is 30.  Exiting
-< Counter is 30.  Exiting
-< Counter is 29.  Exiting
-< Counter is 29.  Exiting
-< Counter is 28.  Exiting
-< Counter is 28.  Exiting
-< Counter is 27.  Exiting
-< Counter is 27.  Exiting
-< Counter is 26.  Exiting
-< Counter is 26.  Exiting
-< Counter is 25.  Exiting
-< Counter is 25.  Exiting
-< Counter is 24.  Exiting
-< Counter is 24.  Exiting
-< Counter is 23.  Exiting
-< Counter is 23.  Exiting
-< Counter is 22.  Exiting
-< Counter is 22.  Exiting
-< Counter is 21.  Exiting
-< Counter is 21.  Exiting
-< Counter is 20.  Exiting
-< Counter is 20.  Exiting
-< Counter is 19.  Exiting
-< Counter is 19.  Exiting
-< Counter is 18.  Exiting
-< Counter is 18.  Exiting
-< Counter is 17.  Exiting
-< Counter is 17.  Exiting
-< Counter is 16.  Exiting
-< Counter is 16.  Exiting
-< Counter is 15.  Exiting
-< Counter is 15.  Exiting
-< Counter is 14.  Exiting
-< Counter is 14.  Exiting
-< Counter is 13.  Exiting
-< Counter is 13.  Exiting
-< Counter is 12.  Exiting
-< Counter is 12.  Exiting
-< Counter is 11.  Exiting
-< Counter is 11.  Exiting
-< Counter is 10.  Exiting
-< Counter is 10.  Exiting
-< Counter is 9.  Exiting
-< Counter is 9.  Exiting
-< Counter is 8.  Exiting
-< Counter is 8.  Exiting
-< Counter is 7.  Exiting
-< Counter is 7.  Exiting
-< Counter is 6.  Exiting
-< Counter is 6.  Exiting
-< Counter is 5.  Exiting
-< Counter is 5.  Exiting
-< Counter is 4.  Exiting
-< Counter is 4.  Exiting
-< Counter is 3.  Exiting
-< Counter is 3.  Exiting
-< Counter is 2.  Exiting
-< Counter is 2.  Exiting
-< Counter is 1.  Exiting
-< Counter is 1.  Exiting
-< Bye
-< Bye
----
-> hereCounter is 50.  Exiting
-> hereCounter is 49.  Exiting
-> hereCounter is 49.  Exiting
-> hereCounter is 48.  Exiting
-> hereCounter is 48.  Exiting
-> hereCounter is 47.  Exiting
-> hereCounter is 47.  Exiting
-> hereCounter is 46.  Exiting
-> hereCounter is 46.  Exiting
-> hereCounter is 45.  Exiting
-> hereCounter is 45.  Exiting
-> hereCounter is 44.  Exiting
-> hereCounter is 44.  Exiting
-> hereCounter is 43.  Exiting
-> hereCounter is 43.  Exiting
-> hereCounter is 42.  Exiting
-> hereCounter is 42.  Exiting
-> hereCounter is 41.  Exiting
-> hereCounter is 41.  Exiting
-> hereCounter is 40.  Exiting
-> hereCounter is 40.  Exiting
-> hereCounter is 39.  Exiting
-> hereCounter is 39.  Exiting
-> hereCounter is 38.  Exiting
-> hereCounter is 38.  Exiting
-> hereCounter is 37.  Exiting
-> hereCounter is 37.  Exiting
-> hereCounter is 36.  Exiting
-> hereCounter is 36.  Exiting
-> hereCounter is 35.  Exiting
-> hereCounter is 35.  Exiting
-> hereCounter is 34.  Exiting
-> hereCounter is 34.  Exiting
-> hereCounter is 33.  Exiting
-> hereCounter is 33.  Exiting
-> hereCounter is 32.  Exiting
-> hereCounter is 32.  Exiting
-> hereCounter is 31.  Exiting
-> hereCounter is 31.  Exiting
-> hereCounter is 30.  Exiting
-> hereCounter is 30.  Exiting
-> hereCounter is 29.  Exiting
-> hereCounter is 29.  Exiting
-> hereCounter is 28.  Exiting
-> hereCounter is 28.  Exiting
-> hereCounter is 27.  Exiting
-> hereCounter is 27.  Exiting
-> hereCounter is 26.  Exiting
-> hereCounter is 26.  Exiting
-> hereCounter is 25.  Exiting
-> hereCounter is 25.  Exiting
-> hereCounter is 24.  Exiting
-> hereCounter is 24.  Exiting
-> hereCounter is 23.  Exiting
-> hereCounter is 23.  Exiting
-> hereCounter is 22.  Exiting
-> hereCounter is 22.  Exiting
-> hereCounter is 21.  Exiting
-> hereCounter is 21.  Exiting
-> hereCounter is 20.  Exiting
-> hereCounter is 20.  Exiting
-> hereCounter is 19.  Exiting
-> hereCounter is 19.  Exiting
-> hereCounter is 18.  Exiting
-> hereCounter is 18.  Exiting
-> hereCounter is 17.  Exiting
-> hereCounter is 17.  Exiting
-> hereCounter is 16.  Exiting
-> hereCounter is 16.  Exiting
-> hereCounter is 15.  Exiting
-> hereCounter is 15.  Exiting
-> hereCounter is 14.  Exiting
-> hereCounter is 14.  Exiting
-> hereCounter is 13.  Exiting
-> hereCounter is 13.  Exiting
-> hereCounter is 12.  Exiting
-> hereCounter is 12.  Exiting
-> hereCounter is 11.  Exiting
-> hereCounter is 11.  Exiting
-> hereCounter is 10.  Exiting
-> hereCounter is 10.  Exiting
-> hereCounter is 9.  Exiting
-> hereCounter is 9.  Exiting
-> hereCounter is 8.  Exiting
-> hereCounter is 8.  Exiting
-> hereCounter is 7.  Exiting
-> hereCounter is 7.  Exiting
-> hereCounter is 6.  Exiting
-> hereCounter is 6.  Exiting
-> hereCounter is 5.  Exiting
-> hereCounter is 5.  Exiting
-> hereCounter is 4.  Exiting
-> hereCounter is 4.  Exiting
-> hereCounter is 3.  Exiting
-> hereCounter is 3.  Exiting
-> hereCounter is 2.  Exiting
-> hereCounter is 2.  Exiting
-> hereCounter is 1.  Exiting
-> hereCounter is 1.  Exiting
-> hereBye
-> hereBye
-> here
-\ No newline at end of file
+> Child process (8357) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
@@ -1446,7 +71,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (10608) exited due to signal (Segmentation fault).
+Child process (8536) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1456,36 +81,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (10608) exited due to signal (Segmentation fault).
----------
-=================================================
-TEST 18: 1024 threads, random exit.
-
-Creat 1024 threads, each of which either yields or exits randomly until
-a counter reaches a given value.
-
-
-
-
-----------
-Reference:
-----------
-Spawining 4096 threads.
-Done.  Count is 50000. (Yielded 406869 times)
-----------
-Submitted:
-----------
-Spawining 4096 threads.
-herehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereDone.  Count is 50000. (Yielded 406869 times)
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2c2
-< Done.  Count is 50000. (Yielded 406869 times)
----
-> herehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereherehereDone.  Count is 50000. (Yielded 406869 times)
+> Child process (8536) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 19: Ping pong with semaphores
@@ -1524,50 +120,18 @@ Done.
 ----------
 Submitted:
 ----------
-Spawining threads. (20)
-   Ping...pong.
-   Ping...pong.
-   Ping...pong.
-here   Pinghere...pong.
-here   Pinghere...pong.
-   Pinghere...pong.
-   Ping...pong.
-here   Ping...pong.
-here   Pinghere...pong.
-   Pinghere...pong.
-   Ping...pong.
-here   Ping...pong.
-here   Pinghere...pong.
-   Pinghere...pong.
-   Ping...pong.
-here   Ping...pong.
-here   Pinghere...pong.
-   Pinghere...pong.
-   Ping...pong.
-here   Pinghere...pong.
-hereDone.
+Child process (8629) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-4a5,19
-> here   Pinghere...pong.
-> here   Pinghere...pong.
->    Pinghere...pong.
->    Ping...pong.
-> here   Ping...pong.
-> here   Pinghere...pong.
->    Pinghere...pong.
->    Ping...pong.
-> here   Ping...pong.
-> here   Pinghere...pong.
->    Pinghere...pong.
->    Ping...pong.
-> here   Ping...pong.
-> here   Pinghere...pong.
->    Pinghere...pong.
-6,22c21,22
+1,22c1
+< Spawining threads. (20)
+<    Ping...pong.
+<    Ping...pong.
+<    Ping...pong.
+<    Ping...pong.
 <    Ping...pong.
 <    Ping...pong.
 <    Ping...pong.
@@ -1586,8 +150,7 @@ Differences (< reference > output)
 <    Ping...pong.
 < Done.
 ---
-> here   Pinghere...pong.
-> hereDone.
+> Child process (8629) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 20: Dine with semaphores
@@ -1809,232 +372,220 @@ Reference:
 ----------
 Submitted:
 ----------
-|=============|=============|=============|=============|=============|
-|      A      |      B      |      C      |      D      |      E      |
-|=============|=============|=============|=============|=============|
-| -----       | -----       | -----       | -----       | -----       |
-| -----       | -1---       | -----       | -----       | -----       |
-| -----       | -12--       | -----       | -----       | -----       |
-| -----       | -12-- Eat   | -----       | -----       | -----       |
-| -----       | -12-- Eat   | -----       | -----       | 0----       |
-| -----       | -12-- Eat   | -----       | ---3-       | 0----       |
-| -----       | -12-- Eat   | -----       | ---3-       | 0---4       |
-| -----       | -12-- Eat   | -----       | ---3-       | 0---4 Eat   |
-| -----       | -12--       | -----       | ---3-       | 0---4 Eat   |
-| -----       | --2--       | -----       | ---3-       | 0---4 Eat   |
-| -----       | -----       | -----       | ---3-       | 0---4 Eat   |
-| -----       | ----- Think | -----       | ---3-       | 0---4 Eat   |
-| -1---       | ----- Think | -----       | ---3-       | 0---4 Eat   |
-| -1---       | ----- Think | -----       | ---3-       | 0---4       |
-| -1---       | ----- Think | -----       | ---3-       | ----4       |
-| -1---       | ----- Think | -----       | ---3-       | -----       |
-| -1---       | ----- Think | -----       | ---3-       | ----- Think |
-| 01---       | ----- Think | -----       | ---3-       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---3-       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 0----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| ----- Think | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01--- Eat   | -----       | -----       | ---34 Eat   | ----- Think |
-| 01---       | -----       | -----       | ---34 Eat   | ----- Think |
-| 0----       | -----       | -----       | ---34 Eat   | ----- Think |
-| -----       | -----       | -----       | ---34 Eat   | ----- Think |
-| ----- Think | -----       | -----       | ---34 Eat   | ----- Think |
-| ----- Think | -1---       | -----       | ---34 Eat   | ----- Think |
-| ----- Think | -12--       | -----       | ---34 Eat   | ----- Think |
-| ----- Think | -12-- Eat   | -----       | ---34 Eat   | ----- Think |
-| ----- Think | -12-- Eat   | -----       | ---34 Eat   | -----       |
-| ----- Think | -12-- Eat   | -----       | ---34 Eat   | 0----       |
-| ----- Think | -12-- Eat   | -----       | ---34       | 0----       |
-| ----- Think | -12-- Eat   | -----       | ----4       | 0----       |
-| ----- Think | -12-- Eat   | -----       | -----       | 0----       |
-| ----- Think | -12-- Eat   | -----       | ----- Think | 0----       |
-| ----- Think | -12-- Eat   | ---3-       | ----- Think | 0----       |
-| ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4       |
-| ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
-| ----- Think | -12--       | ---3-       | ----- Think | 0---4 Eat   |
-| ----- Think | --2--       | ---3-       | ----- Think | 0---4 Eat   |
-| ----- Think | -----       | ---3-       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | ---3-       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | --23-       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | --23-       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | --2--       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | -----       | ----- Think | 0---4 Eat   |
-| ----- Think | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
-| ----- Think | -----       | ----- Think | ----- Think | 0---4 Eat   |
-| ----- Think | -1---       | ----- Think | ----- Think | 0---4 Eat   |
-| ----- Think | -12--       | ----- Think | ----- Think | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
-| -----       | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
-| -----       | -12--       | ----- Think | ----- Think | 0---4 Eat   |
-| -----       | --2--       | ----- Think | ----- Think | 0---4 Eat   |
-| -----       | -----       | ----- Think | ----- Think | 0---4 Eat   |
-| -----       | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
-| -1---       | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
-| -1---       | ----- Think | ----- Think | -----       | 0---4 Eat   |
-| -1---       | ----- Think | ----- Think | ---3-       | 0---4 Eat   |
-| -1---       | ----- Think | -----       | ---3-       | 0---4 Eat   |
-| -1---       | ----- Think | -----       | ---3-       | 0---4       |
-| -1---       | ----- Think | -----       | ---3-       | ----4       |
-| -1---       | ----- Think | -----       | ---3-       | -----       |
-| -1---       | ----- Think | -----       | ---3-       | ----- Think |
-| -1---       | ----- Think | -----       | ---34       | ----- Think |
-| -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 0----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| ----- Think | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ---34       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ----4       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | -----       | ----- Think |
-| 01--- Eat   | ----- Think | -----       | ----- Think | ----- Think |
-| 01--- Eat   | ----- Think | ---3-       | ----- Think | ----- Think |
-| 01--- Eat   | ----- Think | --23-       | ----- Think | ----- Think |
-| 01--- Eat   | ----- Think | --23- Eat   | ----- Think | ----- Think |
-| 01--- Eat   | ----- Think | --23- Eat   | -----       | ----- Think |
-| 01--- Eat   | -----       | --23- Eat   | -----       | ----- Think |
-| 01--- Eat   | -----       | --23- Eat   | -----       | -----       |
-| 01--- Eat   | -----       | --23-       | -----       | -----       |
-| 01--- Eat   | -----       | --2--       | -----       | -----       |
-| 01--- Eat   | -----       | -----       | -----       | -----       |
-| 01--- Eat   | -----       | ----- Think | -----       | -----       |
-| 01--- Eat   | -----       | ----- Think | ---3-       | -----       |
-| 01--- Eat   | -----       | ----- Think | ---34       | -----       |
-| 01--- Eat   | -----       | ----- Think | ---34 Eat   | -----       |
-| 01---       | -----       | ----- Think | ---34 Eat   | -----       |
-| 0----       | -----       | ----- Think | ---34 Eat   | -----       |
-| -----       | -----       | ----- Think | ---34 Eat   | -----       |
-| ----- Think | -----       | ----- Think | ---34 Eat   | -----       |
-| ----- Think | -1---       | ----- Think | ---34 Eat   | -----       |
-| ----- Think | -12--       | ----- Think | ---34 Eat   | -----       |
-| ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | -----       |
-| ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | 0----       |
-| ----- Think | -12-- Eat   | ----- Think | ---34       | 0----       |
-| ----- Think | -12-- Eat   | ----- Think | ----4       | 0----       |
-| ----- Think | -12-- Eat   | ----- Think | -----       | 0----       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | 0----       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | ----4       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | -----       |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | -----       |
-| ----- Think | -12-- Eat   | -----       | ----- Think | -----       |
-| ----- Think | -12-- Eat   | -----       | ----- Think | 0----       |
-| ----- Think | -12-- Eat   | -----       | ----- Think | 0---4       |
-| ----- Think | -12-- Eat   | -----       | ----- Think | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | -12--       | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | --2--       | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | -----       | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | ----- Think | ---3-       | ----- Think | 0---4 Eat   |
-| -----       | ----- Think | --23-       | ----- Think | 0---4 Eat   |
-| -----       | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
-| -1---       | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
-| -1---       | ----- Think | --23- Eat   | -----       | 0---4 Eat   |
-| -1---       | -----       | --23- Eat   | -----       | 0---4 Eat   |
-| -1---       | -----       | --23- Eat   | -----       | 0---4       |
-| -1---       | -----       | --23- Eat   | -----       | ----4       |
-| -1---       | -----       | --23- Eat   | -----       | -----       |
-| -1---       | -----       | --23- Eat   | -----       | ----- Think |
-| 01---       | -----       | --23- Eat   | -----       | ----- Think |
-| 01--- Eat   | -----       | --23- Eat   | -----       | ----- Think |
-| 01---       | -----       | --23- Eat   | -----       | ----- Think |
-| 0----       | -----       | --23- Eat   | -----       | ----- Think |
-| -----       | -----       | --23- Eat   | -----       | ----- Think |
-| ----- Think | -----       | --23- Eat   | -----       | ----- Think |
-| ----- Think | -1---       | --23- Eat   | -----       | ----- Think |
-| ----- Think | -1---       | --23- Eat   | -----       | -----       |
-| ----- Think | -1---       | --23- Eat   | -----       | 0----       |
-| ----- Think | -1---       | --23- Eat   | -----       | 0---4       |
-| ----- Think | -1---       | --23- Eat   | -----       | 0---4 Eat   |
-| ----- Think | -1---       | --23-       | -----       | 0---4 Eat   |
-| ----- Think | -1---       | --2--       | -----       | 0---4 Eat   |
-| ----- Think | -1---       | -----       | -----       | 0---4 Eat   |
-| ----- Think | -1---       | ----- Think | -----       | 0---4 Eat   |
-| ----- Think | -12--       | ----- Think | -----       | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ----- Think | -----       | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ----- Think | ---3-       | 0---4 Eat   |
-| ----- Think | -12-- Eat   | ----- Think | ---3-       | 0---4       |
-| ----- Think | -12-- Eat   | ----- Think | ---3-       | ----4       |
-| ----- Think | -12-- Eat   | ----- Think | ---3-       | -----       |
-| ----- Think | -12-- Eat   | ----- Think | ---3-       | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ---34       | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ---34       | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ----4       | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | -----       | ----- Think |
-| ----- Think | -12-- Eat   | ----- Think | ----- Think | ----- Think |
-| ----- Think | -12-- Eat   | -----       | ----- Think | ----- Think |
-| ----- Think | -12-- Eat   | ---3-       | ----- Think | ----- Think |
-| ----- Think | -12-- Eat   | ---3-       | -----       | ----- Think |
-| -----       | -12-- Eat   | ---3-       | -----       | ----- Think |
-here| -----       | -12-- Eat   | ---3-       | -----       | -----       |
-here| -----       | -12--       | ---3-       | -----       | -----       |
-| -----       | --2--       | ---3-       | -----       | -----       |
-| -----       | -----       | ---3-       | -----       | -----       |
-| -----       | ----- Think | ---3-       | -----       | -----       |
-| -----       | ----- Think | --23-       | -----       | -----       |
-| -----       | ----- Think | --23- Eat   | -----       | -----       |
-| -----       | -----       | --23- Eat   | -----       | -----       |
-here| -----       | -----       | --23-       | -----       | -----       |
-| -----       | -----       | --2--       | -----       | -----       |
-| -----       | -----       | -----       | -----       | -----       |
-| -----       | -----       | ----- Think | -----       | -----       |
-| -----       | -----       | ----- Think | ---3-       | -----       |
-| -----       | -----       | ----- Think | ---34       | -----       |
-| -----       | -----       | ----- Think | ---34 Eat   | -----       |
-| -----       | -----       | -----       | ---34 Eat   | -----       |
-| -----       | -----       | -----       | ---34       | -----       |
-| -----       | -----       | -----       | ----4       | -----       |
-| -----       | -----       | -----       | -----       | -----       |
-| -----       | -----       | -----       | ----- Think | -----       |
-| -----       | -----       | ---3-       | ----- Think | -----       |
-| -----       | -----       | --23-       | ----- Think | -----       |
-| -----       | -----       | --23- Eat   | ----- Think | -----       |
-| -----       | -----       | --23-       | ----- Think | -----       |
-| -----       | -----       | --2--       | ----- Think | -----       |
-| -----       | -----       | -----       | ----- Think | -----       |
-| -----       | -----       | ----- Think | ----- Think | -----       |
-| -----       | -----       | ----- Think | -----       | -----       |
-here| -----       | -----       | -----       | -----       | -----       |
-here|=============|=============|=============|=============|=============|
+Child process (8660) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-176,177c176,177
+1,205c1
+< |=============|=============|=============|=============|=============|
+< |      A      |      B      |      C      |      D      |      E      |
+< |=============|=============|=============|=============|=============|
+< | -----       | -----       | -----       | -----       | -----       |
+< | -----       | -1---       | -----       | -----       | -----       |
+< | -----       | -12--       | -----       | -----       | -----       |
+< | -----       | -12-- Eat   | -----       | -----       | -----       |
+< | -----       | -12-- Eat   | -----       | -----       | 0----       |
+< | -----       | -12-- Eat   | -----       | ---3-       | 0----       |
+< | -----       | -12-- Eat   | -----       | ---3-       | 0---4       |
+< | -----       | -12-- Eat   | -----       | ---3-       | 0---4 Eat   |
+< | -----       | -12--       | -----       | ---3-       | 0---4 Eat   |
+< | -----       | --2--       | -----       | ---3-       | 0---4 Eat   |
+< | -----       | -----       | -----       | ---3-       | 0---4 Eat   |
+< | -----       | ----- Think | -----       | ---3-       | 0---4 Eat   |
+< | -1---       | ----- Think | -----       | ---3-       | 0---4 Eat   |
+< | -1---       | ----- Think | -----       | ---3-       | 0---4       |
+< | -1---       | ----- Think | -----       | ---3-       | ----4       |
+< | -1---       | ----- Think | -----       | ---3-       | -----       |
+< | -1---       | ----- Think | -----       | ---3-       | ----- Think |
+< | 01---       | ----- Think | -----       | ---3-       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---3-       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 0----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01--- Eat   | -----       | -----       | ---34 Eat   | ----- Think |
+< | 01---       | -----       | -----       | ---34 Eat   | ----- Think |
+< | 0----       | -----       | -----       | ---34 Eat   | ----- Think |
+< | -----       | -----       | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | -----       | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | -1---       | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | -12--       | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | -12-- Eat   | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | -12-- Eat   | -----       | ---34 Eat   | -----       |
+< | ----- Think | -12-- Eat   | -----       | ---34 Eat   | 0----       |
+< | ----- Think | -12-- Eat   | -----       | ---34       | 0----       |
+< | ----- Think | -12-- Eat   | -----       | ----4       | 0----       |
+< | ----- Think | -12-- Eat   | -----       | -----       | 0----       |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | 0----       |
+< | ----- Think | -12-- Eat   | ---3-       | ----- Think | 0----       |
+< | ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4       |
+< | ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
+< | ----- Think | -12--       | ---3-       | ----- Think | 0---4 Eat   |
+< | ----- Think | --2--       | ---3-       | ----- Think | 0---4 Eat   |
+< | ----- Think | -----       | ---3-       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | ---3-       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | --23-       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | --23-       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | --2--       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | -----       | ----- Think | 0---4 Eat   |
+< | ----- Think | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
+< | ----- Think | -----       | ----- Think | ----- Think | 0---4 Eat   |
+< | ----- Think | -1---       | ----- Think | ----- Think | 0---4 Eat   |
+< | ----- Think | -12--       | ----- Think | ----- Think | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
+< | -----       | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
+< | -----       | -12--       | ----- Think | ----- Think | 0---4 Eat   |
+< | -----       | --2--       | ----- Think | ----- Think | 0---4 Eat   |
+< | -----       | -----       | ----- Think | ----- Think | 0---4 Eat   |
+< | -----       | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
+< | -1---       | ----- Think | ----- Think | ----- Think | 0---4 Eat   |
+< | -1---       | ----- Think | ----- Think | -----       | 0---4 Eat   |
+< | -1---       | ----- Think | ----- Think | ---3-       | 0---4 Eat   |
+< | -1---       | ----- Think | -----       | ---3-       | 0---4 Eat   |
+< | -1---       | ----- Think | -----       | ---3-       | 0---4       |
+< | -1---       | ----- Think | -----       | ---3-       | ----4       |
+< | -1---       | ----- Think | -----       | ---3-       | -----       |
+< | -1---       | ----- Think | -----       | ---3-       | ----- Think |
+< | -1---       | ----- Think | -----       | ---34       | ----- Think |
+< | -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 0----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | ----- Think | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -----       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | -1---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01---       | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34 Eat   | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ---34       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ----4       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | -----       | ----- Think |
+< | 01--- Eat   | ----- Think | -----       | ----- Think | ----- Think |
+< | 01--- Eat   | ----- Think | ---3-       | ----- Think | ----- Think |
+< | 01--- Eat   | ----- Think | --23-       | ----- Think | ----- Think |
+< | 01--- Eat   | ----- Think | --23- Eat   | ----- Think | ----- Think |
+< | 01--- Eat   | ----- Think | --23- Eat   | -----       | ----- Think |
+< | 01--- Eat   | -----       | --23- Eat   | -----       | ----- Think |
+< | 01--- Eat   | -----       | --23- Eat   | -----       | -----       |
+< | 01--- Eat   | -----       | --23-       | -----       | -----       |
+< | 01--- Eat   | -----       | --2--       | -----       | -----       |
+< | 01--- Eat   | -----       | -----       | -----       | -----       |
+< | 01--- Eat   | -----       | ----- Think | -----       | -----       |
+< | 01--- Eat   | -----       | ----- Think | ---3-       | -----       |
+< | 01--- Eat   | -----       | ----- Think | ---34       | -----       |
+< | 01--- Eat   | -----       | ----- Think | ---34 Eat   | -----       |
+< | 01---       | -----       | ----- Think | ---34 Eat   | -----       |
+< | 0----       | -----       | ----- Think | ---34 Eat   | -----       |
+< | -----       | -----       | ----- Think | ---34 Eat   | -----       |
+< | ----- Think | -----       | ----- Think | ---34 Eat   | -----       |
+< | ----- Think | -1---       | ----- Think | ---34 Eat   | -----       |
+< | ----- Think | -12--       | ----- Think | ---34 Eat   | -----       |
+< | ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | -----       |
+< | ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | 0----       |
+< | ----- Think | -12-- Eat   | ----- Think | ---34       | 0----       |
+< | ----- Think | -12-- Eat   | ----- Think | ----4       | 0----       |
+< | ----- Think | -12-- Eat   | ----- Think | -----       | 0----       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | 0----       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | 0---4       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | ----4       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | -----       |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | -----       |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | -----       |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | 0----       |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | 0---4       |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | -12-- Eat   | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | -12--       | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | --2--       | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | -----       | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | ----- Think | ---3-       | ----- Think | 0---4 Eat   |
+< | -----       | ----- Think | --23-       | ----- Think | 0---4 Eat   |
+< | -----       | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
+< | -1---       | ----- Think | --23- Eat   | ----- Think | 0---4 Eat   |
+< | -1---       | ----- Think | --23- Eat   | -----       | 0---4 Eat   |
+< | -1---       | -----       | --23- Eat   | -----       | 0---4 Eat   |
+< | -1---       | -----       | --23- Eat   | -----       | 0---4       |
+< | -1---       | -----       | --23- Eat   | -----       | ----4       |
+< | -1---       | -----       | --23- Eat   | -----       | -----       |
+< | -1---       | -----       | --23- Eat   | -----       | ----- Think |
+< | 01---       | -----       | --23- Eat   | -----       | ----- Think |
+< | 01--- Eat   | -----       | --23- Eat   | -----       | ----- Think |
+< | 01---       | -----       | --23- Eat   | -----       | ----- Think |
+< | 0----       | -----       | --23- Eat   | -----       | ----- Think |
+< | -----       | -----       | --23- Eat   | -----       | ----- Think |
+< | ----- Think | -----       | --23- Eat   | -----       | ----- Think |
+< | ----- Think | -1---       | --23- Eat   | -----       | ----- Think |
+< | ----- Think | -1---       | --23- Eat   | -----       | -----       |
+< | ----- Think | -1---       | --23- Eat   | -----       | 0----       |
+< | ----- Think | -1---       | --23- Eat   | -----       | 0---4       |
+< | ----- Think | -1---       | --23- Eat   | -----       | 0---4 Eat   |
+< | ----- Think | -1---       | --23-       | -----       | 0---4 Eat   |
+< | ----- Think | -1---       | --2--       | -----       | 0---4 Eat   |
+< | ----- Think | -1---       | -----       | -----       | 0---4 Eat   |
+< | ----- Think | -1---       | ----- Think | -----       | 0---4 Eat   |
+< | ----- Think | -12--       | ----- Think | -----       | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ----- Think | -----       | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ----- Think | ---3-       | 0---4 Eat   |
+< | ----- Think | -12-- Eat   | ----- Think | ---3-       | 0---4       |
+< | ----- Think | -12-- Eat   | ----- Think | ---3-       | ----4       |
+< | ----- Think | -12-- Eat   | ----- Think | ---3-       | -----       |
+< | ----- Think | -12-- Eat   | ----- Think | ---3-       | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ---34       | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ---34 Eat   | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ---34       | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ----4       | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | -----       | ----- Think |
+< | ----- Think | -12-- Eat   | ----- Think | ----- Think | ----- Think |
+< | ----- Think | -12-- Eat   | -----       | ----- Think | ----- Think |
+< | ----- Think | -12-- Eat   | ---3-       | ----- Think | ----- Think |
+< | ----- Think | -12-- Eat   | ---3-       | -----       | ----- Think |
+< | -----       | -12-- Eat   | ---3-       | -----       | ----- Think |
 < | -----       | -12-- Eat   | ---3-       | -----       | -----       |
 < | -----       | -12--       | ---3-       | -----       | -----       |
----
-> here| -----       | -12-- Eat   | ---3-       | -----       | -----       |
-> here| -----       | -12--       | ---3-       | -----       | -----       |
-184c184
+< | -----       | --2--       | ---3-       | -----       | -----       |
+< | -----       | -----       | ---3-       | -----       | -----       |
+< | -----       | ----- Think | ---3-       | -----       | -----       |
+< | -----       | ----- Think | --23-       | -----       | -----       |
+< | -----       | ----- Think | --23- Eat   | -----       | -----       |
+< | -----       | -----       | --23- Eat   | -----       | -----       |
 < | -----       | -----       | --23-       | -----       | -----       |
----
-> here| -----       | -----       | --23-       | -----       | -----       |
-204,205c204,205
+< | -----       | -----       | --2--       | -----       | -----       |
+< | -----       | -----       | -----       | -----       | -----       |
+< | -----       | -----       | ----- Think | -----       | -----       |
+< | -----       | -----       | ----- Think | ---3-       | -----       |
+< | -----       | -----       | ----- Think | ---34       | -----       |
+< | -----       | -----       | ----- Think | ---34 Eat   | -----       |
+< | -----       | -----       | -----       | ---34 Eat   | -----       |
+< | -----       | -----       | -----       | ---34       | -----       |
+< | -----       | -----       | -----       | ----4       | -----       |
+< | -----       | -----       | -----       | -----       | -----       |
+< | -----       | -----       | -----       | ----- Think | -----       |
+< | -----       | -----       | ---3-       | ----- Think | -----       |
+< | -----       | -----       | --23-       | ----- Think | -----       |
+< | -----       | -----       | --23- Eat   | ----- Think | -----       |
+< | -----       | -----       | --23-       | ----- Think | -----       |
+< | -----       | -----       | --2--       | ----- Think | -----       |
+< | -----       | -----       | -----       | ----- Think | -----       |
+< | -----       | -----       | ----- Think | ----- Think | -----       |
+< | -----       | -----       | ----- Think | -----       | -----       |
 < | -----       | -----       | -----       | -----       | -----       |
 < |=============|=============|=============|=============|=============|
 ---
-> here| -----       | -----       | -----       | -----       | -----       |
-> here|=============|=============|=============|=============|=============|
+> Child process (8660) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 21: Transfer threads between schedulers (stopped)
@@ -2071,16 +622,16 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Creating LWPS
-Setting the scheduler.
-Launching LWPS
-hereBack from LWPS.
+Child process (8692) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-4,19c4
+1,19c1
+< Creating LWPS
+< Setting the scheduler.
+< Launching LWPS
 <     1
 <          2
 <               3
@@ -2098,7 +649,7 @@ Differences (< reference > output)
 <                         5
 < Back from LWPS.
 ---
-> hereBack from LWPS.
+> Child process (8692) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 22: Transfer threads between schedulers (live)
@@ -2150,31 +701,15 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Creating LWPS
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-Setting the scheduler.
-Back from LWPS.
+Child process (8724) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-19,33d18
+1,34c1
+< Creating LWPS
+< Launching LWPS
 <     1
 <          2
 <               3
@@ -2190,6 +725,56 @@ Differences (< reference > output)
 <               3
 <                    4
 <                         5
+< Setting the scheduler.
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+<     1
+<          2
+<               3
+<                    4
+<                         5
+< Back from LWPS.
+---
+> Child process (8724) exited due to signal (Segmentation fault).
+---------
+=================================================
+TEST 23: Sched->next() returns NULL to lwp_yield()
+
+Has a scheduler that returns a thread once, then NULL thereafter.
+
+
+
+
+
+----------
+Reference:
+----------
+Before the LWPS.
+First print in threadfun().
+Back from LWPS.
+----------
+Submitted:
+----------
+Child process (8755) exited due to signal (Segmentation fault).
+
+---------------------------------
+Differences (< reference > output)
+---------------------------------
+
+1,3c1
+< Before the LWPS.
+< First print in threadfun().
+< Back from LWPS.
+---
+> Child process (8755) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 24: Transfer threads between schedulers check for init/shutdown
@@ -2306,54 +891,52 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Creating LWPS
-Admitting new thread to First scheduler
-Admitting new thread to First scheduler
-Admitting new thread to First scheduler
-Admitting new thread to First scheduler
-Admitting new thread to First scheduler
-Launching LWPS
-(first->next())
-    1
-(first->next())
-         2
-(first->next())
-              3
-(first->next())
-                   4
-(first->next())
-                        5
-(first->next())
-    1
-(first->next())
-         2
-(first->next())
-              3
-(first->next())
-                   4
-(first->next())
-                        5
-(first->next())
-    1
-(first->next())
-         2
-(first->next())
-              3
-(first->next())
-                   4
-(first->next())
-                        5
-Setting the scheduler.
-(second->next())
-Back from LWPS.
+Child process (8787) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1d0
+1,99c1
 < init: called on first scheduler
-40,97d38
+< Creating LWPS
+< Admitting new thread to First scheduler
+< Admitting new thread to First scheduler
+< Admitting new thread to First scheduler
+< Admitting new thread to First scheduler
+< Admitting new thread to First scheduler
+< Launching LWPS
+< (first->next())
+<     1
+< (first->next())
+<          2
+< (first->next())
+<               3
+< (first->next())
+<                    4
+< (first->next())
+<                         5
+< (first->next())
+<     1
+< (first->next())
+<          2
+< (first->next())
+<               3
+< (first->next())
+<                    4
+< (first->next())
+<                         5
+< (first->next())
+<     1
+< (first->next())
+<          2
+< (first->next())
+<               3
+< (first->next())
+<                    4
+< (first->next())
+<                         5
+< Setting the scheduler.
 < init: called on second scheduler
 < (first->next())
 < Removing thread from First scheduler
@@ -2412,6 +995,10 @@ Differences (< reference > output)
 < Removing thread from Second scheduler
 < (second->next())
 < Removing thread from Second scheduler
+< (second->next())
+< Back from LWPS.
+---
+> Child process (8787) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 26: Does tid2thread return the right thread?
@@ -2818,336 +1405,336 @@ Checking thread IDs...
 ----------
 Submitted:
 ----------
-Launching LWPS
-         2
-                                            9
-                                            9
-                                  7
-              3
-    1
-         2
-                        5
-         2
-              3
-                                       8
-              3
-                                       8
-                             6
-         2
-                             6
-              3
-              3
-    1
-         2
-    1
-                                            9
-                             6
-              3
-         2
-    1
-                                            9
-                   4
-                        5
-                             6
-         2
-         2
-         2
-                        5
-    1
-                   4
-                        5
-              3
-                                  7
-                        5
-         2
-         2
-         2
-                   4
-                                            9
-                   4
-                                            9
-         2
-                   4
-                                  7
-                                            9
-    1
-         2
-    1
-                                            9
-                                            9
-                        5
-    1
-                        5
-                                            9
-                             6
-                             6
-         2
-                                       8
-    1
-                                            9
-                                  7
-    1
-                        5
-                                  7
-                                  7
-                                  7
-                                  7
-                                  7
-                                            9
-                             6
-                                       8
-                   4
-    1
-                             6
-                   4
-    1
-                                  7
-                             6
-         2
-                        5
-         2
-                   4
-              3
-                   4
-    1
-                                  7
-                             6
-                             6
-                                  7
-                                       8
-                             6
-                             6
-                                            9
-         2
-         2
-              3
-                        5
-                             6
-                        5
-                                       8
-                   4
-                             6
-              3
-              3
-    1
-              3
-    1
-              3
-         2
-              3
-                                            9
-                        5
-                             6
-         2
-                             6
-              3
-              3
-                                  7
-                   4
-                             6
-                                            9
-         2
-         2
-                             6
-                                            9
-                                  7
-              3
-                             6
-              3
-                                       8
-              3
-                        5
-    1
-              3
-                   4
-                                  7
-                                            9
-                                       8
-         2
-                   4
-                   4
-                   4
-         2
-                   4
-                                       8
-         2
-                                       8
-    1
-                             6
-                                  7
-                                            9
-                             6
-    1
-              3
-                        5
-              3
-         2
-                                  7
-                                       8
-                   4
-                        5
-                                            9
-                                       8
-              3
-                                            9
-                                  7
-              3
-         2
-                                       8
-                                       8
-                                  7
-         2
-         2
-                                            9
-                   4
-                             6
-                        5
-                             6
-         2
-                   4
-                                  7
-                        5
-                   4
-         2
-    1
-         2
-                        5
-              3
-                                       8
-    1
-                   4
-    1
-                                  7
-                                  7
-                                            9
-    1
-                                       8
-                             6
-                        5
-                                  7
-              3
-    1
-                                       8
-              3
-                             6
-                             6
-              3
-              3
-                        5
-                        5
-                                  7
-    1
-                                  7
-                                            9
-                                       8
-                   4
-                        5
-                                  7
-                                       8
-                        5
-                                  7
-                                            9
-         2
-                                            9
-              3
-                        5
-         2
-    1
-                                       8
-         2
-         2
-                             6
-                                       8
-                   4
-              3
-                             6
-         2
-                        5
-                                            9
-                        5
-                                            9
-                   4
-              3
-                   4
-    1
-                                       8
-              3
-                                            9
-                                  7
-              3
-                             6
-                        5
-              3
-                             6
-              3
-         2
-                                  7
-                                       8
-                        5
-                                  7
-              3
-                                            9
-                             6
-         2
-         2
-                        5
-                   4
-                                            9
-                             6
-                                  7
-                                            9
-                                       8
-                        5
-                   4
-                   4
-                        5
-              3
-                        5
-              3
-                             6
-                   4
-                             6
-                                       8
-              3
-                             6
-              3
-                   4
-                   4
-              3
-    1
-              3
-                        5
-                                  7
-                   4
-         2
-                   4
-                   4
-    1
-                                  7
-         2
-                                       8
-                        5
-                                            9
-              3
-                                       8
-    1
-                        5
-                             6
-                                            9
-              3
-                                       8
-                                  7
-    1
-                             6
-                                            9
-                             6
-Child process (10868) exited due to signal (Segmentation fault).
-                                  7
+Child process (8842) exited due to signal (Segmentation fault).
+
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-324,388c324,325
+1,388c1
+< Launching LWPS
+<          2
+<                                             9
+<                                             9
+<                                   7
+<               3
+<     1
+<          2
+<                         5
+<          2
+<               3
+<                                        8
+<               3
+<                                        8
+<                              6
+<          2
+<                              6
+<               3
+<               3
+<     1
+<          2
+<     1
+<                                             9
+<                              6
+<               3
+<          2
+<     1
+<                                             9
+<                    4
+<                         5
+<                              6
+<          2
+<          2
+<          2
+<                         5
+<     1
+<                    4
+<                         5
+<               3
+<                                   7
+<                         5
+<          2
+<          2
+<          2
+<                    4
+<                                             9
+<                    4
+<                                             9
+<          2
+<                    4
+<                                   7
+<                                             9
+<     1
+<          2
+<     1
+<                                             9
+<                                             9
+<                         5
+<     1
+<                         5
+<                                             9
+<                              6
+<                              6
+<          2
+<                                        8
+<     1
+<                                             9
+<                                   7
+<     1
+<                         5
+<                                   7
+<                                   7
+<                                   7
+<                                   7
+<                                   7
+<                                             9
+<                              6
+<                                        8
+<                    4
+<     1
+<                              6
+<                    4
+<     1
+<                                   7
+<                              6
+<          2
+<                         5
+<          2
+<                    4
+<               3
+<                    4
+<     1
+<                                   7
+<                              6
+<                              6
+<                                   7
+<                                        8
+<                              6
+<                              6
+<                                             9
+<          2
+<          2
+<               3
+<                         5
+<                              6
+<                         5
+<                                        8
+<                    4
+<                              6
+<               3
+<               3
+<     1
+<               3
+<     1
+<               3
+<          2
+<               3
+<                                             9
+<                         5
+<                              6
+<          2
+<                              6
+<               3
+<               3
+<                                   7
+<                    4
+<                              6
+<                                             9
+<          2
+<          2
+<                              6
+<                                             9
+<                                   7
+<               3
+<                              6
+<               3
+<                                        8
+<               3
+<                         5
+<     1
+<               3
+<                    4
+<                                   7
+<                                             9
+<                                        8
+<          2
+<                    4
+<                    4
+<                    4
+<          2
+<                    4
+<                                        8
+<          2
+<                                        8
+<     1
+<                              6
+<                                   7
+<                                             9
+<                              6
+<     1
+<               3
+<                         5
+<               3
+<          2
+<                                   7
+<                                        8
+<                    4
+<                         5
+<                                             9
+<                                        8
+<               3
+<                                             9
+<                                   7
+<               3
+<          2
+<                                        8
+<                                        8
+<                                   7
+<          2
+<          2
+<                                             9
+<                    4
+<                              6
+<                         5
+<                              6
+<          2
+<                    4
+<                                   7
+<                         5
+<                    4
+<          2
+<     1
+<          2
+<                         5
+<               3
+<                                        8
+<     1
+<                    4
+<     1
+<                                   7
+<                                   7
+<                                             9
+<     1
+<                                        8
+<                              6
+<                         5
+<                                   7
+<               3
+<     1
+<                                        8
+<               3
+<                              6
+<                              6
+<               3
+<               3
+<                         5
+<                         5
+<                                   7
+<     1
+<                                   7
+<                                             9
+<                                        8
+<                    4
+<                         5
+<                                   7
+<                                        8
+<                         5
+<                                   7
+<                                             9
+<          2
+<                                             9
+<               3
+<                         5
+<          2
+<     1
+<                                        8
+<          2
+<          2
+<                              6
+<                                        8
+<                    4
+<               3
+<                              6
+<          2
+<                         5
+<                                             9
+<                         5
+<                                             9
+<                    4
+<               3
+<                    4
+<     1
+<                                        8
+<               3
+<                                             9
+<                                   7
+<               3
+<                              6
+<                         5
+<               3
+<                              6
+<               3
+<          2
+<                                   7
+<                                        8
+<                         5
+<                                   7
+<               3
+<                                             9
+<                              6
+<          2
+<          2
+<                         5
+<                    4
+<                                             9
+<                              6
+<                                   7
+<                                             9
+<                                        8
+<                         5
+<                    4
+<                    4
+<                         5
+<               3
+<                         5
+<               3
+<                              6
+<                    4
+<                              6
+<                                        8
+<               3
+<                              6
+<               3
+<                    4
+<                    4
+<               3
+<     1
+<               3
+<                         5
+<                                   7
+<                    4
+<          2
+<                    4
+<                    4
+<     1
+<                                   7
+<          2
+<                                        8
+<                         5
+<                                             9
+<               3
+<                                        8
+<     1
+<                         5
+<                              6
+<                                             9
+<               3
+<                                        8
+<                                   7
+<     1
+<                              6
+<                                             9
+<                              6
 <                                   7
 <     1
 <                         5
@@ -3214,9 +1801,7 @@ Differences (< reference > output)
 < Checking thread IDs...
 < ...done.
 ---
-> Child process (10868) exited due to signal (Segmentation fault).
->                                   7
-\ No newline at end of file
+> Child process (8842) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 27: Tid2thread() returns NULL given a bad tid?
@@ -3233,7 +1818,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (10902) exited due to signal (Segmentation fault).
+Child process (8876) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -3243,7 +1828,7 @@ Differences (< reference > output)
 < Launching LWPS
 < Back from LWPS.
 ---
-> Child process (10902) exited due to signal (Segmentation fault).
+> Child process (8876) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -3472,7 +2057,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (10934) exited due to signal (Segmentation fault).
+Child process (8907) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -3692,5 +2277,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (10934) exited due to signal (Segmentation fault).
+> Child process (8907) exited due to signal (Segmentation fault).
 ---------

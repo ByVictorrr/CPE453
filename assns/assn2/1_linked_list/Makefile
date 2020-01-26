@@ -3,8 +3,8 @@ CFLAGS = -Wall -g
 LD = gcc
 LDFLAGS = -Wall -g -L.
    
-#main: lwp.o magic64.o 17_test.o
-#	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o 17_test.o
+main: lwp.o magic64.o tests/17_test.o
+	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o 17_test.o
 
 #libPLN.a: lwp.c 
 #	gcc -c lwp.c
@@ -21,8 +21,8 @@ lwp.o: lwp.c lwp.h
 #fiveprocsmain.o: fiveprocsmain.c
 	#$(CC) $(CFLAGS) -fpic -c -o fiveprocsmain.o fiveprocsmain.c
 
-17_test.o: 17_test.c
-	$(CC) $(CFLAGS) -fpic -c -o  17_test.o 17_test.c
+tests/17_test.o: tests/17_test.c lwp.h
+	$(CC) $(CFLAGS) -fpic -c -o  17_test.o tests/17_test.c
 
 
 
@@ -33,4 +33,4 @@ magic64.o: magic64.S
 	#$(CC) $(CFLAGS) -fpic -c -o numbersmain.o numbersmain.c
 
 clean:
-	rm *.o main *.so *.a
+	rm *.o main *.so *.a core*
