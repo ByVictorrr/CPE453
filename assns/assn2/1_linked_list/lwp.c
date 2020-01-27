@@ -74,6 +74,7 @@ tid_t lwp_create(lwpfun fn, void *arg, size_t size){
 			head=tail=new;
 			new->lt_prev=tail;
 			new->lt_next=tail;
+			current=head;
 		/* Case - head == fail(only one is list)*/
 		}else if(head==tail){
 			tail=new;	
