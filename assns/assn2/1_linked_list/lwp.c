@@ -1,131 +1,22 @@
 #include "lwp.h"
+#include "scheduler.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+static thread current = NULL;
+static rfile orginal;
 
-#define THREAD_INFO_SIZE sizeof(struct threadinfo_st)
+#define lt_next lib_two
+#define lt_prev lib_one
 
-/**********************Shared variables***************************/
-thread current = NULL;
-// if we were to think of this process current state as a thread
-
-rfile orginal;
-/***************************************************************/
-
-
-//********************Scheduler**********************************//
-thread tail = NULL, head = NULL; // used to keep track of queue
-/** NULL<-[head]-><-[arbitrary]-><-[tail]->(points to head) 
-*		(1) 		(2)
-*/
-
-void rr_admit(thread new){
-	/* new - newly created thread*/
-	thread last;
-	/* Verifys - the thread has a validated thread_id*/
-	if(new->tid > NO_THREAD){
-		/* Case - nothing is in schedulers linked list*/
-		if(!tail && !head){
-			tail=head=new;
-			tail->sched_one=NULL;
-			tail->sched_two=new;
-			return;
-		/* Case - only one node in scheduler*/
-		}else if(head == tail){
-			head->sched_two=new;
-			tail=new;
-			tail->sched_one = head;
-			tail->sched_two=head;
-		/* Case - at least two in schedular*/
-		}else if(head != tail){
-			/* Just have to use the tail*/
-			last=tail;
-			last->sched_two=new;
-			new->sched_one=last;
-			new->sched_two=head;
-			tail=new;
-		}
-	}
-}
-/* Description: helper function to remove*/
-int isInPool(thread victim){
-	if(head==victim){
-		return TRUE;
-	}else{
-		thread temp = head->sched_two;
-		while(temp != head){
-			if(temp==victim){
-				return TRUE;
-			}
-			temp=temp->sched_two;
-		}
-	}
-	return FALSE;
-}
-/* Description: Removes the passwed context from the scheduler's pool*/
-void rr_remove(thread victim){
-	thread right, left;
-	/* Case - which isnt found*/
-	if(!isInPool(victim))
-		return;
-
-	/* Case - when one or more in list*/
-	/* Case - where one is in the list*/
-	if(head==tail && tail && head){
-		//current=NULL;
-		head=tail=NULL;
-	/* Case - where at least two in list*/
-	}else{
-		/* Case - where victims the head*/
-		if(victim==head){
-			right = head->sched_two; // right one
-			tail->sched_two=right;
-			right->sched_one=NULL;
-			head=right;
-		/* Case - where victims the tail*/
-		}else if( victim == tail){
-			left= tail->sched_one;//left one
-			left->sched_two=head;
-			tail=left;
-		/* Case -general case in the middle*/
-		}else{
-			left=victim->sched_one;
-			right=victim->sched_two;	
-			left->sched_two=right;
-			right->sched_one=left;
-		}
-	}
-
-}
+extern void rr_admit(thread new);
+extern void rr_remove(thread victim);
+extern thread rr_next();
 
 
-/* Description: Retursn the next thread to be run or 
-				NULL if there isnt one(used to assign curent)*/
-thread rr_next(){
-	thread temp, next;
-	/* Case - empty pool*/
-	if(!head && !tail){
-		return NULL;
-	}
-
-	/*Case - at least one in pool*/
-
-	/*Case - where current hasnt been assigned*/
-	if(!current){
-		next=head;
-	/*Case - where currrent has been assign*/
-	}else{
-		temp=current;
-		next=temp->sched_two;
-	}
-	return next;
-}
-struct scheduler rr_sched = {NULL, NULL, rr_admit, rr_remove, rr_next};
-scheduler sched = &rr_sched;
-
-//**************************************************************//
+static struct scheduler rr_sched = {NULL, NULL, rr_admit, rr_remove, rr_next};
+static scheduler sched = &rr_sched;
 //************************LWP************************************//
-
 /* lwp_create: 
 			This function creates a new thread with function lwpfun
 			It returns the Thread ID
@@ -133,19 +24,20 @@ scheduler sched = &rr_sched;
 thread newThread(lwpfun fn, void *arg, size_t size){	
 
 	static size_t thread_count = 1;
+
 	unsigned long *temp_stack;
 	thread new;
 	if(!(new=calloc(1, sizeof(struct threadinfo_st)))){
 	   	return NULL;
 	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
-		(new);
+		free(new);
 		return NULL;
 	}else{
 		/*Set the new thread*/
 		new->tid=thread_count++;
 		new->stacksize = size;
-		new->lib_one=NULL;
-		new->lib_two=NULL;
+		new->lt_prev=NULL;
+		new->lt_next=NULL;
 
 
 		/* Init stack */
@@ -172,9 +64,29 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 returns: lwp_id of the new thread OR -1 if cant be made
 				*/
 tid_t lwp_create(lwpfun fn, void *arg, size_t size){
-	thread new;
+	static thread head = NULL, tail = NULL, new = NULL;
 	if((new= newThread(fn, arg, size))){
 		sched->admit(new);
+		/* Case - head and tail are empty(zero on list)*/
+		if(!head && !tail){
+			head=tail=new;
+			new->lt_prev=tail;
+			new->lt_next=tail;
+		/* Case - head == fail(only one is list)*/
+		}else if(head==tail){
+			tail=new;	
+			new->lt_prev=head;
+			new->lt_next=head;
+			head->lt_prev=tail;
+			head->lt_next=tail;
+		/* Case - 2 or more in list*/
+		}else{
+			tail->lt_next=new;
+			new->lt_prev=tail;
+			head->lt_prev=new;
+			new->lt_next=head;
+			tail=new;
+		}
 	}else{
 		return -1;
 	}
@@ -185,15 +97,13 @@ tid_t lwp_create(lwpfun fn, void *arg, size_t size){
 				If no other threads it returns to main process
 				*/
 void lwp_start(){
-	thread next;
 	/* Saving contents of Orginal state before LWP*/
 	/* Make a note to future self when removing check 
 		to if list empty if so point head to NULL*/
-	if(!(next=sched->next())){
+	if(!(current=sched->next())){
 		lwp_exit();
 	}else{
-		current=next;
-		swap_rfiles(&orginal, &(next->state));
+		swap_rfiles(&orginal, &current->state);
 	}
 } 
 
@@ -204,11 +114,10 @@ void lwp_start(){
  *				threads context
 */
 void lwp_yield(){
-	thread curr = current, next;
+	thread prev_current = current, next;
 	/* What is we dont have anymore thread in here*/
-	if((next=sched->next())){
-		current=next;
-		swap_rfiles(&curr->state, &next->state);
+	if((current=sched->next())){
+		swap_rfiles(&prev_current->state, &current->state);
 	}else{
 		lwp_stop();
 	}
@@ -219,12 +128,11 @@ void lwp_yield(){
 				*/
 	
 void lwp_stop(){
-	thread temp; 
 	/* Get current state then write org process*/
 	if(current){
 		swap_rfiles(&current->state, &orginal);
 	}else{
-		//swap_rfiles(NULL, &process.state);
+		swap_rfiles(NULL, &orginal); // TODO : DISABLE
 		return;
 	}
 }
@@ -247,41 +155,39 @@ void lwp_exit(){
 		/* remove from sch list */
 	
 	/* restore the org system thread */
-		if(!(next=sched->next())){
-			current=NULL;
+		if(!(current=sched->next())){
 			(stack);
 			(curr);
 			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
-			current=next;
 			//(_stack);
 			//(_curr);
-			swap_rfiles(NULL, &next->state);
+			swap_rfiles(NULL, &current->state);
 		}
 
 	}
 }
 
 thread tid2thread(tid_t id){
-	thread id_temp = head;
+	thread id_temp = current;
 	if(id <= 0 && !id_temp){
 		return NULL;
-	}
-
-	if(head == id){
-		return head;
 	}else{
-		id_temp=head->sched_two;
-		while(id_temp != head){
 		if(id_temp->tid == id){
 			return id_temp;
+		}else{
+			id_temp=id_temp->lt_next;
+			while(id_temp != current){
+				if(id_temp->tid == id){
+					return id_temp;
+				}
+			id_temp=id_temp->lt_next;	
+			}
 		}
-		id_temp=id_temp->lib_two;	
 	}
 	return NULL;
-	}
 }
 
 tid_t lwp_gettid(){

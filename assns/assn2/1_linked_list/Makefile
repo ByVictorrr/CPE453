@@ -3,26 +3,26 @@ CFLAGS = -Wall -g
 LD = gcc
 LDFLAGS = -Wall -g -L.
    
-main: lwp.o magic64.o tests/17_test.o
-	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o 17_test.o
-
-#libPLN.a: lwp.c 
-#	gcc -c lwp.c
-#	ar r libPLN.a lwp.o
-#	rm lwp.o
+main: lwp.o magic64.o tests/26/26_test.o tests/26/random.o scheduler.o
+	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o 26_test.o random.o scheduler.o
 
 
-liblwp.so: lwp.o magic64.o 
-	$(CC) $(CFLAGS) -fPIC -shared -o $@ lwp.o magic64.o
+liblwp.so: lwp.o magic64.o scheduler.o 
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ lwp.o magic64.o scheduler.o
 
-lwp.o: lwp.c lwp.h
+lwp.o: lwp.c lwp.h scheduler.h
 	$(CC) $(CFLAGS) -fpic -c -o lwp.o lwp.c
 
+scheduler.o: scheduler.h lwp.h
+	$(CC) $(CFLAGS) -fpic -c -o scheduler.o scheduler.c
 #fiveprocsmain.o: fiveprocsmain.c
 	#$(CC) $(CFLAGS) -fpic -c -o fiveprocsmain.o fiveprocsmain.c
 
-tests/17_test.o: tests/17_test.c lwp.h
-	$(CC) $(CFLAGS) -fpic -c -o  17_test.o tests/17_test.c
+tests/26/26_test.o: lwp.h tests/26/schedulers.h 
+	$(CC) $(CFLAGS) -fpic -c -o  26_test.o tests/26/26_test.c 
+
+tests/26/random.o: 	lwp.h tests/26/schedulers.h 
+	$(CC) $(CFLAGS) -fpic -c -o  random.o tests/26/random.c
 
 
 
