@@ -1,88 +1,3 @@
-
-------------------------
-Looking for source files
-------------------------
-
-Found: fp.h lwp.c lwp.h scheduler.c scheduler.h
-
------------------------
-Looking for a Makefile
-----------------------
-
-Found: Makefile
-
---------------------------------
-Checking for long lines (no program should have any lines > 80 chars)
---------------------------------
-
-Line length ok.
-
-
-------------------------------------
-Building the application: "make liblwp.so"
-------------------------------------
-
-make liblwp.so
-make: `liblwp.so' is up to date.
-
----------------
-checking for liblwp.so
----------------
-
-
---------------------------------------------------------
-Test Results:
-   These are the results of trying your liblwp.so
-against several programs with different characteristics 
-described by the filename.  The output of your program
-is compared to a reference output using diff(1).  If they
-differ, the test case is a failure.
-
-
-Testing (failure details below):
-        -----
-         1) Linking (only) against required routines      ... ok.
-         2) start() with no threads                       ... ok.
-         3) One lwp, calling exit()                       ... ok.
-         4) One lwp, calling lwp_yield(), then exit()     ... ok.
-         5) One lwp, calling lwp_yield(), then lwp_exit() ... ok.
-         6) Five lwps, calling lwp_yield(), then exit()   ... ok.
-         7) Five lwps, calling lwp_yield(), then lwp_exit ... ok.
-         8) Five threads, variable iters, exit from front ... ok.
-         9) Five threads, variable iters, exit from back  ... ok.
-        10) Five threads, AlwaysZero scheduling           ... ok.
-        11) One lwp, yields, and returns                  ... ok.
-        12) Ten lwps, yields, and returns                 ... ok.
-        13) Three lwps. Stop, then restart                ... ok.
-        14) Five lwps, all exit, recreate then call start ... ok.
-        15) Lwp spawns another then exits 100 times.      ... ok.
-        16) Two Lwps. spawn then exits 50 times.          ... ok.
-        17) 100 threads with a minimal stack. Just return ... FAILURE.
-        18) 1024 threads, random exit.                    ... ok.
-        19) Ping pong with semaphores                     ... ok.
-        20) Dine with semaphores                          ... ok.
-        21) Transfer threads between schedulers (stopped) ... ok.
-        22) Transfer threads between schedulers (live)    ... ok.
-        23) Sched->next() returns NULL to lwp_yield()     ... ok.
-        24) Transfer threads between schedulers check for ... ok.
-        25) Check that Returned TIDs are unique           ... ok.
-        26) Does tid2thread return the right thread?      ... ok.
-        27) Tid2thread() returns NULL given a bad tid?    ... ok.
-        28) Is thread library using sched_one? sched_two? ... FAILURE.
-        -----
-FAILURE. (26/28 passed)
-
-
-----------------------------
-2 Corefile(s) Present:
-    core.10176
-    core.10507
-----------------------------
-
-
------------------------------------------------------------------
-Failure Details
------------------------------------------------------------------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
 
@@ -98,7 +13,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (10176) exited due to signal (Segmentation fault).
+Child process (11697) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -108,7 +23,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (10176) exited due to signal (Segmentation fault).
+> Child process (11697) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -337,7 +252,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (10507) exited due to signal (Segmentation fault).
+Child process (11967) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -557,5 +472,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (10507) exited due to signal (Segmentation fault).
+> Child process (11967) exited due to signal (Segmentation fault).
 ---------

@@ -4,6 +4,7 @@
 
 
 static thread st_tail = NULL, st_head = NULL, st_current=NULL;
+static int removed = FALSE;
 
 
 void rr_admit(thread new){
@@ -62,6 +63,7 @@ void rr_remove(thread victim){
 	/* Case - where one is in the list*/
 	if(st_head==st_tail && st_tail && st_head){
 		st_head=st_tail=NULL;
+        st_current=NULL;
 	/* Case - where at least two in list*/
 	}else{
 		/* Case - where victims the st_head*/
@@ -70,18 +72,22 @@ void rr_remove(thread victim){
 			st_tail->st_next=right;
 			right->st_prev=st_tail;
 			st_head=right;
+            st_current=st_head;
 		/* Case - where victims the st_tail*/
 		}else if( victim == st_tail){
 			left= st_tail->st_prev;//left one
 			left->st_next=st_head;
 			st_tail=left;
+            st_current=st_head;
 		/* Case -general case in the middle*/
 		}else{
 			left=victim->st_prev;
 			right=victim->st_next;	
 			left->st_next=right;
 			right->st_prev=left;
+            st_current=right;
 		}
+        removed=TRUE;
 	}
 }
 
@@ -96,9 +102,11 @@ thread rr_next(){
     }
     if(!st_current){
         st_current=st_head;
-    }else{
+    /*Case - not removed (set in remove function)*/
+    }else if (!(removed)){
         st_current = st_current->st_next;
     }
+    removed=FALSE;
 	/*Case - at least one in pool*/
         return st_current;
 }

@@ -74,9 +74,15 @@ FAILURE. (26/28 passed)
 
 
 ----------------------------
-2 Corefile(s) Present:
+8 Corefile(s) Present:
     core.10176
     core.10507
+    core.10975
+    core.11238
+    core.11697
+    core.11967
+    core.12466
+    core.12784
 ----------------------------
 
 
@@ -98,7 +104,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (10176) exited due to signal (Segmentation fault).
+Child process (12466) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -108,7 +114,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (10176) exited due to signal (Segmentation fault).
+> Child process (12466) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -337,7 +343,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (10507) exited due to signal (Segmentation fault).
+Child process (12784) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -557,5 +563,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (10507) exited due to signal (Segmentation fault).
+> Child process (12784) exited due to signal (Segmentation fault).
 ---------

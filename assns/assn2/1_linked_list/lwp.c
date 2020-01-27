@@ -6,8 +6,8 @@
 
 static rfile orginal;
 
-#define lt_next lib_two
-#define lt_prev lib_one
+#define lt_next lib_one
+#define lt_prev lib_two
 static thread head = NULL, tail = NULL, current = NULL;
 
 extern void rr_admit(thread new);
@@ -242,9 +242,10 @@ void lwp_set_scheduler(scheduler sch){
 		if(sch->init){
 			sch->init();
 		}
-		while((current=sched->next())){
-			sched->remove(current);
-			sch->admit(current);
+		while((next=sched->next())){
+			sched->remove(next);
+			sch->admit(next);
+			current=next;
 		}
 		if(sched->shutdown){
 			sched->shutdown();
