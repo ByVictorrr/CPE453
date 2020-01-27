@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static thread current = NULL;
+
 static rfile orginal;
 
-#define lt_next lib_two
-#define lt_prev lib_one
+#define lt_next lib_one
+#define lt_prev lib_two
+static thread head = NULL, tail = NULL, current = NULL;
 
 extern void rr_admit(thread new);
 extern void rr_remove(thread victim);
@@ -52,6 +53,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
+		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 		return new;
@@ -64,7 +66,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 returns: lwp_id of the new thread OR -1 if cant be made
 				*/
 tid_t lwp_create(lwpfun fn, void *arg, size_t size){
-	static thread head = NULL, tail = NULL, new = NULL;
+	thread new;
 	if((new= newThread(fn, arg, size))){
 		sched->admit(new);
 		/* Case - head and tail are empty(zero on list)*/
@@ -72,6 +74,7 @@ tid_t lwp_create(lwpfun fn, void *arg, size_t size){
 			head=tail=new;
 			new->lt_prev=tail;
 			new->lt_next=tail;
+			current=head;
 		/* Case - head == fail(only one is list)*/
 		}else if(head==tail){
 			tail=new;	
@@ -114,10 +117,10 @@ void lwp_start(){
  *				threads context
 */
 void lwp_yield(){
-	thread prev_current = current, next;
+	thread prev = current;
 	/* What is we dont have anymore thread in here*/
 	if((current=sched->next())){
-		swap_rfiles(&prev_current->state, &current->state);
+		swap_rfiles(&prev->state, &current->state);
 	}else{
 		lwp_stop();
 	}
@@ -133,9 +136,40 @@ void lwp_stop(){
 		swap_rfiles(&current->state, &orginal);
 	}else{
 		swap_rfiles(NULL, &orginal); // TODO : DISABLE
-		return;
 	}
 }
+
+void remove_lt_thread(thread victim){
+	thread right, left;
+	/* Case - where one in list*/
+	if(head==tail && tail && head){
+		current=NULL;
+		head=tail=NULL;
+	/* Case - where at least two in list*/
+	}else{
+		/* Case - where victims the head*/
+		if(victim==head){
+			right = head->lt_next; // right one
+			tail->lt_next=right;
+			right->lt_prev=tail;
+			head=right;
+		/* Case - where victims the tail*/
+		}else if( victim == tail){
+			left= tail->lt_prev;//left one
+			left->lt_next=head;
+			tail=left;
+		/* Case -general case in the middle*/
+		}else{
+			left=victim->lt_prev;
+			right=victim->lt_next;	
+			left->lt_next=right;
+			right->lt_prev=left;
+		}
+	}
+
+}
+	
+
 
 
 /*Description: Terminates the current process and s 
@@ -146,24 +180,22 @@ void lwp_stop(){
 				*/
 void lwp_exit(){
 	/* if a current exists then*/
-	thread next, curr;
+	thread next, curr = current;
 	unsigned long *stack;
 	if(current){
+		SetSP(orginal.rsp);
 		sched->remove(current);
-		stack=current->stack;
-		curr=current;
-		/* remove from sch list */
-	
+		remove_lt_thread(current);
 	/* restore the org system thread */
 		if(!(current=sched->next())){
-			(stack);
-			(curr);
+			free(curr->stack);
+			free(curr);
 			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
-			//(_stack);
-			//(_curr);
+			free(curr->stack);
+			free(curr);
 			swap_rfiles(NULL, &current->state);
 		}
 
@@ -213,6 +245,7 @@ void lwp_set_scheduler(scheduler sch){
 		while((next=sched->next())){
 			sched->remove(next);
 			sch->admit(next);
+			current=next;
 		}
 		if(sched->shutdown){
 			sched->shutdown();

@@ -11,8 +11,8 @@
 #define NUMTHREADS 9
 #define ITERS 50
 
-#define tnext sched_one
-#define tprev sched_two
+#define tnext sched_two
+#define tprev sched_one
 
 typedef void (*sigfun)(int signum);
 static void indentnum(uintptr_t num);

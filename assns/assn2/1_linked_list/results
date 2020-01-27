@@ -3,7 +3,7 @@
 Looking for source files
 ------------------------
 
-Found: fiveprocsmain.c fp.h lwp.c lwp.h scheduler.c scheduler.h
+Found: fp.h lwp.c lwp.h scheduler.c scheduler.h
 
 -----------------------
 Looking for a Makefile
@@ -23,12 +23,7 @@ Building the application: "make liblwp.so"
 ------------------------------------
 
 make liblwp.so
-gcc -Wall -g  -fpic -c -o lwp.o lwp.c
-gcc -Wall -g  -fpic -c -o magic64.o magic64.S
-#gcc -Wall -g  -fpic -c -o numbersmain.o numbersmain.c
-gcc -Wall -g  -fpic -c -o scheduler.o scheduler.c
-#gcc -Wall -g  -fpic -c -o fiveprocsmain.o fiveprocsmain.c
-gcc -Wall -g  -fPIC -shared -o liblwp.so lwp.o magic64.o scheduler.o
+make: `liblwp.so' is up to date.
 
 ---------------
 checking for liblwp.so
@@ -59,15 +54,15 @@ Testing (failure details below):
         11) One lwp, yields, and returns                  ... ok.
         12) Ten lwps, yields, and returns                 ... ok.
         13) Three lwps. Stop, then restart                ... ok.
-        14) Five lwps, all exit, recreate then call start ... FAILURE.
+        14) Five lwps, all exit, recreate then call start ... ok.
         15) Lwp spawns another then exits 100 times.      ... ok.
         16) Two Lwps. spawn then exits 50 times.          ... ok.
         17) 100 threads with a minimal stack. Just return ... FAILURE.
         18) 1024 threads, random exit.                    ... ok.
         19) Ping pong with semaphores                     ... ok.
         20) Dine with semaphores                          ... ok.
-        21) Transfer threads between schedulers (stopped) ... FAILURE.
-        22) Transfer threads between schedulers (live)    ... FAILURE.
+        21) Transfer threads between schedulers (stopped) ... ok.
+        22) Transfer threads between schedulers (live)    ... ok.
         23) Sched->next() returns NULL to lwp_yield()     ... ok.
         24) Transfer threads between schedulers check for ... ok.
         25) Check that Returned TIDs are unique           ... ok.
@@ -75,88 +70,19 @@ Testing (failure details below):
         27) Tid2thread() returns NULL given a bad tid?    ... ok.
         28) Is thread library using sched_one? sched_two? ... FAILURE.
         -----
-FAILURE. (23/28 passed)
+FAILURE. (26/28 passed)
 
 
 ----------------------------
-3 Corefile(s) Present:
-    core.3405
-    core.3487
-    core.4258
+2 Corefile(s) Present:
+    core.10176
+    core.10507
 ----------------------------
 
 
 -----------------------------------------------------------------
 Failure Details
 -----------------------------------------------------------------
-=================================================
-TEST 14: Five lwps, all exit, recreate then call start
-
-Creates five lwps each of which eventually exits.  After exiting,
-main() recreates them and calls start again()
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-First round complete. Restarting with no queue
-Creating five LWPs and starting them
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-LWPs have ended.
-----------
-Submitted:
-----------
-Child process (3405) exited due to signal (Segmentation fault).
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1,23c1
-< Greetings from Thread 0.  Yielding...
-< Greetings from Thread 1.  Yielding...
-< Greetings from Thread 2.  Yielding...
-< Greetings from Thread 3.  Yielding...
-< Greetings from Thread 4.  Yielding...
-< I (0) am still alive.  Goodbye.
-< I (1) am still alive.  Goodbye.
-< I (2) am still alive.  Goodbye.
-< I (3) am still alive.  Goodbye.
-< I (4) am still alive.  Goodbye.
-< First round complete. Restarting with no queue
-< Creating five LWPs and starting them
-< Greetings from Thread 0.  Yielding...
-< Greetings from Thread 1.  Yielding...
-< Greetings from Thread 2.  Yielding...
-< Greetings from Thread 3.  Yielding...
-< Greetings from Thread 4.  Yielding...
-< I (0) am still alive.  Goodbye.
-< I (1) am still alive.  Goodbye.
-< I (2) am still alive.  Goodbye.
-< I (3) am still alive.  Goodbye.
-< I (4) am still alive.  Goodbye.
-< LWPs have ended.
----
-> Child process (3405) exited due to signal (Segmentation fault).
----------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
 
@@ -172,7 +98,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (3487) exited due to signal (Segmentation fault).
+Child process (10176) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -182,169 +108,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (3487) exited due to signal (Segmentation fault).
----------
-=================================================
-TEST 21: Transfer threads between schedulers (stopped)
-
-Create a number of threads, then set_scheduler() and see if 
-they transfer properly.
-
-
-
-
-
-----------
-Reference:
-----------
-Creating LWPS
-Setting the scheduler.
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-         2
-              3
-                   4
-                        5
-              3
-                   4
-                        5
-                   4
-                        5
-                        5
-Back from LWPS.
-----------
-Submitted:
-----------
-Timed out.
-Child process (3598) exited due to signal (Terminated).
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1,19c1,2
-< Creating LWPS
-< Setting the scheduler.
-< Launching LWPS
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<          2
-<               3
-<                    4
-<                         5
-<               3
-<                    4
-<                         5
-<                    4
-<                         5
-<                         5
-< Back from LWPS.
----
-> Timed out.
-> Child process (3598) exited due to signal (Terminated).
----------
-=================================================
-TEST 22: Transfer threads between schedulers (live)
-
-Create a number of threads, start them running,
-then set_scheduler() and see if they transfer properly.
-
-
-
-
-
-----------
-Reference:
-----------
-Creating LWPS
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-Setting the scheduler.
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-Back from LWPS.
-----------
-Submitted:
-----------
-Timed out.
-Child process (3826) exited due to signal (Terminated).
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1,34c1,2
-< Creating LWPS
-< Launching LWPS
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<     1
-<          2
-<               3
-<                    4
-<                         5
-< Setting the scheduler.
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<     1
-<          2
-<               3
-<                    4
-<                         5
-<     1
-<          2
-<               3
-<                    4
-<                         5
-< Back from LWPS.
----
-> Timed out.
-> Child process (3826) exited due to signal (Terminated).
+> Child process (10176) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -573,7 +337,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (4258) exited due to signal (Segmentation fault).
+Child process (10507) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -793,5 +557,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (4258) exited due to signal (Segmentation fault).
+> Child process (10507) exited due to signal (Segmentation fault).
 ---------
