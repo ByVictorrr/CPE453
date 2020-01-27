@@ -180,23 +180,22 @@ void remove_lt_thread(thread victim){
 				*/
 void lwp_exit(){
 	/* if a current exists then*/
-	thread next, curr;
+	thread next, curr = current;
 	unsigned long *stack;
 	if(current){
+		SetSP(orginal.rsp);
 		sched->remove(current);
-		stack=current->stack;
-		curr=current;
 		remove_lt_thread(current);
 	/* restore the org system thread */
 		if(!(current=sched->next())){
-			(stack);
-			(curr);
+			free(curr->stack);
+			free(curr);
 			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
-			//(_stack);
-			//(_curr);
+			free(curr->stack);
+			free(curr);
 			swap_rfiles(NULL, &current->state);
 		}
 

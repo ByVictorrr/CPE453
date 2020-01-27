@@ -54,6 +54,7 @@ typedef struct threadinfo_st {
 } context;
 
 
+
 typedef void (*lwpfun)(void *); /* type for lwp function */
 
 /* Tuple that describes a scheduler */
