@@ -33,7 +33,7 @@ LWPs have ended.
 ----------
 Submitted:
 ----------
-Child process (2307) exited due to signal (Segmentation fault).
+Child process (3405) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -64,7 +64,7 @@ Differences (< reference > output)
 < I (4) am still alive.  Goodbye.
 < LWPs have ended.
 ---
-> Child process (2307) exited due to signal (Segmentation fault).
+> Child process (3405) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
@@ -81,7 +81,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (2388) exited due to signal (Segmentation fault).
+Child process (3487) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -91,7 +91,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (2388) exited due to signal (Segmentation fault).
+> Child process (3487) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 21: Transfer threads between schedulers (stopped)
@@ -128,15 +128,14 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-^CParent process (2486) caught signal (Interrupt).
-Forwarding signal (Interrupt) to child.
-Child process (2494) exited due to signal (Interrupt).
+Timed out.
+Child process (3598) exited due to signal (Terminated).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1,19c1,3
+1,19c1,2
 < Creating LWPS
 < Setting the scheduler.
 < Launching LWPS
@@ -157,9 +156,8 @@ Differences (< reference > output)
 <                         5
 < Back from LWPS.
 ---
-> ^CParent process (2486) caught signal (Interrupt).
-> Forwarding signal (Interrupt) to child.
-> Child process (2494) exited due to signal (Interrupt).
+> Timed out.
+> Child process (3598) exited due to signal (Terminated).
 ---------
 =================================================
 TEST 22: Transfer threads between schedulers (live)
@@ -211,15 +209,14 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-^CParent process (2676) caught signal (Interrupt).
-Forwarding signal (Interrupt) to child.
-Child process (2684) exited due to signal (Interrupt).
+Timed out.
+Child process (3826) exited due to signal (Terminated).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1,34c1,3
+1,34c1,2
 < Creating LWPS
 < Launching LWPS
 <     1
@@ -255,9 +252,8 @@ Differences (< reference > output)
 <                         5
 < Back from LWPS.
 ---
-> ^CParent process (2676) caught signal (Interrupt).
-> Forwarding signal (Interrupt) to child.
-> Child process (2684) exited due to signal (Interrupt).
+> Timed out.
+> Child process (3826) exited due to signal (Terminated).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -486,7 +482,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (2880) exited due to signal (Segmentation fault).
+Child process (4258) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -706,5 +702,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (2880) exited due to signal (Segmentation fault).
+> Child process (4258) exited due to signal (Segmentation fault).
 ---------

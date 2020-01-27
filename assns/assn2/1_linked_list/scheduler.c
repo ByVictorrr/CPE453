@@ -64,7 +64,7 @@ void rr_remove(thread victim){
 		if(victim==head){
 			right = head->st_next; // right one
 			tail->st_next=right;
-			right->st_prev=NULL;
+			right->st_prev=tail;
 			head=right;
 		/* Case - where victims the tail*/
 		}else if( victim == tail){
@@ -86,12 +86,11 @@ void rr_remove(thread victim){
 /* Description: Retursn the next thread to be run or 
 				NULL if there isnt one(used to assign curent)*/
 thread rr_next(){
-    static thread next;
+    thread next = head;
 	/* Case - empty pool*/
 	if(!head && !tail){
 		return NULL;
 	}
-
 	/*Case - at least one in pool*/
 
 	/*Case - where current hasnt been assigned*/

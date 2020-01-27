@@ -8,6 +8,7 @@ static rfile orginal;
 
 #define lt_next lib_two
 #define lt_prev lib_one
+static thread head, tail;
 
 extern void rr_admit(thread new);
 extern void rr_remove(thread victim);
@@ -64,7 +65,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 returns: lwp_id of the new thread OR -1 if cant be made
 				*/
 tid_t lwp_create(lwpfun fn, void *arg, size_t size){
-	static thread head = NULL, tail = NULL, new = NULL;
+	thread new;
 	if((new= newThread(fn, arg, size))){
 		sched->admit(new);
 		/* Case - head and tail are empty(zero on list)*/
@@ -137,6 +138,38 @@ void lwp_stop(){
 	}
 }
 
+void remove_lt_thread(thread victim){
+	thread right, left;
+	/* Case - where one in list*/
+	if(head==tail && tail && head){
+		current=NULL;
+		head=tail=NULL;
+	/* Case - where at least two in list*/
+	}else{
+		/* Case - where victims the head*/
+		if(victim==head){
+			right = head->lt_next; // right one
+			tail->lt_next=right;
+			right->lt_prev=tail;
+			head=right;
+		/* Case - where victims the tail*/
+		}else if( victim == tail){
+			left= tail->lt_prev;//left one
+			left->lt_next=head;
+			tail=left;
+		/* Case -general case in the middle*/
+		}else{
+			left=victim->lt_prev;
+			right=victim->lt_next;	
+			left->lt_next=right;
+			right->lt_prev=left;
+		}
+	}
+
+}
+	
+
+
 
 /*Description: Terminates the current process and s 
 				its resource(i.e. its stack). 
@@ -152,8 +185,7 @@ void lwp_exit(){
 		sched->remove(current);
 		stack=current->stack;
 		curr=current;
-		/* remove from sch list */
-	
+		remove_lt_thread(current);
 	/* restore the org system thread */
 		if(!(current=sched->next())){
 			(stack);
