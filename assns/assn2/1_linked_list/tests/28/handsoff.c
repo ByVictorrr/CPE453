@@ -5,7 +5,7 @@
  * each time next() is called.
  */
 
-#include <lwp.h>
+#include "../../lwp.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "handsoff.h"
@@ -16,7 +16,7 @@ static thread qhead=NULL;
 #define tprev sched_two
 
 static int count=0;
-static int current=0;
+static int current_v=0;
 static thread table[THREAD_MAX];
 static tid_t  id[THREAD_MAX];
 
@@ -55,12 +55,12 @@ static thread s_next() {
   thread next = NULL;
   if (count) {
     /* Test that tid2thread() is working */
-    if ( table[current] != tid2thread(id[current]) ) {
+    if ( table[current_v] != tid2thread(id[current_v]) ) {
       fprintf(stderr,"tid2thread() is returning bogus values\n");
     }
     /* the scheduling part */
-    next = table[current];
-    current = (current+1)%count;
+    next = table[current_v];
+    current_v = (current_v+1)%count;
   }
   return next;
 }

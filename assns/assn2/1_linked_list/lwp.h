@@ -11,7 +11,6 @@
 #endif
 
 
-
 #if defined(__x86_64)
 #include "fp.h"
 typedef struct __attribute__ ((aligned(16))) __attribute__ ((packed))
@@ -53,6 +52,7 @@ typedef struct threadinfo_st {
   thread        sched_one;      /* Two more for            */
   thread        sched_two;      /* schedulers to use       */
 } context;
+
 
 typedef void (*lwpfun)(void *); /* type for lwp function */
 

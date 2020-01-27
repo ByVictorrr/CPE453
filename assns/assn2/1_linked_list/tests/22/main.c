@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "lwp.h"
+#include "../../lwp.h"
 #include "rr.h"
 
 #define INITIALSTACK 2048

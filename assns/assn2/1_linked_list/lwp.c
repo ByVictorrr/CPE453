@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static thread current = NULL;
+
 static rfile orginal;
 
 #define lt_next lib_two
 #define lt_prev lib_one
-static thread head, tail;
+static thread head = NULL, tail = NULL, current = NULL;
 
 extern void rr_admit(thread new);
 extern void rr_remove(thread victim);
@@ -53,6 +53,7 @@ thread newThread(lwpfun fn, void *arg, size_t size){
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
+		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 		return new;
@@ -115,10 +116,10 @@ void lwp_start(){
  *				threads context
 */
 void lwp_yield(){
-	thread prev_current = current, next;
+	thread prev = current;
 	/* What is we dont have anymore thread in here*/
 	if((current=sched->next())){
-		swap_rfiles(&prev_current->state, &current->state);
+		swap_rfiles(&prev->state, &current->state);
 	}else{
 		lwp_stop();
 	}
@@ -134,7 +135,6 @@ void lwp_stop(){
 		swap_rfiles(&current->state, &orginal);
 	}else{
 		swap_rfiles(NULL, &orginal); // TODO : DISABLE
-		return;
 	}
 }
 
@@ -242,9 +242,9 @@ void lwp_set_scheduler(scheduler sch){
 		if(sch->init){
 			sch->init();
 		}
-		while((next=sched->next())){
-			sched->remove(next);
-			sch->admit(next);
+		while((current=sched->next())){
+			sched->remove(current);
+			sch->admit(current);
 		}
 		if(sched->shutdown){
 			sched->shutdown();

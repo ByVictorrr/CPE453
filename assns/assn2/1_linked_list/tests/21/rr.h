@@ -1,7 +1,7 @@
 #ifndef RRH
 #define RRH
 
-#include <lwp.h>
+#include "../../lwp.h"
 
 extern scheduler AltRoundRobin;
 
