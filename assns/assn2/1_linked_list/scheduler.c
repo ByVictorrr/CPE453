@@ -11,13 +11,14 @@ void rr_admit(thread new){
 		/* Case - nothing is in schedulers linked list*/
 		if(!tail && !head){
 			tail=head=new;
-			tail->st_prev=NULL;
+			tail->st_prev=new;
 			tail->st_next=new;
 			return;
 		/* Case - only one node in scheduler*/
 		}else if(head == tail){
-			head->st_next=new;
 			tail=new;
+			head->st_next=new;
+            head->st_prev=tail;
 			tail->st_prev = head;
 			tail->st_next=head;
 		/* Case - at least two in schedular*/
@@ -86,21 +87,20 @@ void rr_remove(thread victim){
 /* Description: Retursn the next thread to be run or 
 				NULL if there isnt one(used to assign curent)*/
 thread rr_next(){
-    thread next = head;
-	/* Case - empty pool*/
+    //initally current is the head
+    static thread current = NULL;
+   	/* Case - empty pool*/
 	if(!head && !tail){
 		return NULL;
-	}
-	/*Case - at least one in pool*/
+    }
 
-	/*Case - where current hasnt been assigned*/
-	if(!next){
-		next=head;
-	/*Case - where currrent has been assign*/
+    if(current==NULL){
+        current=head;
+	/*Case - at least one in pool*/
 	}else{
-		next=next->st_next;
+		current=current->st_next;
 	}
-	return next;
+	return current;
 }
 
 

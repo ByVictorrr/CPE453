@@ -23,6 +23,9 @@ Building the application: "make liblwp.so"
 ------------------------------------
 
 make liblwp.so
+gcc -Wall -g  -fpic -c -o lwp.o lwp.c
+gcc -Wall -g  -fpic -c -o magic64.o magic64.S
+gcc -Wall -g  -fpic -c -o scheduler.o scheduler.c
 gcc -Wall -g  -fPIC -shared -o liblwp.so lwp.o magic64.o scheduler.o
 
 ---------------
@@ -46,17 +49,17 @@ Testing (failure details below):
          3) One lwp, calling exit()                       ... ok.
          4) One lwp, calling lwp_yield(), then exit()     ... ok.
          5) One lwp, calling lwp_yield(), then lwp_exit() ... ok.
-         6) Five lwps, calling lwp_yield(), then exit()   ... FAILURE.
-         7) Five lwps, calling lwp_yield(), then lwp_exit ... FAILURE.
-         8) Five threads, variable iters, exit from front ... FAILURE.
-         9) Five threads, variable iters, exit from back  ... FAILURE.
+         6) Five lwps, calling lwp_yield(), then exit()   ... ok.
+         7) Five lwps, calling lwp_yield(), then lwp_exit ... ok.
+         8) Five threads, variable iters, exit from front ... ok.
+         9) Five threads, variable iters, exit from back  ... ok.
         10) Five threads, AlwaysZero scheduling           ... ok.
         11) One lwp, yields, and returns                  ... ok.
-        12) Ten lwps, yields, and returns                 ... FAILURE.
-        13) Three lwps. Stop, then restart                ... FAILURE.
+        12) Ten lwps, yields, and returns                 ... ok.
+        13) Three lwps. Stop, then restart                ... ok.
         14) Five lwps, all exit, recreate then call start ... FAILURE.
         15) Lwp spawns another then exits 100 times.      ... ok.
-        16) Two Lwps. spawn then exits 50 times.          ... FAILURE.
+        16) Two Lwps. spawn then exits 50 times.          ... ok.
         17) 100 threads with a minimal stack. Just return ... FAILURE.
         18) 1024 threads, random exit.                    ... ok.
         19) Ping pong with semaphores                     ... ok.
@@ -70,446 +73,20 @@ Testing (failure details below):
         27) Tid2thread() returns NULL given a bad tid?    ... ok.
         28) Is thread library using sched_one? sched_two? ... FAILURE.
         -----
-FAILURE. (16/28 passed)
+FAILURE. (23/28 passed)
 
 
 ----------------------------
-2 Corefile(s) Present:
-    core.15577
-    core.15855
+3 Corefile(s) Present:
+    core.30880
+    core.30958
+    core.31317
 ----------------------------
 
 
 -----------------------------------------------------------------
 Failure Details
 -----------------------------------------------------------------
-=================================================
-TEST 6: Five lwps, calling lwp_yield(), then exit()
-
-This test spawns five threads that each print a message and yield.
-The second time through the last one calls exit();
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-----------
-Submitted:
-----------
-Greetings from Thread 1.  Yielding...
-I (1) am still alive.  Goodbye.
-Greetings from Thread 2.  Yielding...
-I (2) am still alive.  Goodbye.
-Greetings from Thread 3.  Yielding...
-I (3) am still alive.  Goodbye.
-Greetings from Thread 4.  Yielding...
-I (4) am still alive.  Goodbye.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1d0
-< Greetings from Thread 0.  Yielding...
-3,6d1
-< Greetings from Thread 2.  Yielding...
-< Greetings from Thread 3.  Yielding...
-< Greetings from Thread 4.  Yielding...
-< I (0) am still alive.  Goodbye.
-7a3
-> Greetings from Thread 2.  Yielding...
-8a5
-> Greetings from Thread 3.  Yielding...
-9a7
-> Greetings from Thread 4.  Yielding...
----------
-=================================================
-TEST 7: Five lwps, calling lwp_yield(), then lwp_exit()
-
-This test spawns five LWPs, each of which yields once,
-then calls lwp_exit() the second time.
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-I (0) am still alive.  Goodbye.
-I (1) am still alive.  Goodbye.
-I (2) am still alive.  Goodbye.
-I (3) am still alive.  Goodbye.
-I (4) am still alive.  Goodbye.
-LWPs have ended.
-----------
-Submitted:
-----------
-Greetings from Thread 1.  Yielding...
-I (1) am still alive.  Goodbye.
-Greetings from Thread 2.  Yielding...
-I (2) am still alive.  Goodbye.
-Greetings from Thread 3.  Yielding...
-I (3) am still alive.  Goodbye.
-Greetings from Thread 4.  Yielding...
-I (4) am still alive.  Goodbye.
-Greetings from Thread 0.  Yielding...
-I (0) am still alive.  Goodbye.
-LWPs have ended.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1d0
-< Greetings from Thread 0.  Yielding...
-3,6d1
-< Greetings from Thread 2.  Yielding...
-< Greetings from Thread 3.  Yielding...
-< Greetings from Thread 4.  Yielding...
-< I (0) am still alive.  Goodbye.
-7a3
-> Greetings from Thread 2.  Yielding...
-8a5
-> Greetings from Thread 3.  Yielding...
-9a7
-> Greetings from Thread 4.  Yielding...
-10a9,10
-> Greetings from Thread 0.  Yielding...
-> I (0) am still alive.  Goodbye.
----------
-=================================================
-TEST 8: Five threads, variable iters, exit from front
-
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after its number of iterations
-
-
-----------
-Reference:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-         2
-              3
-                   4
-                        5
-              3
-                   4
-                        5
-                   4
-                        5
-                        5
-Back from LWPS.
-----------
-Submitted:
-----------
-Launching LWPS
-         2
-         2
-              3
-              3
-              3
-                   4
-                   4
-                   4
-                   4
-                        5
-                        5
-                        5
-                        5
-                        5
-    1
-Back from LWPS.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2d1
-<     1
-4,6d2
-<               3
-<                    4
-<                         5
-9,10c5
-<                    4
-<                         5
----
->               3
-13d7
-<                         5
-14a9,11
->                    4
->                    4
->                         5
-16a14,16
->                         5
->                         5
->     1
----------
-=================================================
-TEST 9: Five threads, variable iters, exit from back
-
-This is the numbersmain program distributed with the assignment.
-Each thread (1..5) exits after N minus its number of iterations.
-The effect is to always have the last process call lwp_exit().
-
-
-----------
-Reference:
-----------
-Launching LWPS
-    1
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-    1
-         2
-              3
-    1
-         2
-    1
-Back from LWPS.
-----------
-Submitted:
-----------
-Launching LWPS
-         2
-         2
-         2
-         2
-              3
-              3
-              3
-                   4
-                   4
-                        5
-    1
-    1
-    1
-    1
-    1
-Back from LWPS.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2c2,4
-<     1
----
->          2
->          2
->          2
-4a7,9
->               3
->               3
->                    4
-8,10d12
-<          2
-<               3
-<                    4
-12,13d13
-<          2
-<               3
-15c15
-<          2
----
->     1
----------
-=================================================
-TEST 12: Ten lwps, yields, and returns
-
-This test spawns several threads that prints a message, yields
-to itself, then returns
-
-----------
-Reference:
-----------
-Greetings from Thread 0.  Yielding...
-Greetings from Thread 1.  Yielding...
-Greetings from Thread 2.  Yielding...
-Greetings from Thread 3.  Yielding...
-Greetings from Thread 4.  Yielding...
-Greetings from Thread 5.  Yielding...
-Greetings from Thread 6.  Yielding...
-Greetings from Thread 7.  Yielding...
-Greetings from Thread 8.  Yielding...
-Greetings from Thread 9.  Yielding...
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-I'm still alive.  Goodbye
-After thread termination
-----------
-Submitted:
-----------
-Greetings from Thread 1.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 2.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 3.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 4.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 5.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 6.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 7.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 8.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 9.  Yielding...
-I'm still alive.  Goodbye
-Greetings from Thread 0.  Yielding...
-I'm still alive.  Goodbye
-After thread termination
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-1d0
-< Greetings from Thread 0.  Yielding...
-3,10d1
-< Greetings from Thread 2.  Yielding...
-< Greetings from Thread 3.  Yielding...
-< Greetings from Thread 4.  Yielding...
-< Greetings from Thread 5.  Yielding...
-< Greetings from Thread 6.  Yielding...
-< Greetings from Thread 7.  Yielding...
-< Greetings from Thread 8.  Yielding...
-< Greetings from Thread 9.  Yielding...
-11a3
-> Greetings from Thread 2.  Yielding...
-12a5
-> Greetings from Thread 3.  Yielding...
-13a7
-> Greetings from Thread 4.  Yielding...
-14a9
-> Greetings from Thread 5.  Yielding...
-15a11
-> Greetings from Thread 6.  Yielding...
-16a13
-> Greetings from Thread 7.  Yielding...
-17a15
-> Greetings from Thread 8.  Yielding...
-18a17
-> Greetings from Thread 9.  Yielding...
-19a19
-> Greetings from Thread 0.  Yielding...
----------
-=================================================
-TEST 13: Three lwps.  Stop, then restart
-
-This test spawns a three threads each of which stops and restarts
-several times.
-
-
-----------
-Reference:
-----------
-Starting LWPs...
-Test
-Test
-Test
-Test2
-Test2
-Test2
-Test3
-Test3
-Test3
-Test4
-Test4
-Test4
-Test5
-Test5
-Test5
-Test6
-Test6
-Test6
-Done.
-----------
-Submitted:
-----------
-Starting LWPs...
-Test
-Test2
-Test3
-Test4
-Test5
-Test6
-Test
-Test2
-Test3
-Test4
-Test5
-Test6
-Test
-Test2
-Test3
-Test4
-Test5
-Test6
-Done.
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-3,5d2
-< Test
-< Test
-< Test2
-7,8d3
-< Test2
-< Test3
-10,12d4
-< Test3
-< Test4
-< Test4
-15,16d6
-< Test5
-< Test5
-17a8,12
-> Test
-> Test2
-> Test3
-> Test4
-> Test5
-18a14,18
-> Test
-> Test2
-> Test3
-> Test4
-> Test5
----------
 =================================================
 TEST 14: Five lwps, all exit, recreate then call start
 
@@ -545,422 +122,38 @@ LWPs have ended.
 ----------
 Submitted:
 ----------
-Greetings from Thread 1.  Yielding...
-I (1) am still alive.  Goodbye.
-Greetings from Thread 2.  Yielding...
-I (2) am still alive.  Goodbye.
-Greetings from Thread 3.  Yielding...
-I (3) am still alive.  Goodbye.
-Greetings from Thread 4.  Yielding...
-I (4) am still alive.  Goodbye.
-Greetings from Thread 0.  Yielding...
-I (0) am still alive.  Goodbye.
-First round complete. Restarting with no queue
-Creating five LWPs and starting them
-Greetings from Thread 1.  Yielding...
-I (1) am still alive.  Goodbye.
-Greetings from Thread 2.  Yielding...
-I (2) am still alive.  Goodbye.
-Greetings from Thread 3.  Yielding...
-I (3) am still alive.  Goodbye.
-Greetings from Thread 4.  Yielding...
-I (4) am still alive.  Goodbye.
-Greetings from Thread 0.  Yielding...
-I (0) am still alive.  Goodbye.
-LWPs have ended.
+Child process (30880) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-1d0
+1,23c1
 < Greetings from Thread 0.  Yielding...
-3,6d1
+< Greetings from Thread 1.  Yielding...
 < Greetings from Thread 2.  Yielding...
 < Greetings from Thread 3.  Yielding...
 < Greetings from Thread 4.  Yielding...
 < I (0) am still alive.  Goodbye.
-7a3
-> Greetings from Thread 2.  Yielding...
-8a5
-> Greetings from Thread 3.  Yielding...
-9a7
-> Greetings from Thread 4.  Yielding...
-10a9,10
-> Greetings from Thread 0.  Yielding...
-> I (0) am still alive.  Goodbye.
-13d12
+< I (1) am still alive.  Goodbye.
+< I (2) am still alive.  Goodbye.
+< I (3) am still alive.  Goodbye.
+< I (4) am still alive.  Goodbye.
+< First round complete. Restarting with no queue
+< Creating five LWPs and starting them
 < Greetings from Thread 0.  Yielding...
-15,18d13
+< Greetings from Thread 1.  Yielding...
 < Greetings from Thread 2.  Yielding...
 < Greetings from Thread 3.  Yielding...
 < Greetings from Thread 4.  Yielding...
 < I (0) am still alive.  Goodbye.
-19a15
-> Greetings from Thread 2.  Yielding...
-20a17
-> Greetings from Thread 3.  Yielding...
-21a19
-> Greetings from Thread 4.  Yielding...
-22a21,22
-> Greetings from Thread 0.  Yielding...
-> I (0) am still alive.  Goodbye.
----------
-=================================================
-TEST 16: Two Lwps. spawn then exits 50 times.
-
-Two threads creates new ones, then exits.
-
-
-
-----------
-Reference:
-----------
-Counter is 50.  Exiting
-Counter is 50.  Exiting
-Counter is 49.  Exiting
-Counter is 49.  Exiting
-Counter is 48.  Exiting
-Counter is 48.  Exiting
-Counter is 47.  Exiting
-Counter is 47.  Exiting
-Counter is 46.  Exiting
-Counter is 46.  Exiting
-Counter is 45.  Exiting
-Counter is 45.  Exiting
-Counter is 44.  Exiting
-Counter is 44.  Exiting
-Counter is 43.  Exiting
-Counter is 43.  Exiting
-Counter is 42.  Exiting
-Counter is 42.  Exiting
-Counter is 41.  Exiting
-Counter is 41.  Exiting
-Counter is 40.  Exiting
-Counter is 40.  Exiting
-Counter is 39.  Exiting
-Counter is 39.  Exiting
-Counter is 38.  Exiting
-Counter is 38.  Exiting
-Counter is 37.  Exiting
-Counter is 37.  Exiting
-Counter is 36.  Exiting
-Counter is 36.  Exiting
-Counter is 35.  Exiting
-Counter is 35.  Exiting
-Counter is 34.  Exiting
-Counter is 34.  Exiting
-Counter is 33.  Exiting
-Counter is 33.  Exiting
-Counter is 32.  Exiting
-Counter is 32.  Exiting
-Counter is 31.  Exiting
-Counter is 31.  Exiting
-Counter is 30.  Exiting
-Counter is 30.  Exiting
-Counter is 29.  Exiting
-Counter is 29.  Exiting
-Counter is 28.  Exiting
-Counter is 28.  Exiting
-Counter is 27.  Exiting
-Counter is 27.  Exiting
-Counter is 26.  Exiting
-Counter is 26.  Exiting
-Counter is 25.  Exiting
-Counter is 25.  Exiting
-Counter is 24.  Exiting
-Counter is 24.  Exiting
-Counter is 23.  Exiting
-Counter is 23.  Exiting
-Counter is 22.  Exiting
-Counter is 22.  Exiting
-Counter is 21.  Exiting
-Counter is 21.  Exiting
-Counter is 20.  Exiting
-Counter is 20.  Exiting
-Counter is 19.  Exiting
-Counter is 19.  Exiting
-Counter is 18.  Exiting
-Counter is 18.  Exiting
-Counter is 17.  Exiting
-Counter is 17.  Exiting
-Counter is 16.  Exiting
-Counter is 16.  Exiting
-Counter is 15.  Exiting
-Counter is 15.  Exiting
-Counter is 14.  Exiting
-Counter is 14.  Exiting
-Counter is 13.  Exiting
-Counter is 13.  Exiting
-Counter is 12.  Exiting
-Counter is 12.  Exiting
-Counter is 11.  Exiting
-Counter is 11.  Exiting
-Counter is 10.  Exiting
-Counter is 10.  Exiting
-Counter is 9.  Exiting
-Counter is 9.  Exiting
-Counter is 8.  Exiting
-Counter is 8.  Exiting
-Counter is 7.  Exiting
-Counter is 7.  Exiting
-Counter is 6.  Exiting
-Counter is 6.  Exiting
-Counter is 5.  Exiting
-Counter is 5.  Exiting
-Counter is 4.  Exiting
-Counter is 4.  Exiting
-Counter is 3.  Exiting
-Counter is 3.  Exiting
-Counter is 2.  Exiting
-Counter is 2.  Exiting
-Counter is 1.  Exiting
-Counter is 1.  Exiting
-Bye
-Bye
-----------
-Submitted:
-----------
-Counter is 50.  Exiting
-Counter is 49.  Exiting
-Counter is 48.  Exiting
-Counter is 47.  Exiting
-Counter is 46.  Exiting
-Counter is 45.  Exiting
-Counter is 44.  Exiting
-Counter is 43.  Exiting
-Counter is 42.  Exiting
-Counter is 41.  Exiting
-Counter is 40.  Exiting
-Counter is 39.  Exiting
-Counter is 38.  Exiting
-Counter is 37.  Exiting
-Counter is 36.  Exiting
-Counter is 35.  Exiting
-Counter is 34.  Exiting
-Counter is 33.  Exiting
-Counter is 32.  Exiting
-Counter is 31.  Exiting
-Counter is 30.  Exiting
-Counter is 29.  Exiting
-Counter is 28.  Exiting
-Counter is 27.  Exiting
-Counter is 26.  Exiting
-Counter is 25.  Exiting
-Counter is 24.  Exiting
-Counter is 23.  Exiting
-Counter is 22.  Exiting
-Counter is 21.  Exiting
-Counter is 20.  Exiting
-Counter is 19.  Exiting
-Counter is 18.  Exiting
-Counter is 17.  Exiting
-Counter is 16.  Exiting
-Counter is 15.  Exiting
-Counter is 14.  Exiting
-Counter is 13.  Exiting
-Counter is 12.  Exiting
-Counter is 11.  Exiting
-Counter is 10.  Exiting
-Counter is 9.  Exiting
-Counter is 8.  Exiting
-Counter is 7.  Exiting
-Counter is 6.  Exiting
-Counter is 5.  Exiting
-Counter is 4.  Exiting
-Counter is 3.  Exiting
-Counter is 2.  Exiting
-Counter is 1.  Exiting
-Bye
-Counter is 50.  Exiting
-Counter is 49.  Exiting
-Counter is 48.  Exiting
-Counter is 47.  Exiting
-Counter is 46.  Exiting
-Counter is 45.  Exiting
-Counter is 44.  Exiting
-Counter is 43.  Exiting
-Counter is 42.  Exiting
-Counter is 41.  Exiting
-Counter is 40.  Exiting
-Counter is 39.  Exiting
-Counter is 38.  Exiting
-Counter is 37.  Exiting
-Counter is 36.  Exiting
-Counter is 35.  Exiting
-Counter is 34.  Exiting
-Counter is 33.  Exiting
-Counter is 32.  Exiting
-Counter is 31.  Exiting
-Counter is 30.  Exiting
-Counter is 29.  Exiting
-Counter is 28.  Exiting
-Counter is 27.  Exiting
-Counter is 26.  Exiting
-Counter is 25.  Exiting
-Counter is 24.  Exiting
-Counter is 23.  Exiting
-Counter is 22.  Exiting
-Counter is 21.  Exiting
-Counter is 20.  Exiting
-Counter is 19.  Exiting
-Counter is 18.  Exiting
-Counter is 17.  Exiting
-Counter is 16.  Exiting
-Counter is 15.  Exiting
-Counter is 14.  Exiting
-Counter is 13.  Exiting
-Counter is 12.  Exiting
-Counter is 11.  Exiting
-Counter is 10.  Exiting
-Counter is 9.  Exiting
-Counter is 8.  Exiting
-Counter is 7.  Exiting
-Counter is 6.  Exiting
-Counter is 5.  Exiting
-Counter is 4.  Exiting
-Counter is 3.  Exiting
-Counter is 2.  Exiting
-Counter is 1.  Exiting
-Bye
-
----------------------------------
-Differences (< reference > output)
----------------------------------
-
-2,3d1
-< Counter is 50.  Exiting
-< Counter is 49.  Exiting
-6,7d3
-< Counter is 48.  Exiting
-< Counter is 47.  Exiting
-10,11d5
-< Counter is 46.  Exiting
-< Counter is 45.  Exiting
-14d7
-< Counter is 44.  Exiting
-16,17d8
-< Counter is 43.  Exiting
-< Counter is 42.  Exiting
-20d10
-< Counter is 41.  Exiting
-22,23d11
-< Counter is 40.  Exiting
-< Counter is 39.  Exiting
-26d13
-< Counter is 38.  Exiting
-28,29d14
-< Counter is 37.  Exiting
-< Counter is 36.  Exiting
-32d16
-< Counter is 35.  Exiting
-34,35d17
-< Counter is 34.  Exiting
-< Counter is 33.  Exiting
-38d19
-< Counter is 32.  Exiting
-40,41d20
-< Counter is 31.  Exiting
-< Counter is 30.  Exiting
-44d22
-< Counter is 29.  Exiting
-46,47d23
-< Counter is 28.  Exiting
-< Counter is 27.  Exiting
-50d25
-< Counter is 26.  Exiting
-52,53d26
-< Counter is 25.  Exiting
-< Counter is 24.  Exiting
-56,57d28
-< Counter is 23.  Exiting
-< Counter is 22.  Exiting
-60,61d30
-< Counter is 21.  Exiting
-< Counter is 20.  Exiting
-64d32
-< Counter is 19.  Exiting
-66,67d33
-< Counter is 18.  Exiting
-< Counter is 17.  Exiting
-70d35
-< Counter is 16.  Exiting
-72,73d36
-< Counter is 15.  Exiting
-< Counter is 14.  Exiting
-76d38
-< Counter is 13.  Exiting
-78,79d39
-< Counter is 12.  Exiting
-< Counter is 11.  Exiting
-82d41
-< Counter is 10.  Exiting
-84,85d42
-< Counter is 9.  Exiting
-< Counter is 8.  Exiting
-88d44
-< Counter is 7.  Exiting
-90,91d45
-< Counter is 6.  Exiting
-< Counter is 5.  Exiting
-94d47
-< Counter is 4.  Exiting
-96,97d48
-< Counter is 3.  Exiting
-< Counter is 2.  Exiting
-100d50
-< Counter is 1.  Exiting
-101a52,101
-> Counter is 50.  Exiting
-> Counter is 49.  Exiting
-> Counter is 48.  Exiting
-> Counter is 47.  Exiting
-> Counter is 46.  Exiting
-> Counter is 45.  Exiting
-> Counter is 44.  Exiting
-> Counter is 43.  Exiting
-> Counter is 42.  Exiting
-> Counter is 41.  Exiting
-> Counter is 40.  Exiting
-> Counter is 39.  Exiting
-> Counter is 38.  Exiting
-> Counter is 37.  Exiting
-> Counter is 36.  Exiting
-> Counter is 35.  Exiting
-> Counter is 34.  Exiting
-> Counter is 33.  Exiting
-> Counter is 32.  Exiting
-> Counter is 31.  Exiting
-> Counter is 30.  Exiting
-> Counter is 29.  Exiting
-> Counter is 28.  Exiting
-> Counter is 27.  Exiting
-> Counter is 26.  Exiting
-> Counter is 25.  Exiting
-> Counter is 24.  Exiting
-> Counter is 23.  Exiting
-> Counter is 22.  Exiting
-> Counter is 21.  Exiting
-> Counter is 20.  Exiting
-> Counter is 19.  Exiting
-> Counter is 18.  Exiting
-> Counter is 17.  Exiting
-> Counter is 16.  Exiting
-> Counter is 15.  Exiting
-> Counter is 14.  Exiting
-> Counter is 13.  Exiting
-> Counter is 12.  Exiting
-> Counter is 11.  Exiting
-> Counter is 10.  Exiting
-> Counter is 9.  Exiting
-> Counter is 8.  Exiting
-> Counter is 7.  Exiting
-> Counter is 6.  Exiting
-> Counter is 5.  Exiting
-> Counter is 4.  Exiting
-> Counter is 3.  Exiting
-> Counter is 2.  Exiting
-> Counter is 1.  Exiting
+< I (1) am still alive.  Goodbye.
+< I (2) am still alive.  Goodbye.
+< I (3) am still alive.  Goodbye.
+< I (4) am still alive.  Goodbye.
+< LWPs have ended.
+---
+> Child process (30880) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 17: 100 threads with a minimal stack.  Just return.
@@ -977,7 +170,7 @@ Done.  Count is 100.
 ----------
 Submitted:
 ----------
-Child process (15577) exited due to signal (Segmentation fault).
+Child process (30958) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -987,7 +180,7 @@ Differences (< reference > output)
 < Spawining 100 minumal threads.
 < Done.  Count is 100.
 ---
-> Child process (15577) exited due to signal (Segmentation fault).
+> Child process (30958) exited due to signal (Segmentation fault).
 ---------
 =================================================
 TEST 21: Transfer threads between schedulers (stopped)
@@ -1024,34 +217,38 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Creating LWPS
-Setting the scheduler.
-Launching LWPS
-         2
-              3
-                   4
-                        5
-    1
-         2
-              3
-                   4
-                        5
-              3
-                   4
-                        5
-                   4
-                        5
-                        5
-Back from LWPS.
+^CParent process (31053) caught signal (Interrupt).
+Forwarding signal (Interrupt) to child.
+Child process (31061) exited due to signal (Interrupt).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-4d3
+1,19c1,3
+< Creating LWPS
+< Setting the scheduler.
+< Launching LWPS
 <     1
-8a8
->     1
+<          2
+<               3
+<                    4
+<                         5
+<          2
+<               3
+<                    4
+<                         5
+<               3
+<                    4
+<                         5
+<                    4
+<                         5
+<                         5
+< Back from LWPS.
+---
+> ^CParent process (31053) caught signal (Interrupt).
+> Forwarding signal (Interrupt) to child.
+> Child process (31061) exited due to signal (Interrupt).
 ---------
 =================================================
 TEST 22: Transfer threads between schedulers (live)
@@ -1103,93 +300,53 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Creating LWPS
-Launching LWPS
-         2
-         2
-         2
-         2
-         2
-         2
-              3
-              3
-              3
-              3
-              3
-              3
-                   4
-                   4
-                   4
-                   4
-                   4
-                   4
-                        5
-                        5
-                        5
-Setting the scheduler.
-                        5
-    1
-                        5
-    1
-                        5
-    1
-    1
-    1
-    1
-Back from LWPS.
+^CParent process (31159) caught signal (Interrupt).
+Forwarding signal (Interrupt) to child.
+Child process (31168) exited due to signal (Interrupt).
 
 ---------------------------------
 Differences (< reference > output)
 ---------------------------------
 
-3d2
+1,34c1,3
+< Creating LWPS
+< Launching LWPS
 <     1
-5,8d3
+<          2
 <               3
 <                    4
 <                         5
 <     1
-10,13d4
+<          2
 <               3
 <                    4
 <                         5
 <     1
-14a6,11
->          2
->          2
->          2
->               3
->               3
->               3
-15a13,16
->               3
->               3
->                    4
->                    4
-16a18,22
->                    4
->                    4
->                    4
->                         5
->                         5
-19,22d24
+<          2
+<               3
+<                    4
+<                         5
+< Setting the scheduler.
 <     1
 <          2
 <               3
 <                    4
-25,27d26
+<                         5
+<     1
 <          2
 <               3
 <                    4
-30,32d28
+<                         5
+<     1
 <          2
 <               3
 <                    4
-33a30,33
->     1
->     1
->     1
->     1
+<                         5
+< Back from LWPS.
+---
+> ^CParent process (31159) caught signal (Interrupt).
+> Forwarding signal (Interrupt) to child.
+> Child process (31168) exited due to signal (Interrupt).
 ---------
 =================================================
 TEST 28: Is thread library using sched_{one,two}?
@@ -1418,7 +575,7 @@ Back from LWPS.
 ----------
 Submitted:
 ----------
-Child process (15855) exited due to signal (Segmentation fault).
+Child process (31317) exited due to signal (Segmentation fault).
 
 ---------------------------------
 Differences (< reference > output)
@@ -1638,5 +795,5 @@ Differences (< reference > output)
 <                                                           20
 < Back from LWPS.
 ---
-> Child process (15855) exited due to signal (Segmentation fault).
+> Child process (31317) exited due to signal (Segmentation fault).
 ---------
