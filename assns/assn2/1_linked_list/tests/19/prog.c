@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <lwp.h>
-#include <sems.h>
+#include "../../lwp.h"
+#include "sems.h"
 
 #define STACKSIZE   (8192*16)
 #define TIMES 10
@@ -47,10 +47,19 @@ int main() {
 
   srandom(0);                   /* There's random and there's random... */
 
+ 
   report_ids = (getenv("VERBOSE") != NULL);
   lwp_set_scheduler(Semaphores);
   ping = newsem("Ping",1);
   pong = newsem("Pong",0);
+
+/*
+ thread new =  malloc(sizeof(struct threadinfo_st));
+  new->stack = malloc(STACKSIZE*sizeof(unsigned long));
+  free(new->stack);
+  free(new);
+  */
+
 
   for(i=0;i<TIMES;i++) {
     lwp_create((lwpfun)ponger,(void*)2,STACKSIZE);

@@ -3,9 +3,9 @@ CFLAGS = -Wall -g
 LD = gcc
 LDFLAGS = -Wall -g -L.
    
-main: lwp.o magic64.o scheduler.o tests/28/prog.o tests/28/handsoff.o
-	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o scheduler.o prog.o handsoff.o
-	#prog.o handsoff.o
+main: lwp.o magic64.o scheduler.o tests/19/prog.o tests/19/sems.o
+	$(CC) $(CFLAGS) -o $@ lwp.o magic64.o scheduler.o prog.o sems.o
+	#prog.o sems.o
 
 liblwp.so: lwp.o magic64.o scheduler.o 
 	$(CC) $(CFLAGS) -fPIC -shared -o $@ lwp.o magic64.o scheduler.o
@@ -21,11 +21,11 @@ magic64.o: magic64.S
 
 # Tests BELOW THIS POINT
 
-tests/28/prog.o: tests/28/prog.c lwp.h	
-	$(CC) $(CFLAGS) -fpic -c -o prog.o tests/28/prog.c
+tests/19/prog.o: tests/19/prog.c lwp.h	
+	$(CC) $(CFLAGS) -fpic -c -o prog.o tests/19/prog.c
 
-tests/28/handsoff.o: tests/28/handsoff.h tests/28/handsoff.c lwp.h 
-	$(CC) $(CFLAGS) -fpic -c -o handsoff.o tests/28/handsoff.c
+tests/19/sems.o: tests/19/sems.h tests/19/sems.c lwp.h 
+	$(CC) $(CFLAGS) -fpic -c -o sems.o tests/19/sems.c
 
 
 #tests/14/fiveprocsmain.o: tests/14/fiveprocsmain.c lwp.h

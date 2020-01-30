@@ -3,11 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-static rfile orginal;
-
 #define lt_next lib_one
 #define lt_prev lib_two
+static rfile orginal;
+
 static thread head = NULL, tail = NULL, current = NULL;
 
 extern void rr_admit(thread new);
@@ -18,6 +17,26 @@ extern thread rr_next();
 static struct scheduler rr_sched = {NULL, NULL, rr_admit, rr_remove, rr_next};
 static scheduler sched = &rr_sched;
 //************************LWP************************************//
+void set_registers(rfile *file){
+ file->rax = 0 ;
+ file->rbx= 0;
+ file->rcx= 0;
+ file->rdx= 0;
+ file->rsi= 0;
+ file->rdi= 0;
+ file->rbp= 0;
+ file->rsp= 0;
+ file->r8= 0;
+ file->r9= 0;
+ file->r10= 0;
+ file->r11= 0;
+ file->r12= 0;
+ file->r13= 0;
+ file->r14= 0;
+ file->r15= 0;
+ file->fxsave=FPU_INIT;
+}
+
 /* lwp_create: 
 			This function creates a new thread with function lwpfun
 			It returns the Thread ID
@@ -25,41 +44,42 @@ static scheduler sched = &rr_sched;
 thread newThread(lwpfun fn, void *arg, size_t size){	
 
 	static size_t thread_count = 1;
-
 	unsigned long *temp_stack;
 	thread new;
 	if(!(new=calloc(1, sizeof(struct threadinfo_st)))){
 	   	return NULL;
-	}else if(!(new->stack=calloc(size, sizeof(unsigned long)))){
+	}
+	if(!(new->stack=calloc(size, sizeof(unsigned long)))){
 		free(new);
 		return NULL;
-	}else{
+	}
 		/*Set the new thread*/
 		new->tid=thread_count++;
 		new->stacksize = size;
+
 		new->lt_prev=NULL;
 		new->lt_next=NULL;
 
+		new->st_next=NULL;
+		new->st_prev=NULL;
 
 		/* Init stack */
-		temp_stack=((unsigned long*)(new->stack))+new->stacksize;
-		temp_stack--;
+		temp_stack=new->stack+(size - 1);
 		*temp_stack = lwp_exit;
 		temp_stack--;
 		*temp_stack = fn; 		
-		temp_stack--;
+		temp_stack-=1;
 
-
+		set_registers(&new->state);
 		/* Register stuff */
 		new->state.rdi = arg;
 		new->state.rbp=temp_stack;
-		new->state.rsp=temp_stack;
 		new->state.fxsave=FPU_INIT;
 
 		return new;
-	}
-
 }
+
+
 /*Description: creates a new lwp which executes the given 
 				function with given arguments. The new proces
 				stack will be stacksize
@@ -140,11 +160,12 @@ void lwp_stop(){
 }
 
 void remove_lt_thread(thread victim){
-	thread right, left;
+	thread right = NULL, left = NULL;
 	/* Case - where one in list*/
 	if(head==tail && tail && head){
 		current=NULL;
 		head=tail=NULL;
+		return;
 	/* Case - where at least two in list*/
 	}else{
 		/* Case - where victims the head*/
@@ -165,13 +186,19 @@ void remove_lt_thread(thread victim){
 			left->lt_next=right;
 			right->lt_prev=left;
 		}
+		return;
 	}
 
 }
 	
 
 
+void really_exit(thread curr){
+	free(curr->stack);
+	free(curr);
+}
 
+void phoney_exit(){return;}
 /*Description: Terminates the current process and s 
 				its resource(i.e. its stack). 
 				Calls sched->next()
@@ -180,25 +207,23 @@ void remove_lt_thread(thread victim){
 				*/
 void lwp_exit(){
 	/* if a current exists then*/
-	thread next, curr = current;
-	unsigned long *stack;
+	thread curr = current;
 	if(current){
+		sched->remove(curr); // ethan changed
+		remove_lt_thread(curr);
+
 		SetSP(orginal.rsp);
-		sched->remove(current);
-		remove_lt_thread(current);
-	/* restore the org system thread */
+		really_exit(curr);
+
+		//really_exit(curr);
+		/* restore the org system thread */
 		if(!(current=sched->next())){
-			free(curr->stack);
-			free(curr);
 			swap_rfiles(NULL, &orginal);
 		/* Set next to the current thread*/
 		}else{
 			/* We dont care what was previous in address*/
-			free(curr->stack);
-			free(curr);
-			swap_rfiles(NULL, &current->state);
+		swap_rfiles(NULL, &current->state);
 		}
-
 	}
 }
 
@@ -250,7 +275,7 @@ void lwp_set_scheduler(scheduler sch){
 		if(sched->shutdown){
 			sched->shutdown();
 		}
-			sched=sch;
+		sched=sch;
 	}else{
 		sched=&rr_sched;
 	}	
