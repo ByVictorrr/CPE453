@@ -1,0 +1,2538 @@
+==24587== Memcheck, a memory error detector
+==24587== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==24587== Using Valgrind-3.14.0 and LibVEX; rerun with -h for copyright info
+==24587== Command: ./main
+==24587== 
+==24587== Warning: client switching stacks?  SP change: 0x1ffefffe80 --> 0x0
+==24587==          to suppress, use: --max-stackframe=137422175872 or greater
+==24587== Warning: client switching stacks?  SP change: 0x0 --> 0x523ec80
+==24587==          to suppress, use: --max-stackframe=86240384 or greater
+==24587== Warning: client switching stacks?  SP change: 0x523ec08 --> 0x0
+==24587==          to suppress, use: --max-stackframe=86240264 or greater
+==24587==          further instances of this message will not be shown.
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011EA: ??? (magic64.S:74)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400D96: lwp_yield (lwp.c:124)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400D97: lwp_yield (lwp.c:124)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401A85: down (sems.c:118)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401A86: down (sems.c:118)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401683: pinger (prog.c:34)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x40168D: pinger (prog.c:34)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011EA: ??? (magic64.S:74)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400D96: lwp_yield (lwp.c:124)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401A85: down (sems.c:118)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4015FB: ponger (prog.c:19)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401605: ponger (prog.c:19)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401831: enqueue (sems.c:44)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011E9: ??? (magic64.S:73)
+==24587==    by 0x401586: rr_next (scheduler.c:112)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011EA: ??? (magic64.S:74)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401831: enqueue (sems.c:44)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C5: ??? (magic64.S:63)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317370 is 96 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C9: ??? (magic64.S:64)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317378 is 104 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011CD: ??? (magic64.S:65)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317380 is 112 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D1: ??? (magic64.S:66)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317388 is 120 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D5: ??? (magic64.S:67)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317390 is 128 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D9: ??? (magic64.S:68)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317398 is 136 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011DD: ??? (magic64.S:69)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53173a0 is 144 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011E1: ??? (magic64.S:70)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53173a8 is 152 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011E5: ??? (magic64.S:71)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317350 is 64 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011E9: ??? (magic64.S:73)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5295878 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401802: enqueue (sems.c:42)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401810: enqueue (sems.c:43)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40181B: enqueue (sems.c:43)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401826: enqueue (sems.c:44)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401831: enqueue (sems.c:44)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401843: enqueue (sems.c:45)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018A0: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401802: enqueue (sems.c:42)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401810: enqueue (sems.c:43)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40181B: enqueue (sems.c:43)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401826: enqueue (sems.c:44)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53175c8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401831: enqueue (sems.c:44)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52308c0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401843: enqueue (sems.c:45)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401AFC: s_next (sems.c:140)
+==24587==    by 0x400D5C: lwp_yield (lwp.c:119)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401151: ??? (magic64.S:26)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317330 is 32 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 4
+==24587==    at 0x40115B: ??? (magic64.S:30)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53173b0 is 160 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40115B: ??? (magic64.S:30)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317450 is 320 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40115E: ??? (magic64.S:32)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317338 is 40 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401162: ??? (magic64.S:33)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317340 is 48 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401166: ??? (magic64.S:34)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317348 is 56 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40116A: ??? (magic64.S:35)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317350 is 64 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40116E: ??? (magic64.S:36)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317358 is 72 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401172: ??? (magic64.S:37)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317360 is 80 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401176: ??? (magic64.S:38)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317368 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40117A: ??? (magic64.S:39)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317370 is 96 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40117E: ??? (magic64.S:40)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317378 is 104 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401182: ??? (magic64.S:41)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317380 is 112 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401186: ??? (magic64.S:42)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317388 is 120 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40118A: ??? (magic64.S:43)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317390 is 128 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x40118E: ??? (magic64.S:44)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5317398 is 136 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401192: ??? (magic64.S:45)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53173a0 is 144 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401196: ??? (magic64.S:46)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x53173a8 is 152 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ce0 is 160 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 16
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308d80 is 320 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011AA: ??? (magic64.S:56)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c60 is 32 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011AD: ??? (magic64.S:57)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c68 is 40 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B1: ??? (magic64.S:58)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c70 is 48 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B5: ??? (magic64.S:59)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c78 is 56 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B9: ??? (magic64.S:60)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c88 is 72 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011BD: ??? (magic64.S:61)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c90 is 80 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x5325927: ???
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x520504F: ???
+==24587==    by 0x531730F: ???
+==24587==    by 0x5325957: ???
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x520503F: ???
+==24587==  Address 0x5308c98 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C5: ??? (magic64.S:63)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ca0 is 96 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C9: ??? (magic64.S:64)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ca8 is 104 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011CD: ??? (magic64.S:65)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cb0 is 112 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D1: ??? (magic64.S:66)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cb8 is 120 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D5: ??? (magic64.S:67)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cc0 is 128 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011D9: ??? (magic64.S:68)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cc8 is 136 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011DD: ??? (magic64.S:69)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cd0 is 144 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011E1: ??? (magic64.S:70)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308cd8 is 152 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011E5: ??? (magic64.S:71)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308c80 is 64 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400D97: lwp_yield (lwp.c:124)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x52050EF: ???
+==24587==    by 0x53172B7: ???
+==24587==    by 0x5308C3F: ???
+==24587==    by 0x53172B7: ???
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52a3f48 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401802: enqueue (sems.c:42)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401810: enqueue (sems.c:43)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== 
+==24587== More than 100 errors detected.  Subsequent errors
+==24587== will still be recorded, but in less detail than before.
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401608: ponger (prog.c:27)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401609: ponger (prog.c:27)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018A0: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213b28 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef0 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ef8 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400ED6: remove_lt_thread (lwp.c:160)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ee8 is 680 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400EE5: remove_lt_thread (lwp.c:161)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308ee0 is 672 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x400EF8: remove_lt_thread (lwp.c:162)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52fa810 is 672 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401AFC: s_next (sems.c:140)
+==24587==    by 0x400F6A: lwp_exit (lwp.c:186)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213b20 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400FB1: lwp_exit (lwp.c:193)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5308c48 is 8 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400FBD: lwp_exit (lwp.c:194)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x53172b8 is 58,232 bytes inside a block of size 58,248 free'd
+==24587==    at 0x4C2AF9D: free (vg_replace_malloc.c:540)
+==24587==    by 0x400FBC: lwp_exit (lwp.c:193)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Block was alloc'd at
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213910 is 160 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 16
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52139b0 is 320 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011AA: ??? (magic64.S:56)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213890 is 32 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011AD: ??? (magic64.S:57)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5213898 is 40 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B1: ??? (magic64.S:58)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52138a0 is 48 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B5: ??? (magic64.S:59)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52138a8 is 56 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011B9: ??? (magic64.S:60)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52138b8 is 72 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011BD: ??? (magic64.S:61)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52138c0 is 80 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x53172BF: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52138c8 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011E9: ??? (magic64.S:73)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221e68 is 58,104 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011EA: ??? (magic64.S:74)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221e70 is 58,112 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400D96: lwp_yield (lwp.c:124)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221e88 is 58,136 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400D97: lwp_yield (lwp.c:124)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221e90 is 58,144 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401A85: down (sems.c:118)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221eb8 is 58,184 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401A86: down (sems.c:118)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ec0 is 58,192 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x401683: pinger (prog.c:34)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ee4 is 58,228 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x401687: pinger (prog.c:34)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ee4 is 58,228 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x40168A: pinger (prog.c:34)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ed4 is 58,212 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401690: pinger (prog.c:42)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ee8 is 58,232 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401691: pinger (prog.c:42)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5221ef0 is 58,240 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x400F07: remove_lt_thread (lwp.c:163)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52221e8 is 680 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401A85: down (sems.c:118)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52137e8 is 58,184 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401A86: down (sems.c:118)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52137f0 is 58,192 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018A0: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x4015FB: ponger (prog.c:19)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213814 is 58,228 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x4015FF: ponger (prog.c:19)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213814 is 58,228 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 4
+==24587==    at 0x401602: ponger (prog.c:19)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213804 is 58,212 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401608: ponger (prog.c:27)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213818 is 58,232 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x401609: ponger (prog.c:27)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x5213820 is 58,240 bytes inside a block of size 58,248 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x400E80: remove_lt_thread (lwp.c:151)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52221e8 is 680 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x400EBE: remove_lt_thread (lwp.c:156)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52fa810 is 672 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4C2AF50: free (vg_replace_malloc.c:540)
+==24587==    by 0x400FBC: lwp_exit (lwp.c:193)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x532598F: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52ebef8 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401925: dequeue (sems.c:68)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4018CF: q_remove (sems.c:58)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4018E0: q_remove (sems.c:59)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4019CD: up (sems.c:97)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401802: enqueue (sems.c:42)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x40181B: enqueue (sems.c:43)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401826: enqueue (sems.c:44)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x52FA4B7: ???
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x52050FF: ???
+==24587==    by 0x52EBE9F: ???
+==24587==    by 0x52FA4E7: ???
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x52050EF: ???
+==24587==    by 0x52FA517: ???
+==24587==    by 0x52EBE9F: ???
+==24587==    by 0x52FA517: ???
+==24587==  Address 0x5230668 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401939: dequeue (sems.c:69)
+==24587==    by 0x4019C3: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401690: pinger (prog.c:42)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401691: pinger (prog.c:42)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4017F5: enqueue (sems.c:41)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401810: enqueue (sems.c:43)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401843: enqueue (sems.c:45)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4019CD: up (sems.c:97)
+==24587==    by 0x401682: pinger (prog.c:40)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x52FA51F: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52fa5c8 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400EF8: remove_lt_thread (lwp.c:162)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400F07: remove_lt_thread (lwp.c:163)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018A0: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018BD: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4018E0: q_remove (sems.c:59)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401ADD: s_next (sems.c:138)
+==24587==    by 0x400F6A: lwp_exit (lwp.c:186)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401AFC: s_next (sems.c:140)
+==24587==    by 0x400F6A: lwp_exit (lwp.c:186)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400F7C: lwp_exit (lwp.c:186)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x40119E: ??? (magic64.S:50)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011AA: ??? (magic64.S:56)
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4017F5: enqueue (sems.c:41)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401810: enqueue (sems.c:43)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401831: enqueue (sems.c:44)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401843: enqueue (sems.c:45)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x4015FA: ponger (prog.c:25)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401925: dequeue (sems.c:68)
+==24587==    by 0x401A2D: down (sems.c:109)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401A37: down (sems.c:110)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401802: enqueue (sems.c:42)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x40181B: enqueue (sems.c:43)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401826: enqueue (sems.c:44)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401ADD: s_next (sems.c:138)
+==24587==    by 0x400D5C: lwp_yield (lwp.c:119)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401AFC: s_next (sems.c:140)
+==24587==    by 0x400D5C: lwp_yield (lwp.c:119)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400D6E: lwp_yield (lwp.c:119)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x40114F: ??? (magic64.S:24)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401151: ??? (magic64.S:26)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x40119E: ??? (magic64.S:50)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011A7: ??? (magic64.S:54)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4011AA: ??? (magic64.S:56)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4015B5: ponger (prog.c:20)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400F2E: lwp_exit (lwp.c:181)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x40188E: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x401899: q_remove (sems.c:55)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018AB: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018B6: q_remove (sems.c:56)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4018CF: q_remove (sems.c:58)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018D5: q_remove (sems.c:59)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x4018E6: q_remove (sems.c:60)
+==24587==    by 0x401AC7: s_remove (sems.c:131)
+==24587==    by 0x400F51: lwp_exit (lwp.c:183)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400E4F: remove_lt_thread (lwp.c:148)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400E9F: remove_lt_thread (lwp.c:154)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400EA8: remove_lt_thread (lwp.c:155)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52fa818 is 680 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400FB1: lwp_exit (lwp.c:193)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x5308BEF: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5221f98 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x52DD77F: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x526a1a8 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x5278767: ???
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x520504F: ???
+==24587==    by 0x526A14F: ???
+==24587==    by 0x5278797: ???
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x4019E1: up (sems.c:98)
+==24587==    by 0x520503F: ???
+==24587==  Address 0x5221f98 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400E58: remove_lt_thread (lwp.c:149)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52221e0 is 672 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x400E6E: remove_lt_thread (lwp.c:150)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52c0cd0 is 672 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x52305BF: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5286f48 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x401A37: down (sems.c:110)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x526A0FF: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52c0a88 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400E80: remove_lt_thread (lwp.c:151)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400E01: remove_lt_thread (lwp.c:142)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400E58: remove_lt_thread (lwp.c:149)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x52CF0AF: ???
+==24587==    by 0x400FE0: lwp_exit (lwp.c:195)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x5295618 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587==    by 0x400D8D: lwp_yield (lwp.c:120)
+==24587==    by 0x401A83: down (sems.c:117)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52a3ce8 is 88 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401862: enqueue (sems.c:48)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52a3f40 is 688 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Invalid write of size 8
+==24587==    at 0x401874: enqueue (sems.c:49)
+==24587==    by 0x401A7E: down (sems.c:115)
+==24587==    by 0x401638: pinger (prog.c:35)
+==24587==    by 0x400F10: remove_lt_thread (lwp.c:167)
+==24587==  Address 0x52a3f48 is 696 bytes inside a block of size 704 alloc'd
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x400985: newThread (lwp.c:30)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x401744: main (prog.c:57)
+==24587== 
+==24587== Use of uninitialised value of size 8
+==24587==    at 0x400EBE: remove_lt_thread (lwp.c:156)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400E0D: remove_lt_thread (lwp.c:142)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x400E19: remove_lt_thread (lwp.c:142)
+==24587==    by 0x400F5D: lwp_exit (lwp.c:184)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Conditional jump or move depends on uninitialised value(s)
+==24587==    at 0x4C2AF50: free (vg_replace_malloc.c:540)
+==24587==    by 0x400F8D: lwp_exit (lwp.c:187)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Uninitialised value was created by a stack allocation
+==24587==    at 0x4011C1: ??? (magic64.S:62)
+==24587== 
+==24587== Invalid read of size 8
+==24587==    at 0x400F8E: lwp_exit (lwp.c:188)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Address 0x52a3c38 is 58,232 bytes inside a block of size 58,248 free'd
+==24587==    at 0x4C2AF9D: free (vg_replace_malloc.c:540)
+==24587==    by 0x400F8D: lwp_exit (lwp.c:187)
+==24587==    by 0x1FFEFFFE8F: ???
+==24587==    by 0x400D39: lwp_start (lwp.c:106)
+==24587==    by 0x1FFEFFFEAF: ???
+==24587==    by 0x401770: main (prog.c:61)
+==24587==  Block was alloc'd at
+==24587==    at 0x4C2BFB9: calloc (vg_replace_malloc.c:762)
+==24587==    by 0x4009AE: newThread (lwp.c:32)
+==24587==    by 0x400B94: lwp_create (lwp.c:67)
+==24587==    by 0x40172E: main (prog.c:56)
+==24587== 
+==24587== 
+==24587== HEAP SUMMARY:
+==24587==     in use at exit: 58 bytes in 4 blocks
+==24587==   total heap usage: 44 allocs, 40 frees, 1,179,098 bytes allocated
+==24587== 
+==24587== LEAK SUMMARY:
+==24587==    definitely lost: 0 bytes in 0 blocks
+==24587==    indirectly lost: 0 bytes in 0 blocks
+==24587==      possibly lost: 0 bytes in 0 blocks
+==24587==    still reachable: 58 bytes in 4 blocks
+==24587==         suppressed: 0 bytes in 0 blocks
+==24587== Rerun with --leak-check=full to see details of leaked memory
+==24587== 
+==24587== For counts of detected and suppressed errors, rerun with: -v
+==24587== ERROR SUMMARY: 4858 errors from 233 contexts (suppressed: 0 from 0)
