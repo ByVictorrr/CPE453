@@ -33,8 +33,9 @@
 
 #define NUM_PHILOSPHOPHERS 5
 #define LAST NUM_PHILOSPHOPHERS-1
-#define EQUAL_PER_COLUMN 10
+#define EQUAL_PER_COLUMN 13
 typedef enum STATES{EATING, THINKING, CHANGING} state_t;
+typedef enum SEMA_STATE{USED, UN_USED} sema_state_t;
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
@@ -56,9 +57,14 @@ sem_t print_lock;
 
 /* WOULD NEED MUTEXT LOCKS IF KEEPING r_fork, and l_fork and state*/
 
+typedef struct semaphore{
+    sem_t *sema;
+    sema_state_t flag;
+}sema_t;
+
 typedef struct philospher{
     pthread_t thread; /* represents its session*/
-    sem_t *right, *left; /* For altering global fork before done*/
+    sema_t right, left; /* For altering global fork before done*/
     state_t state; /* state of the philospher*/
 }phil_t;
 
@@ -72,7 +78,7 @@ void build_header(){
     for(j=0; j < NUM_PHILOSPHOPHERS; j++){
         *sb='|';
         sb++;
-        for(i=0; i< per_col;){
+        for(i=0; i< per_col;i++){
             *sb='=';
             sb++;
         }
@@ -83,8 +89,8 @@ void build_header(){
     for(j=0; j < NUM_PHILOSPHOPHERS; j++){
         *sb='|';
         sb++;
-        for(i=0; i< per_col;){
-            if (i/2 == per_col){
+        for(i=0; i< per_col;i++){
+            if (i == per_col/2){
                 *sb = j+'A';
             }else{
                 *sb=' ';
@@ -98,12 +104,16 @@ void build_header(){
     for(j=0; j < NUM_PHILOSPHOPHERS; j++){
         *sb='|';
         sb++;
-        for(i=0; i< per_col;){
+        for(i=0; i< per_col;i++){
             *sb='=';
             sb++;
         }
     }
     *sb='|';
+    printf("%s\n",sb_array[0]);
+    printf("%s\n",sb_array[1]);
+    printf("%s\n",sb_array[2]);
+    
 }
 
 /*usage:  ./philospher [cycles]*/
@@ -115,6 +125,9 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "%s", "Usage: ./philospher [Cycles]\n"); /*flush stderr*/
         return;
     }
+
+
+    sem_init(&print_lock, 0, 1);
     /* Init the fork*/
     for(i=0; i< NUM_PHILOSPHOPHERS; i++){
         if(sem_init(&forks[i], 0, 1) <= -1){ /*each fork starting*/
@@ -130,19 +143,20 @@ int main(int argc, char *argv[]){
         int r = (i+1)%NUM_PHILOSPHOPHERS;
         int l = (i)%NUM_PHILOSPHOPHERS;
         phils[i].state=CHANGING;
+        phils[i].right.flag = UN_USED;
+        phils[i].left.flag = UN_USED;
         /* LAST SEMAPHORE IS DYSLEXIC*/
         if(i == LAST){
             /* TO AVOID DEAD LOCK(last philos takes right first) */
-            phils[i].right = &forks[l];
-            phils[i].left = &forks[r];
+            phils[i].right.sema = &forks[l];
+            phils[i].left.sema = &forks[r];
         }else{
-            phils[i].right = &forks[r];
-            phils[i].left = &forks[l];
+            phils[i].right.sema = &forks[r];
+            phils[i].left.sema = &forks[l];
         }
-        pthread_create(&phils[i], NULL, phil_life, &i);
+        pthread_create(&phils[i].thread, NULL, phil_life, &i);
+        pthread_join(phils[i].thread, NULL);
     }
-
-
 
     // Initally they all start out starving (trying to go in eat state before)
 
@@ -157,13 +171,16 @@ void down(sem_t *sema){
 }
 void up(sem_t *sema){
     /*alter right to taken that is UNUSED*/
-    sem_pos(sema);
+    sem_post(sema);
 }
 
-/* IS phils[id] using fork?*/
-#define USED 0
 char map_fork_to_char(int fork, int id){
-    if(*phils[id].right== USED | *phils[id].left==USED){
+    int l, r;
+    l=id%NUM_PHILOSPHOPHERS;
+    r=(id+1)%NUM_PHILOSPHOPHERS;
+    /*TODO : NEED NEW WAY TO FIND IF current phil is using semaphore*/
+
+    if((fork == r && phils[id].right.flag == USED) | (fork == l && phils[id].left.flag==USED)){
         return fork + '0';
     }
     return '-';
@@ -173,12 +190,17 @@ void print_sema(int id){
     phil_t curr = phils[id];
     const int len = EQUAL_PER_COLUMN;
     int i;
-    const char *STATUS[3] = {"Eat", "Think"," "};
+    const char *STATUS[3] = {"Eat", "Think","  "};
                 
-    char sb[EQUAL_PER_COLUMN+1] = {'\0'}, *pSb=sb;
-    printf('|');
+    char sb[EQUAL_PER_COLUMN+1+1] = {'\0'}, *pSb=sb;
+
+    down(&print_lock);
+
+    sb[0] = '|';
+    pSb++;
+
     /* Setting equals*/
-    for(i=0; pSb-sb< len; pSb++, i++){
+    for(i=0; pSb-sb< len-1; pSb++, i++){
         if(i < NUM_PHILOSPHOPHERS){
             *pSb=map_fork_to_char(i,id); /*STATE OF FORKS THEN AFTER ALL BLANKS*/
         }else{
@@ -191,29 +213,36 @@ void print_sema(int id){
             }
         }
     }
-    printf('%s', sb);
+    printf("%s\n", sb);
     if(id == LAST){
-        printf('|\n');
+        /* CHANGE SCHEDULEING HAVE NON ADJ EATING AT SAME TIME*/
+        printf("|\n");
     }
+
+    up(&print_lock);
 }
 
 void take_forks(int id){
     /* Use fork */ 
-    down(phils[id].left);
+    down(phils[id].left.sema);
     phils[id].state = CHANGING;
+    phils[id].left.flag = USED;
     print_sema(id);
-    down(phils[id].right);// inside down (changes right to used)
+    down(phils[id].right.sema);// inside down (changes right to used)
     phils[id].state = EATING;
+    phils[id].right.flag = USED;
     print_sema(id);
 }
 
 void give_forks(int id){
     /* PUT BACK FORKS in the order we picked up*/
-    up(phils[id].left);
+    up(phils[id].left.sema);
     phils[id].state = CHANGING;
+    phils[id].left.flag = UN_USED;
     print_sema(id);
-    up(phils[id].right); /**(phils[id].left)=UN_USED;(inside up)*/
+    up(phils[id].right.sema); /**(phils[id].left)=UN_USED;(inside up)*/
     phils[id].state = THINKING;
+    phils[id].right.flag = UN_USED;
     print_sema(id);
 }
 void dawdle() {
