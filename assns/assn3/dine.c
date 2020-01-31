@@ -12,18 +12,21 @@
         4.) Non-adj pilosers to eat at same time
         5.) Philosphers stay over their food for a random time
         6.) Each time philospher changes sate, print a status line 
-            Format: "Eat", "Think", ""- for changing with forks held by philospher
+            Format: "Eat", "Think", ""- for changing with forks 
+               held by philospher
             State changes include:
                 – changing among “eat”, “think” and “transition”
                 – picking up a fork
                 – setting down a fork
         7.) optional cmd-line arg (int) indicating how many times,
-            each philospher should go through his or her eat-think cycle before exiting
+            each philospher should go through his or her eat-think cycle 
+            before exiting
         8.) Number forks (0,1,2,3,4)
                     philosers(A,B,C,D, E)
                     sit pos (.5, 1.5, 2.5,..,4.5)
 
-        9.) Binary semaphore around the state printing and updating to ensure that 
+        9.) Binary semaphore around the state printing and 
+        updating to ensure that 
             prints a consistent statw
         10.) 
 
@@ -31,7 +34,7 @@
 */
 
 
-#define NUM_PHILOSPHOPHERS 8
+#define NUM_PHILOSPHOPHERS 5
 #define LAST NUM_PHILOSPHOPHERS-1
 #define EQUAL_PER_COLUMN NUM_PHILOSPHOPHERS*2
 typedef enum STATES{EATING, THINKING, CHANGING} state_t;
@@ -71,10 +74,13 @@ typedef struct philospher{
 
 phil_t phils[NUM_PHILOSPHOPHERS];
 
-#define SIZE_SB_HEAD (NUM_PHILOSPHOPHERS*EQUAL_PER_COLUMN)+(NUM_PHILOSPHOPHERS+1)
+/*#define SIZE_SB_HEAD 
+(NUM_PHILOSPHOPHERS*EQUAL_PER_COLUMN)+(NUM_PHILOSPHOPHERS+1)*/
 void build_footer(){
     int i,j, per_col = EQUAL_PER_COLUMN;
-    char sb_array[SIZE_SB_HEAD+1] = {'\0'}, *sb=sb_array;
+    char sb_array[NUM_PHILOSPHOPHERS*
+                   EQUAL_PER_COLUMN+NUM_PHILOSPHOPHERS+1+1] = {'\0'}, 
+                   *sb=sb_array;
     /* ROW 1 or sb_array[0]*/
     for(j=0; j < NUM_PHILOSPHOPHERS; j++){
         *sb='|';
@@ -86,12 +92,15 @@ void build_footer(){
     }
     *sb='|';
 
-    printf("%s",sb_array);
+    printf("%s\n",sb_array);
  
 }
 void build_header(){
     int i,j, per_col = EQUAL_PER_COLUMN;
-    char sb_array[3][SIZE_SB_HEAD+1] = {'\0'}, *sb=sb_array[0];
+    char sb_array[3][(
+            NUM_PHILOSPHOPHERS*
+            EQUAL_PER_COLUMN+NUM_PHILOSPHOPHERS+1
+    )+1] = {'\0'}, *sb=sb_array[0];
     /* ROW 1 or sb_array[0]*/
     for(j=0; j < NUM_PHILOSPHOPHERS; j++){
         *sb='|';
@@ -140,7 +149,7 @@ int main(int argc, char *argv[]){
 
 
     if((cycles = get_cycles(argc, argv[1])) == -1){   
-        fprintf(stderr, "%s", "Usage: ./philospher [Cycles]\n"); /*flush stderr*/
+        fprintf(stderr, "%s", "Usage: ./dine [Cycles]\n");
         return;
     }
 
@@ -205,9 +214,13 @@ char map_fork_to_char(int fork, int id){
     r=(id+1)%(NUM_PHILOSPHOPHERS);
     /*TODO : NEED NEW WAY TO FIND IF current phil is using semaphore*/
 
-    if((id != LAST && fork == r && phils[id].right.flag == USED) | (id!=LAST && fork == l && phils[id].left.flag==USED)){
+    if(phils[id].state == THINKING){
+        return '-';
+    }else if((id != LAST && fork == r && phils[id].right.flag == USED) | 
+        (id!=LAST && fork == l && phils[id].left.flag==USED)){
         return fork + '0';
-    }else if((id==LAST && fork == r && phils[id].left.flag == USED) | (id==LAST && fork == l && phils[id].right.flag==USED)){
+    }else if((id==LAST && fork == r && phils[id].left.flag == USED) | 
+            (id==LAST && fork == l && phils[id].right.flag==USED)){
         return fork + '0';
     }
     return '-';
@@ -228,7 +241,8 @@ void print_sema(int id){
     /* Setting equals*/
     for(i=0; pSb-sb< len-1; pSb++, i++){
         if(i < NUM_PHILOSPHOPHERS){
-            *pSb=map_fork_to_char(i,id); /*STATE OF FORKS THEN AFTER ALL BLANKS*/
+            *pSb=map_fork_to_char(i,id); 
+            /*STATE OF FORKS THEN AFTER ALL BLANKS*/
         }else{
             /*HERE DO STATE*/
             //int more_len = strlen(STAT)
