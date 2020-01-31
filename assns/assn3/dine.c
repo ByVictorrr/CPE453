@@ -123,7 +123,7 @@ int main(int argc, char *argv[]){
 
     if((cycles = get_cycles(argc, argv[1])) == -1){   
         fprintf(stderr, "%s", "Usage: ./philospher [Cycles]\n"); /*flush stderr*/
-        return;
+        return -1;
     }
 
 
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
     /* Init the fork*/
     for(i=0; i< NUM_PHILOSPHOPHERS; i++){
         if(sem_init(&forks[i], 0, 1) <= -1){ /*each fork starting*/
-            perror('semaphore init problem');
+            perror("semaphore init problem");
             exit(EXIT_FAILURE);
         }
 
@@ -145,16 +145,16 @@ int main(int argc, char *argv[]){
         phils[i].state=CHANGING;
         phils[i].right.flag = UN_USED;
         phils[i].left.flag = UN_USED;
-        /* LAST SEMAPHORE IS DYSLEXIC*/
-        if(i == LAST){
-            /* TO AVOID DEAD LOCK(last philos takes right first) */
+        /* EVEN SEMAPHORE are DYSLEXIC*/
+        if(i%2){
+            /* TO AVOID DEAD LOCK(even philos takes right first) */
             phils[i].right.sema = &forks[l];
             phils[i].left.sema = &forks[r];
         }else{
             phils[i].right.sema = &forks[r];
             phils[i].left.sema = &forks[l];
         }
-        pthread_create(&phils[i].thread, NULL, phil_life, &i);
+        pthread_create(&phils[i].thread, NULL, (void*)(void*)phil_life, &i);
         pthread_join(phils[i].thread, NULL);
     }
 
@@ -265,12 +265,12 @@ void dawdle() {
 }
 void eat(int id){
     /* Randomize*/
-    dawdle();
+    //dawdle();
     print_sema(id);
 }
 
 void think(int id){
-    dawdle();
+    //dawdle();
     print_sema(id);
 }
 
