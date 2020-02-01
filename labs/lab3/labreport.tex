@@ -1,0 +1,61 @@
+\documentclass[11pt]{article}
+
+% Use wide margins, but not quite so wide as fullpage.sty
+\marginparwidth 0.5in 
+\oddsidemargin 0.25in 
+\evensidemargin 0.25in 
+\marginparsep 0.25in
+\topmargin 0.25in 
+\textwidth 6in \textheight 8 in
+% That's about enough definitions
+
+
+\begin{document}
+\hfill\vbox{\hbox{Delaplaine, Victor}
+		\hbox{Cpe 453, Section 01}	
+		\hbox{Lab 3}	
+		\hbox{\today}}\par
+
+\bigskip
+\centerline{\Large\bf Lab 3: Exercise 3}\par
+\bigskip 
+
+
+\section{Problems}
+
+
+\subsection{1}
+In Minix (or any other Unix), if user 2 links to a file owned by user 1, then user 1 removes
+the file, what happens when user 2 tries to read the file? (Tanenbaum and Woodhull, Ch. 1,
+Ex. 15)
+ 
+ANS: Nothing because there is another because in the inode structure there is a another link. And you cant fully remove a file unless the number of links is one.
+
+
+\subsection{2}
+Under what circumstances is multiprogramming likely to increase CPU utilization? Why?
+
+ANS: Under the case where one one process is blocked and you want to run another process.
+	Because one is waiting for I/O and the CPU is free.
+\subsection{3}
+suppose a computer can execute 1 billion instructions/sec and that a system call takes 1000
+instructions, including the trap and all the context switching. How many system calls can
+the computer execute per second and still have half the CPU capacity for running application
+code? (T&W 1-21)
+
+ANS: 
+
+\subsection{4}
+
+whatt is a race condition? What are the symptoms of a race condition?(T&W 2-9)
+
+ANS: When two/more processes are reading/wrtiing some shared resource and the final results depend on who runs.
+	Symptoms: Unexpected ouputs such as no result 
+
+
+
+
+
+\end{document}
+
+
