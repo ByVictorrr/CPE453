@@ -10,4 +10,4 @@ dine.o: dine.c
 	$(CC) $(CFLAGS) -c -o dine.o dine.c
 
 clean:
-	rm *.o main
+	rm *.o dine

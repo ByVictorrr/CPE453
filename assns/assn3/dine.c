@@ -37,6 +37,7 @@
 #define NUM_PHILOSPHOPHERS 5
 #define LAST NUM_PHILOSPHOPHERS-1
 #define EQUAL_PER_COLUMN NUM_PHILOSPHOPHERS*2
+
 typedef enum STATES{EATING, THINKING, CHANGING} state_t;
 typedef enum SEMA_STATE{USED, UN_USED} sema_state_t;
 #include <stdio.h>
@@ -187,8 +188,11 @@ int main(int argc, char *argv[]){
         pthread_create(&phils[i].thread, NULL, (void*)(void*)phil_life, &i);
     
 
-    for(i=0; i< NUM_PHILOSPHOPHERS; i++)
+
+    for(i=0; i< NUM_PHILOSPHOPHERS; i++){
         pthread_join(phils[i].thread, NULL);
+    }
+
         
 
     build_footer();
