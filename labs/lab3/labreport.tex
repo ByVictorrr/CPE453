@@ -21,23 +21,24 @@
 \bigskip 
 
 
-\section{Problems}
 
-
-\subsection{1}
+\section{1}
 In Minix (or any other Unix), if user 2 links to a file owned by user 1, then user 1 removes
 the file, what happens when user 2 tries to read the file? (Tanenbaum and Woodhull, Ch. 1,
 Ex. 15)
  
-ANS: Nothing because there is another because in the inode structure there is a another link. And you cant fully remove a file unless the number of links is one.
+ANS: Nothing the file still exists, because there were two links in the inode structure. 
+	To delete the "file", the link number has to be at one.
 
 
-\subsection{2}
+\section{2}
 Under what circumstances is multiprogramming likely to increase CPU utilization? Why?
 
-ANS: Under the case where one one process is blocked and you want to run another process.
+ANS: Under the case where one one process is currently blocked and the other process is using the CPU.
 	Because one is waiting for I/O and the CPU is free.
-\subsection{3}
+
+
+\section{3}
 suppose a computer can execute 1 billion instructions/sec and that a system call takes 1000
 instructions, including the trap and all the context switching. How many system calls can
 the computer execute per second and still have half the CPU capacity for running application
@@ -45,17 +46,131 @@ code? (T&W 1-21)
 
 ANS: 
 
+\frac{10^9instr}{2s}*\frac{1 syscall}{1000 instructions} = 500000 sys calls
+
+
+
 \subsection{4}
 
 whatt is a race condition? What are the symptoms of a race condition?(T&W 2-9)
 
 ANS: When two/more processes are reading/wrtiing some shared resource and the final results depend on who runs.
-	Symptoms: Unexpected ouputs such as no result 
+	Symptoms: Unexpected ouputs such as overwriting another processes action
+
+
+\subsection{5}
+Does the busy waiting solution using the turn variable (Fig. 2-10 in T&W) work when the
+ two processes are running on a shared-memory multiprocessor, that is, two CPUs, sharing a
+ common memory? (T&W, 2-13)
+
+ANS: 
+	Yes, it does work. Although, it violates condition 3 in T&W book that says one process must not block the other when its not in critical region.
 
 
 
+\subsection{6}
+Describe how an operating system that can disable interrupts could implement semaphores.
+	That is, what steps would have to happen in which order to implement the semaphore operations safely. (T&W, 2-10)
+
+ANS:
+	The steps that would have to occur are that the operations would have to be as an indivisble atomic action.
+
+\subsection{7}
+
+Round robin schedulers normally maintain a list of all runnable processes, with each process
+occurring exactly once in the list. What would happen if a process occurred twice in the list?
+Can you think of any reason for allowing this? (T&W, 2-25) (And what is the reason. “Yes”
+or “no” would not be considered a sufficient answer.)
+
+ANS:
+	It would just be executed more than the other processs. Maybe in a timesharing system, user1 and user2 has been promsied 50\% of the CPU.
+	Lets say user1 has runnable processes A,B and user2 has runnable process C. So the sequence of scheduling would be:
+		A C B C
 
 
+\subsection{8}
+8. Five batch jobs, A through E, arrive at a computer center, in alphabetical order, at almost
+the same time. They have estimated running times of 10, 3, 4, 7, and 6 seconds respectively.
+Their (externally determined) priorities are 3, 5, 2, 1, and 4, respectively, with 5 being the
+highest priority. For each of the following scheduling algorithms, determine the time at which
+each job completes and the mean process turnaround time. Assume a 1 second quantum and
+ignore process switching overhead. (Modified from T&W, 2-28)
+
+(a) Round robin.
+(b) Priority scheduling.
+(c) First-come, first served (given that they arrive in alphabetical order).
+(d) Shortest job first.
+
+for (a), assume that the system is multiprogrammed, and that each job gets its fair share of
+the CPU. For (b)–(d) assume that only one job at a time runs, and each job runs until it
+finished. All jobs are completely CPU bound.
+
+ANS:
+
+
+(a) Round robin.
+A 30
+B 12
+C 17
+D 27
+E 25
+AVG = 22.2
+
+
+(b) Priority scheduling.
+TURN_T_B = 3s
+TURN_T_E = 3s+6s = 9s
+TURN_T_A = 3s+6s+10s=19s
+TURN_T_C = 3s+6s+10s+4s=23s
+TURN_T_D = 3s+6s+10s+4s+7s=30s
+TURN_T_AVG = 16.8s
+
+
+(c) First-come, first served (given that they arrive in alphabetical order).
+A = 10s
+B = 10s+3=13
+C = 10s+3+4=17s
+D = 10s+3+4+7=24s
+E = 10s+3+4+7+6=30s
+
+avg = 18.8
+
+
+(d) Shortest job first
+B = 3s
+C = 7s
+E= 7s+6 = 13s
+D=7+13=20s
+A=10+20=30s
+
+AVG = 14.6
+
+
+\subsection{9}
+Re-do problem 8a with the modification that job D is IO bound. After each 500ms it is allowed
+to run, it blocks for an IO operation that takes 1s to complete. The IO processing itself doesn’t
+take any noticeable time. Assume that jobs moving from the blocked state to the ready state
+are placed at the end of the run queue. If a blocked job becomes runnable at the same time a
+running process’s quantum is up, the formerly blocked job is placed back on the queue ahead
+of the other one.
+
+(a) Round robin.
+
+B=12
+C=17
+D=21
+A=28
+E=24
+AVG = 20.4
+
+
+\subsection{10}
+A CPU-bound process running on CTSS needs 30 quanta to complete. How many times must
+it be swapped in, including the first time (before it has run at all)? Assume that there are
+always other runnable jobs and that the number of priority classes is unlimited. (T&W, 2-29)
+
+ANS:
+    5 times
 \end{document}
 
 
