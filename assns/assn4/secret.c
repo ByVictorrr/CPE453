@@ -110,7 +110,18 @@ PRIVATE int s_do_open(struct driver *dp, message *m_ptr){
 	open_count++;
 	return OK;
 }
-
+/*============================================================
+				  	 s_do_close
+*==============================================================*/
+// QUESTIONS; do we have to check if a file is open (or does os do that)
+PRIVATE int s_do_open(struct driver *dp, message *m_ptr){
+	if(open_count < 1){
+		panic("closed too often");
+	}
+	// else close file
+	open_count--;
+	return OK;	
+}
 
 /*============================================================
 				  	 s_prepare 
@@ -124,44 +135,12 @@ PRIVATE struct device *s_prepare(int dev){
 	return &s_device;
 }
 
-/*============================================================
-					s_do_read
-*==============================================================*/
-PRIVATE int s_do_read(
-	u64_t position,
-	iovect_t *iov,
-	unsigned nr_req
-){
-	int ret;
-
-	ret=sys_safecopyto(proc_nr, iov->iov_addr, 0,
-							(vir_bytes)(secret+position.lo),
-							bytes,D)
-	iov->iov_size-=bytes;
-	return ret;
-}
-/*============================================================
-					s_do_write
-*==============================================================*/
-PRIVATE int s_do_wrtie(
-	u64_t position,
-	iovect_t *iov,
-	unsigned nr_req
-){
-	int ret;
-
-	ret=sys_safecopyfrom(proc_nr, iov->iov_addr, 0,
-							(vir_bytes)(secret+position.lo),
-							bytes,D)
-	iov->iov_size-=bytes;
-	return ret;
-}
 	
 
 /*============================================================
 						s_transfer(for R/W in opcode)
 *==============================================================*/
-/* Assumption: that file is open*/
+/* Assumption: that file is open(that is secret is empty or owner reading)*/
 PRIVATE int s_transfer(
 	int proc_nr,
 	int opcode,
@@ -169,26 +148,41 @@ PRIVATE int s_transfer(
 	iovect_t *iov,
 	unsigned nr_req
 ){
-	int ret;
+	int ret, bytes;
 
-	// TODDO NOT sure what it does
+	// position - where we are in the /dev/Secret file
+	bytes = strlen(secret) - position.lo < iov->iov_size ?
+			strlen(secret) - position.lo : iov->iov_size;
+
+	if(bytes <=0){
+		// EOF
+		return OK;
+	}
+
 	switch (opcode)
 	{
 
 	case DEV_GATHER_S: // READ
-		ret=s_do_read();
+		ret=sys_safecopyfrom(proc_nr, iov->iov_addr, 0,
+							(vir_bytes)(secret+position.lo),
+							bytes,D);
+		iov->iov_size-=bytes;	
+		// IS IT POSSIBLE TO HAVE OPEN and not be owner and another person write to it (yes - I think)
+		owner_cred={NOT_OWNED,NOT_OWNED,NOT_OWNED};
 		break;
 	case DEV_SCATTER_S: // WRITE
-		ret=s_do_write();
+		ret=sys_safecopyto(proc_nr, iov->iov_addr, 0,
+							(vir_bytes)(secret+position.lo),
+							bytes,D);
+		iov->iov_size-=bytes;		
+		// CHECK
+		getnucred(proc_nr, &owner_cred);
 		break;	
 	default:
 		return EINVAL;
 	}
 
-	// Happend in write (change ownership)
-	if(getnucred(proc_endpt, &owner_cred)){
-		return FALSE;
-	}
+	return ret;
 }
 
 /*============== END DRIVER ======================*/
