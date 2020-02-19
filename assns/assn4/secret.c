@@ -1,16 +1,19 @@
 #include <sys/socket.h>
-#includ <sys/ucred.h>
+#include <sys/ucred.h>
 #include <minix/type.h>
 #include <unistd.h>
+// R/W perms consts
+#include <minix/const.h>
 
 static typdef enum BOOL{FALSE, TRUE} bool;
-static typdef enum REQUEST{READ,WRITE} req_t;
-
+#define NOT_OWNED -1
 
 // TODO: If secret size is greater than this return ENOSPC
 #define SECRET_SIZE 10000
 char secret[SECRET_SIZE] = {0};
 
+// Initalize phony creds 
+static struct ucred owner_cred = {NOT_OWNED,NOT_OWNED,NOT_OWNED}; 
 
 /* State var to count number of times the device has been  opened */
 PRIVATE int open_count;
@@ -22,7 +25,7 @@ PRIVATE struct driver s_dtab = {
 	s_do_close,			/* release device */
 	s_do_ioctl,			/* ioctl */
 	s_prepare, 			/* prepare for I/O */
-	s_transfer, 		/* do I/O */
+	s_transfer, 		/* do I/O read or write*/
 	nop_cleanup, 		/* nothing to clean up */
 	nop_geometry, 		/* no geometry*/
 	nop_alarm,			/* no alarm */
@@ -54,7 +57,88 @@ PRIVATE char *s_name(){
 	return "Secret";
 }
 
+/*============================================================
+						s_do_open
+*==============================================================*/
 
+/* Helper function 
+	Description: checking the perms are correct of open
+*/
+PRIVATE bool isPerms(int perms){
+	switch (perms)
+	{
+	case R_BIT:
+		return TRUE;
+		break;
+	case W_BIT:
+		return TRUE;
+		break;
+	default:
+		// could be WR (dont want this)
+		return FALSE;
+		break;
+	}
+	return FALSE;
+}
+
+/* Returns{
+	EACCES - if other permission other than RONLY or WRONLY	
+			Or if not owner 
+	FALSE - any other error
+}
+*/
+PRIVATE int s_do_open(struct driver *dp, message *m_ptr){
+	endpoint_t proc_endpt = getpid();
+	// step 0 - check permission given
+	if(!isPerms(m_ptr->COUNT)){
+		return EACCES; 
+	}
+	/*step 1 - check if proc_endpt=current.pid
+		DO this if empty | owner is proc 
+	*/
+	// if owned 
+	if(!(owner_cred=={NOT_OWNED,NOT_OWNED,NOT_OWNED})){
+		// and if proc_enpt is not the owner
+		if(!owner_cred.pid==proc_endpt){
+			return EACCES;
+		}
+	}
+
+	open_count++;
+	return OK;
+}
+
+/*============================================================
+						s_transfer(for R/W in opcode)
+*==============================================================*/
+
+PRIVATE int s_transfer(
+	int proc_nr,
+	int opcode,
+	u64_t position,
+	iovect_t *iov,
+	unsigned nr_req
+){
+
+
+	switch (opcode)
+	{
+
+	case DEV_GATHER_S: // READ
+
+		break;
+	case DEV_SCATTER_S: // WRITE
+
+		break;	
+	default:
+		return EINVAL;
+	}
+
+	// Happend in write (change ownership)
+	if(getnucred(proc_endpt, &owner_cred)){
+		return FALSE;
+	}
+}
 
 /*============== END DRIVER ======================*/
 
