@@ -12,33 +12,200 @@ static typdef enum REQUEST{READ,WRITE} req_t;
 char secret[SECRET_SIZE] = {0};
 
 
-// QUESTIONS: is the number of opens on a file an attribute of inode struct
+/* State var to count number of times the device has been  opened */
+PRIVATE int open_count;
+
+/* entry point for this driver*/
+PRIVATE struct driver s_dtab = {
+	s_name, 			/* current device's name */
+	s_do_open, 			/* open request, init device */
+	s_do_close,			/* release device */
+	s_do_ioctl,			/* ioctl */
+	s_prepare, 			/* prepare for I/O */
+	s_transfer, 		/* do I/O */
+	nop_cleanup, 		/* nothing to clean up */
+	nop_geometry, 		/* no geometry*/
+	nop_alarm,			/* no alarm */
+	nop_cancel,			/* nop cancel */ 
+	nop_select, 		/* not really sure */
+	s_ioctl,			/* cath-all for unrecognized commands  and ioctl*/
+	do_nop				/* not sure for dr_hw_int*/
+};
+
+/*============================================================
+						main
+*==============================================================*/
+
+int main(){
+	/* SEF local startup */
+	sef_local_startup();
+
+	/* Call the generic recieve loop */
+	driver_task(&s_dtab, DRIVER_STD);
+
+	return OK;
+}
+
+/*============== DRIVER FUNCTIONS======================*/
+/*============================================================
+						s_name
+*==============================================================*/
+PRIVATE char *s_name(){
+	return "Secret";
+}
+
+
+
+/*============== END DRIVER ======================*/
 
 
 
 
-/* HOW TO READ or WRITE FROM a variable of another proc
+/*============== SEF FNS================================
+	DESCRIPTION{
+	Every system service (driver) must call sef_startup() at 
+	startup time to handle init. And sef_reieve() when recieving a message
 
-   	* SYS task help from function below
+	For registering callbacks to provide handlers for each particular type of event such as:
 
-int sys safecopyfrom (
-endpoint t source, /* source process */
-cp grant id t grant, /* source buffer */
-vir bytes grant offset, /* offset in source buffer (for block devs) */
-vir bytes my address, /* virtual address of destination buffer */
-size t bytes, /* bytes to copy */
-int my seg /* memory segment (It’s ’D’ :-) */
-);
+		Initalization: triggered by init message sent by reincarnation Server(RS) when a server is started
+		Ping: triggered by keep-a-live msg send by the RS periodically to check the status of system servicce
+		Live Update: triggerd by live update message sent by RS when an update is avail for particular system
+}
+/*
+						sef_local_startup
+DESCRIPTION
+*==============================================================*/
+/*============================================================
+						sef_local_startup
+*==============================================================*/
+PRIVATE void sef_local_startup(){
+	/* Register init callbacks to be called by RS*/
+	sef_setcb_init_fresh(seef_cb_init_fresh);
+	sef_setcb_init_lu(seef_cb_init_fresh);
+	sef_setcb_init_restart(seef_cb_init_fresh);
 
-int sys safecopyto (
-endpoint t source, /* destination process */
-cp grant id t grant, /* destination buffer */
-vir bytes grant offset, /* offset in destination buffer (for block devs) */
-vir bytes my address, /* virtual address of source buffer */
-size t bytes, /* bytes to copy */
-int my seg /* memory segment (It’s ’D’ :-) */
-);
-*/
+	/* Register live callback (for diff events)*/
+	sef_setcb_lu_state_save(sef_cb_lu_state_save);
+	
+}
+
+/*============================================================
+						sef_cb_lu_state_save
+DESCRIPTION:{
+	Used for live event RS might give us
+}
+RETURNS:{
+	EAGIN - if no more spots in ds
+	OK - if init went ok
+}
+*==============================================================*/
+PRIVATE int sef_cb_lu_state_save(int state, int flags){
+	/* save the state of open_counter*/
+	if(ds_publish_u32("open_counter",open_counter, DSF_OVERWRITE)){
+		return EAGIN;
+	}
+	return OK;
+}
+
+
+/*============================================================
+						sef_cb_init_fresh
+DESCRIPTION:{
+		Used to set sef_cbs.sef_cb_init_fresh, which is used in
+	process_init(lib/libsys/sef_init.c), which is used in do_sef_rs_init 
+	and do_sef_init_request.
+}
+RETURNS:{
+	ESRCH - if not able to restore open_count(i.e "open_count" DNE)
+	OK - if init went ok
+}
+*==============================================================*/
+PRIVATE int sef_cb_init_fresh(int type, sef_init_info_t *info){
+	/*  Initalize the secret driver. */
+	bool do_announce_driver = TRUE;
+
+	open_counter = 0;
+	switch(type){
+		/* init fresh */
+		case SEF_INIT_FRESH:
+			break;
+		/* init after live update */
+		case SEF_INIT_LU:
+			/* restores the state */
+			if(lu_state_restore()==ESRCH){
+				return ESRCH;
+			}
+			do_announce_driver=FALSE;
+			printf("%Hey, I'm a new version!\n", HELLO_MESSAGE);
+			break;
+		case SEF_INIT_RESTART:
+			printf("%Hey, I've just been restarted\n", HELLO_MESSAGE);
+			break;
+
+	}
+	if (do_annoounce_driver){
+		/* TODO: dont really understand(ASK nico)*/
+		driver_announce();
+	}
+
+	/* init went sucessfully*/
+	return OK;
+}
+
+/*============================================================
+						lu_state_restore
+DESCRIPTION:{
+	restores the state of open count 
+}
+RETURNS: {
+	ESRCH - {if no variable named "open_counter"}
+	OK - if every thing went ok
+}
+*==============================================================*/
+PRIVATE int lu_state_restore(){
+	/* restore the state */
+	u32_t value;
+	/* Retrieve an unsigned int */
+	if(ds_retrieve_u32("open_counter", &value) == ESRCH){
+		return ESRCH;
+	}
+	/* delete the variable stored in ds*/
+	if(ds_delete_u32("open_counter")==ESRCH){
+		return ESRCH;
+	}
+	open_counter = (int)value;
+
+	return OK;
+}
+
+/*============== ENDOF SEF==============================*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* when_open:{
    1. After a write
@@ -123,3 +290,4 @@ bool try_open(){
 		// return  EACCES
 	}
 }
+
