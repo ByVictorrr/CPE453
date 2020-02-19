@@ -35,6 +35,9 @@ PRIVATE struct driver s_dtab = {
 	do_nop				/* not sure for dr_hw_int*/
 };
 
+/* represents /dev/Secret */
+PRIVATE struct device secret_device;
+
 /*============================================================
 						main
 *==============================================================*/
@@ -108,27 +111,75 @@ PRIVATE int s_do_open(struct driver *dp, message *m_ptr){
 	return OK;
 }
 
-/*============================================================
-						s_transfer(for R/W in opcode)
-*==============================================================*/
 
-PRIVATE int s_transfer(
-	int proc_nr,
-	int opcode,
+/*============================================================
+				  	 s_prepare 
+*==============================================================*/
+PRIVATE struct device *s_prepare(int dev){
+	// ASK : what is base and size of a partion?
+	s_device.dev_base.lo=0;
+	s_device.dev_base.hi=0;
+	s_device.dev_base.dv_size.lo=strlen(secret);
+	s_device.dev_base.dv_size.hi=0;
+	return &s_device;
+}
+
+/*============================================================
+					s_do_read
+*==============================================================*/
+PRIVATE int s_do_read(
 	u64_t position,
 	iovect_t *iov,
 	unsigned nr_req
 ){
+	int ret;
 
+	ret=sys_safecopyto(proc_nr, iov->iov_addr, 0,
+							(vir_bytes)(secret+position.lo),
+							bytes,D)
+	iov->iov_size-=bytes;
+	return ret;
+}
+/*============================================================
+					s_do_write
+*==============================================================*/
+PRIVATE int s_do_wrtie(
+	u64_t position,
+	iovect_t *iov,
+	unsigned nr_req
+){
+	int ret;
 
+	ret=sys_safecopyfrom(proc_nr, iov->iov_addr, 0,
+							(vir_bytes)(secret+position.lo),
+							bytes,D)
+	iov->iov_size-=bytes;
+	return ret;
+}
+	
+
+/*============================================================
+						s_transfer(for R/W in opcode)
+*==============================================================*/
+/* Assumption: that file is open*/
+PRIVATE int s_transfer(
+	int proc_nr,
+	int opcode,
+	u64_t position, // ASK : what is position(seek mode maybe)???
+	iovect_t *iov,
+	unsigned nr_req
+){
+	int ret;
+
+	// TODDO NOT sure what it does
 	switch (opcode)
 	{
 
 	case DEV_GATHER_S: // READ
-
+		ret=s_do_read();
 		break;
 	case DEV_SCATTER_S: // WRITE
-
+		ret=s_do_write();
 		break;	
 	default:
 		return EINVAL;
@@ -141,8 +192,6 @@ PRIVATE int s_transfer(
 }
 
 /*============== END DRIVER ======================*/
-
-
 
 
 /*============== SEF FNS================================
