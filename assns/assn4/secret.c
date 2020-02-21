@@ -59,6 +59,24 @@ int main(){
 PRIVATE char *s_name(){
 	return "Secret";
 }
+PRIVATE int s_do_ioctl(struct driver *dp, message *m_ptr){
+	uid_t grantee; // uid of new owner
+	int res;
+	switch (m_ptr->REQUEST)
+	{
+	case IO_GRAND:
+		// give grantee the uid access
+		uid=
+		res=sys_safecopyfrom(m_ptr->IO_ENDPT
+			(vir_bytes)m->IO_GRANT, (vir_bytes)&grantee, sizeof(grantee), D);
+		owner_cred.uid=grantee;
+		break;
+	
+	default:
+		break;
+	}
+
+}
 
 /*============================================================
 						s_do_open
