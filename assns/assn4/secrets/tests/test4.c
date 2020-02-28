@@ -4,7 +4,9 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
+
 
 #define MSG "Hello, World\n"
 
@@ -14,16 +16,14 @@ int main(int argc, char *argv[]){
 		/* Test 1*/
 		char *msg=MSG;
 		fd1=open("/dev/secret", O_WRONLY);
+		fd2=open("/dev/secret", O_RDONLY);
 		printf("opening... fd1=%d\n",fd1);
 		res=write(fd1, msg, strlen(msg));
+
 		printf("writing... res=%d\n", res);
 
-		if(argc > 1 && 0!=(uid=atoi(argv[1]))){
-			if(res=ioctl(fd1,SSGRANT,&uid)){
-				perror("ioctl");
-			}
-			printf("Trying to change owner to %d... res=%d\n",uid,res);
-		}
+		execlp("service", "service update /dev/") 
+
 
 		res=close(fd1);
 
