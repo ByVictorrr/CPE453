@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.9.30)  29 FEB 2020 18:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.9.30)  29 FEB 2020 19:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -925,77 +925,77 @@ File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
 <images/nicoTestInv.png, id=84, 729.72626pt x 750.805pt>
 File: images/nicoTestInv.png Graphic file (type png)
 <use images/nicoTestInv.png>
-Package pdftex.def Info: images/nicoTestInv.png  used on input line 265.
+Package pdftex.def Info: images/nicoTestInv.png  used on input line 266.
 (pdftex.def)             Requested size: 390.25534pt x 401.52205pt.
  [13 <./images/nicoTestInv.png>]
 <images/BigFileInv.png, id=89, 843.15pt x 311.1625pt>
 File: images/BigFileInv.png Graphic file (type png)
 <use images/BigFileInv.png>
-Package pdftex.def Info: images/BigFileInv.png  used on input line 286.
+Package pdftex.def Info: images/BigFileInv.png  used on input line 287.
 (pdftex.def)             Requested size: 390.25534pt x 144.02435pt.
 <images/OwnerBehaviorInv.png, id=90, 814.04124pt x 342.27875pt>
 File: images/OwnerBehaviorInv.png Graphic file (type png)
 <use images/OwnerBehaviorInv.png>
-Package pdftex.def Info: images/OwnerBehaviorInv.png  used on input line 311.
+Package pdftex.def Info: images/OwnerBehaviorInv.png  used on input line 312.
 (pdftex.def)             Requested size: 390.25534pt x 164.08823pt.
  [14 <./images/BigFileInv.png> <./images/OwnerBehaviorInv.png>]
 <images/RefreshSecretInv.png, id=94, 644.4075pt x 181.67876pt>
 File: images/RefreshSecretInv.png Graphic file (type png)
 <use images/RefreshSecretInv.png>
-Package pdftex.def Info: images/RefreshSecretInv.png  used on input line 336.
+Package pdftex.def Info: images/RefreshSecretInv.png  used on input line 337.
 (pdftex.def)             Requested size: 390.25534pt x 110.02824pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 374--377
+Underfull \hbox (badness 10000) in paragraph at lines 375--378
 
  []
 
 [15 <./images/RefreshSecretInv.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 378--380
+Underfull \hbox (badness 10000) in paragraph at lines 379--381
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 381--383
+Underfull \hbox (badness 10000) in paragraph at lines 382--384
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 386--387
+Underfull \hbox (badness 10000) in paragraph at lines 387--388
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 388--389
+Underfull \hbox (badness 10000) in paragraph at lines 389--390
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 390--391
+Underfull \hbox (badness 10000) in paragraph at lines 391--392
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 392--395
+Underfull \hbox (badness 10000) in paragraph at lines 393--396
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 396--398
+Underfull \hbox (badness 10000) in paragraph at lines 397--399
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 399--402
+Underfull \hbox (badness 10000) in paragraph at lines 400--403
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 407--409
+Underfull \hbox (badness 10000) in paragraph at lines 408--410
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 410--415
+Underfull \hbox (badness 10000) in paragraph at lines 411--416
 
  []
 
@@ -1018,7 +1018,7 @@ f-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
 urw/courier/ucrr8a.pfb>
-Output written on asgn4.pdf (17 pages, 955187 bytes).
+Output written on asgn4.pdf (17 pages, 955188 bytes).
 PDF statistics:
  123 PDF objects out of 1000 (max. 8388607)
  70 compressed objects within 1 object stream
