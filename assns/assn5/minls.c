@@ -40,12 +40,14 @@ void help()
    usage(NO_EXIT);
 
    printf("Options:\n");
-   printf("%*s%*s%*s\n", 15, "-p", 20, "part", 30, "--- select partition for filesystem (default: none)" );
-   printf("%8s %6s %20s \n", "-s", "sub", "--- select partition for filesystem (default: none)" );
-   printf("%8s%7s%3s\n", "-h", "help",
+   printf("%7s %-8s %-7s %s\n", "", "-p", "part",
          "--- select partition for filesystem (default: none)" );
-   printf("%6s%6s%3s\n", "-v", "verbose",
-         "--- select partition for filesystem (default: none)" );
+   printf("%7s %-8s %-7s %s\n", "", "-s", "sub",
+         "--- select subpartition for filesystem (default: none)" );
+   printf("%7s %-8s %-7s %s\n", "", "-h", "help",
+         "--- print usage information and exit" );
+   printf("%7s %-8s %-7s %s\n", "", "-v", "verbose",
+         "--- increase verbosity level" );
 
    exit(EXIT_FAILURE);
 }
@@ -106,7 +108,6 @@ void getArgs(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-   printf("Hello World\n");
    getArgs(argc, argv);
 
    return EXIT_SUCCESS;
