@@ -14,7 +14,6 @@
 #define LENGTH 1000
 // In bytes
 #define SECTOR_SIZE 512
-#define BLOCK_SIZE SECTOR * 2
 // Location of partition table
 #define ADDR_PARTITION_TABLE  0x1BE
 // indicates a valid minix partition
@@ -52,20 +51,21 @@ void *safe_malloc(size_t size){
 /* 
 * This function checks to see if the partion table is valid
 * @parm image - file pointer to image
+* @parm start_par - absolute address of start of current partition
 * @return - if the part table is valid true else false 
 */
-bool_t is_part_table_valid(FILE *image, uint32_t offset){
+bool_t is_part_table_valid(FILE *image, uint32_t start_addr){
     const int VALID_SIG[2][2]={{510, 0x55},{511, 0xAA}};
     uint8_t sig;
     // step 1 - check at byte 510
-    safe_fseek(image, VALID_SIG[0][0]+offset, SEEK_SET);
+    safe_fseek(image, VALID_SIG[0][0]+start_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[0][1]){
         printf("location %d doesnt have signature of %d", VALID_SIG[0][0], VALID_SIG[0][1]);
         return FALSE;
     }    
     // step 2 - check at byte 511
-    safe_fseek(image, VALID_SIG[1][0]+offset, SEEK_SET);
+    safe_fseek(image, VALID_SIG[1][0]+start_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[1][1]){
         printf("location %d doesnt have signature of %d", VALID_SIG[1][0], VALID_SIG[1][1]);
@@ -76,38 +76,50 @@ bool_t is_part_table_valid(FILE *image, uint32_t offset){
 
 /* 
 * Checks to see if the partion is bootable
-* @parm - part_num 
+* @parm - addr absolute address to get parition
 */
-partition_t get_partition(FILE *image, const int part_num){
+partition_t get_partition(FILE *image, uint32_t addr){
     partition_t part;
-    safe_fseek(image, ADDR_PARTITION_TABLE+part_num*SECTOR_SIZE, SEEK_SET);
+    safe_fseek(image, addr, SEEK_SET);
     safe_fread(&part, sizeof(part),1, image);
+    return part;
+}
 
+partition_t read_partition(FILE * image, uint32_t abs_addr, uint32_t abs_start_addr){
+    partition_t part;
+    // step 1 - make sure its valid
+    if(!is_part_table_valid(image, abs_start_addr)){
+        printf("Not a valid partition table");
+        exit(EXIT_FAILURE);
+    }
+    if((part = get_partition(image, abs_addr)).type != MINIX_PART){
+        printf("not a minix partition");
+        exit(EXIT_FAILURE);
+    }
     return part;
 }
 
 /* 
 * This function return a valid minix partition object
-* TODO: make it recursive for sub-partitions
+* @param prim_part - what primary partition to read
+* @param sub_part - what subpartion with a prim_part to read (-1 means no subpartion)
 * @return minix partition or null if table not valid
+
 */
-partition_t find_minix_partion(FILE *image){
+partition_t find_minix_partion(FILE *image, int prim_part, int sub_part){
     partition_t part;
-    int part_num=0;
-    int last_sector;
-    // step 0 - check to see if valid parition table
-    if(!is_part_table_valid(image)){
-        printf("Not a valid partition table");
-        return (partition_t){0};
+    const uint32_t prim_part_addr = ADDR_PARTITION_TABLE + 
+                            sizeof(partition_t) * prim_part;
+    uint32_t sub_part_addr;
+    // step 1 - get primary parition
+    part=read_partition(image, prim_part_addr, 0);
+    // step 2 - get sub partition is asked for
+    if(sub_part != -1){
+        sub_part_addr = (part.lFirst*SECTOR_SIZE) // this quanity is starting of partition table
+                + ADDR_PARTITION_TABLE + sizeof(partition_t)*sub_part;
+        part=read_partition(image, sub_part_addr, part.lFirst*SECTOR_SIZE);
     }
-    // step 1 - go through every partition until find a minix partition
-    while(part.type != MINIX_PART){
-        part = get_partition(image, part_num);
-        // next partion
-        last_sector = part.lFirst+part.size-1; // gives last sector of part number
-        part_num = last_sector+1; // gives begging of next partition(in sectors)
-    }
-    // step 2 - once got a minix valid partition return it
+
     return part;
 }
 
@@ -130,7 +142,7 @@ superblock_t get_SB(FILE *image, const uint32_t first_sector){
  * @parma sum_blk_maps - sum of sizes of zone and inode maps
  */
 inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb){
-    uint32_t LOC = first_sector+2*SECTOR_SIZE+(sb.z_blocks+sb.i_blocks);
+    uint32_t LOC = first_sector+BOOT_SIZE+(sb.z_blocks+sb.i_blocks)*sb.blocksize;
     inode_t *inodes = safe_malloc(sizeof(inode_t)*sb.ninodes);
     safe_fseek(image, LOC, SEEK_SET);
     safe_fread(inodes, sizeof(inode_t), sb.ninodes, image);
@@ -146,7 +158,6 @@ inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb){
  * recursive function that goes through directies until it finds the src_path
  * returns the inode corresponding to the file_path
  */
-/*
 inode_t find_file(inode_t *inodes, int inode_num, const char *file_path, FILE * image){
     
     dirent_t dir;
@@ -157,14 +168,14 @@ inode_t find_file(inode_t *inodes, int inode_num, const char *file_path, FILE * 
     // general case
     //safe_fseek(image, inodes[inode_num], )
 }
-*/
-void read_file(FILE *image, const char * src_path){
+
+void read_file(FILE *image, const char * src_path, int prim_part, int sub_part){
     partition_t minix_part;
     superblock_t sb;
     inode_t *inodes; // need to malloc doesnt know how many inodes
     uint32_t addr_first_sector;
     // step 1 - get minix part
-    minix_part = find_minix_partion(image);
+    minix_part = find_minix_partion(image, prim_part, sub_part);
     // absolute first sector of given partition in bytes
     addr_first_sector=minix_part.lFirst*SECTOR_SIZE;
     // step 2 - locate the relative address of superblock
@@ -183,11 +194,13 @@ int main(){
     FILE * image;
     const char * IMAGE = "Images/HardDisk";
     const char * SRC_FILE = "/minix";
+    const int prim_part = 0;
+    const int sub_part = 0;
     if((image=fopen(IMAGE,"r"))== NULL){
         printf("No such image exists");
         exit(EXIT_FAILURE);
     }
-    read_file(image, SRC_FILE);
+    read_file(image, SRC_FILE, prim_part, sub_part);
 
     return 0;
 }
