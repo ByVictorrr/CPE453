@@ -9,6 +9,8 @@
 #include <sys/wait.h>
 #include <libgen.h>
 #include <getopt.h>
+#include <ctype.h>
+#include <errno.h>
 
 #include "minfs.h"
 
@@ -22,7 +24,7 @@ struct
    char  *imagefile;
    char  *srcpath;
    char  *path;
-   int   verbose_flag;
+   int   verbose;
 
 } argInfo;
 
@@ -52,47 +54,92 @@ void help()
    exit(EXIT_FAILURE);
 }
 
+long getValue(char *input)
+{
+   char *ptr = input;
+   long val = -1;
+
+   while (*ptr) {
+      if (isdigit(*ptr)) {
+         val = strtol(ptr, &ptr, 10);
+         printf("%ld\n", val);
+      } else {
+         fprintf(stderr, "%s: badly formed integer.\n", input);
+         help();
+         ptr++;
+      }
+   }
+   return val;
+}
+
 
 void getArgs(int argc, char *argv[])
 {
    int opt_index = 0;
    int i = 0;
 
-   while((opt_index = getopt(argc, argv, ":if:lrxh")) != -1)
+   argInfo.part = -1;
+   argInfo.subpart = -1;
+   argInfo.imagefile = NULL;
+   argInfo.srcpath = NULL;
+   argInfo.path = NULL;
+   argInfo.verbose = 0;
+
+   while((opt_index = getopt(argc, argv, ":ifp:lrxh")) != -1)
       switch(opt_index)
          {
+            /* NEEDED */
             case 'h':
-                 help();
-                 break;
+               help();
+               break;
 
+            /* NEEDED */
             case 'v':
-            case 'l':
+               argInfo.verbose = 1;
+               break;
+
+            /* NEEDED */
+            case 'p':
+               argInfo.part = getValue(optarg);
+               if(argInfo.part < 0 || argInfo.part > 3) {
+                  fprintf(stderr, "Partition %d out of range.  Must be 0..3.\n", argInfo.part);
+                  help();
+               }
+
+
+               if( 0 == sprintf(optarg, "%d", argInfo.part)){
+                  perror(optarg);
+
+                  usage(EXIT_FAILURE);
+
+               }
+               /*if(-1 == (argInfo.part = atoi(optarg)))*/
+                  /*usage(EXIT_FAILURE);*/
+               printf("part: %s\n", optarg);
+               break;
+
+            /* NEEDED */
+            case 's':
+               printf("subpart: %s\n", optarg);
+               break;
+
             case 'r':
-                printf("option: %c\n", opt_index);
-                break;
+               printf("option: %c\n", opt_index);
+               break;
 
             case 'f':
-                printf("filename: %s\n", optarg);
-                break;
+               printf("filename: %s\n", optarg);
+               break;
 
-            case 'p': /* needed */
-                if(-1 == (argInfo.part = atoi(optarg)))
-                   usage(EXIT_FAILURE);
-                printf("part: %s\n", optarg);
-                break;
-
-            case 's': /* needed */
-                printf("subpart: %s\n", optarg);
-                break;
 
             case ':':
-                printf("option needs a value\n");
-                break;
+               printf("option needs a value\n");
+               break;
 
             case '?':
-                printf("unknown option: %c\n", optopt);
-                usage(EXIT_FAILURE);
-                break;
+               printf("unknown option: %c\n", optopt);
+               usage(EXIT_FAILURE);
+               break;
          }
 
    for(i = 0 ; optind < argc; optind++){
