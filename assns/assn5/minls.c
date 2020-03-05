@@ -60,10 +60,10 @@ long getValue(char *input)
    long val = -1;
 
    while (*ptr) {
-      if (isdigit(*ptr)) {
+      if (isdigit(*ptr) || *ptr == '-') { /* allow for negative numbers */
          val = strtol(ptr, &ptr, 10);
-         printf("%ld\n", val);
-      } else {
+      }
+      else {
          fprintf(stderr, "%s: badly formed integer.\n", input);
          help();
          ptr++;
@@ -85,52 +85,41 @@ void getArgs(int argc, char *argv[])
    argInfo.path = NULL;
    argInfo.verbose = 0;
 
-   while((opt_index = getopt(argc, argv, ":ifp:lrxh")) != -1)
+   /*funky: to indicate that case requires an optarg write: "s:" */
+
+   while((opt_index = getopt(argc, argv, ":p:s:vh")) != -1)
       switch(opt_index)
          {
-            /* NEEDED */
             case 'h':
                help();
                break;
 
-            /* NEEDED */
             case 'v':
                argInfo.verbose = 1;
                break;
 
-            /* NEEDED */
             case 'p':
-               argInfo.part = getValue(optarg);
+               argInfo.part = getValue(optarg); /* getValue handles type error
+                                                   (badly formed Integer)*/
                if(argInfo.part < 0 || argInfo.part > 3) {
-                  fprintf(stderr, "Partition %d out of range.  Must be 0..3.\n", argInfo.part);
+                  fprintf(stderr, "Partition %d out of range.  %s\n",
+                        argInfo.part, "Must be 0..3.");
                   help();
                }
-
-
-               if( 0 == sprintf(optarg, "%d", argInfo.part)){
-                  perror(optarg);
-
-                  usage(EXIT_FAILURE);
-
-               }
-               /*if(-1 == (argInfo.part = atoi(optarg)))*/
-                  /*usage(EXIT_FAILURE);*/
                printf("part: %s\n", optarg);
                break;
 
             /* NEEDED */
             case 's':
+               argInfo.subpart = getValue(optarg); /* getValue handles type error
+                                                   (badly formed Integer)*/
+               if(argInfo.subpart < 0 || argInfo.subpart > 3) {
+                  fprintf(stderr, "Subpartition %d out of range.  %s\n",
+                        argInfo.subpart, "Must be 0..3.");
+                  help();
+               }
                printf("subpart: %s\n", optarg);
                break;
-
-            case 'r':
-               printf("option: %c\n", opt_index);
-               break;
-
-            case 'f':
-               printf("filename: %s\n", optarg);
-               break;
-
 
             case ':':
                printf("option needs a value\n");
@@ -142,21 +131,26 @@ void getArgs(int argc, char *argv[])
                break;
          }
 
-   for(i = 0 ; optind < argc; optind++){
-      if(i == 0){
+   if(argInfo.subpart != -1 && argInfo.part == -1)
+      fprintf(stderr, "Cannot have a subpartition without a partition.");
 
-      }
 
+   /* handle non-option args */
+   for(i = 0 ; optind < argc; i++, optind++){
+      if(i == 0)
+         argInfo.imagefile = argv[optind];
+      if(i == 1)
+         argInfo.srcpath = argv[optind];
+      if(i == 2)
+         argInfo.path = argv[optind];
       printf("extra arguments: %s\n", argv[optind]);
    }
-
 }
 
 
 int main(int argc, char *argv[])
 {
    getArgs(argc, argv);
-
    return EXIT_SUCCESS;
 }
 
