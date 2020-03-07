@@ -30,6 +30,14 @@ void *safe_malloc(size_t size){
     }
     return ptr;
 }
+void * safe_calloc(size_t nitems, size_t size){
+    void *ptr;
+    if((ptr=calloc(nitems, size))==NULL){
+        printf("malloc error");
+        exit(EXIT_FAILURE);
+    }
+    return ptr;
+}
 
 
 /*******************************PARITION FUNCTIONS*******************************************/

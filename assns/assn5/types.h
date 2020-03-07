@@ -80,6 +80,7 @@ typedef struct minix{
 void safe_fseek(FILE *fp, long int offset, int pos);
 void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 void *safe_malloc(size_t size);
+void *safe_calloc(size_t nitems, size_t size);
 
 
 /*====================PARTITION================================*/
