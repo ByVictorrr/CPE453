@@ -100,11 +100,8 @@ void *safe_calloc(size_t nitems, size_t size);
 bool_t is_part_table_valid(FILE *image, uint32_t start_addr);
 partition_t get_partition(FILE *image, uint32_t addr);
 partition_t read_partition(FILE * image, uint32_t offset, uint32_t im_addr);
-/*                   MF                                          */
 partition_t find_minix_partion(FILE *image, int prim_part, int sub_part);
 void print_partition(superblock_t sb, inode_t * inodes);
-
-/*****************************EO PARTITION*************************************************/
 
 /******************************SUPER BLOCK*******************************************/
 /* Given an image at @parm2 start reading SB from there */
@@ -113,6 +110,10 @@ void print_superBlock(minix_t minix);
 
 /******************************INODE BLOCK*******************************************/
 inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb);
+
+/******************************MINIX structure*******************************************/
+minix_t get_minix(FILE *image, int prim_part, int sub_part);
+
 void print_inode(minix_t minix, inode_t inode);
 
  #endif

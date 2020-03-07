@@ -113,7 +113,6 @@ partition_t find_minix_partion(FILE *image, int prim_part, int sub_part){
     return part;
 }
 
-/*****************************EO PARTITION*************************************************/
 
 
 
@@ -129,7 +128,7 @@ superblock_t get_SB(FILE *image, const uint32_t first_sector){
     return sb;
 }
 
-/******************************INODE BLOCK*******************************************/
+/***************************O GET INODE STRUCTS*******************************************/
 /**
  * @parm image file pointer object
  * @parma first_sector absolute value where first sector is
@@ -144,6 +143,19 @@ inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb){
     return inodes;
 }
 
+/**************************TO GET MINIX STRUCT*****************************************/
+minix_t get_minix(FILE *image, int prim_part, int sub_part){
+    minix_t minix;
+    // step 1 - get minix part
+    minix.part = find_minix_partion(image, prim_part, sub_part);
+    // step 2 - locate the relative address of superblock
+    minix.sb=get_SB(image, minix.part.lFirst*SECTOR_SIZE);
+    // step 3 - skip over inode bit map and zone bit map to get inodes 
+    minix.inodes = get_inodes(image, minix.part.lFirst*SECTOR_SIZE, minix.sb);
+    return minix; 
+}
+
+/**************************************************************************/
 
 void print_partition(superblock_t sb, inode_t * inodes)
 {
