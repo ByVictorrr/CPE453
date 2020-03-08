@@ -17,6 +17,18 @@
 #define DIRECT_ZONES 7
 
 
+#define MASK_DIR  0040000
+#define MASK_O_R  0000400
+#define MASK_O_W  0000200
+#define MASK_O_X  0000100
+#define MASK_G_R  0000040
+#define MASK_G_W  0000020
+#define MASK_G_X  0000010
+#define MASK_OT_R 0000004
+#define MASK_OT_W 0000002
+#define MASK_OT_X 0000001
+#define GET_PERM(mode, mask, c) ( (((mode)&(mask)) == mask) ? c : '-' )
+
 typedef enum BOOL{FALSE,TRUE} bool_t;
 typedef struct __attribute__ ((__packed__)) inode {
       uint16_t mode;            /* mode */
@@ -101,6 +113,6 @@ void print_superBlock(minix_t minix);
 
 /******************************INODE BLOCK*******************************************/
 inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb);
-void print_inode(minix_t minix);
+void print_inode(minix_t minix, inode_t inode);
 
  #endif

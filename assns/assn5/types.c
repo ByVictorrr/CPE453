@@ -182,6 +182,24 @@ drwxr-xr-x      3200 src
 */
 
 
+/************************PRINT FUNCTIONS ************************************************/
+char *get_mode(uint16_t mode)
+{
+   char* permissions = (char *) malloc(sizeof(char) * 11);
+   permissions[0] = GET_PERM(mode, MASK_DIR, 'd');
+   permissions[1] = GET_PERM(mode, MASK_O_R, 'r');
+   permissions[2] = GET_PERM(mode, MASK_O_W, 'w');
+   permissions[3] = GET_PERM(mode, MASK_O_X, 'x');
+   permissions[4] = GET_PERM(mode, MASK_G_R, 'r');
+   permissions[5] = GET_PERM(mode, MASK_G_W, 'w');
+   permissions[6] = GET_PERM(mode, MASK_G_X, 'x');
+   permissions[7] = GET_PERM(mode, MASK_OT_R, 'r');
+   permissions[8] = GET_PERM(mode, MASK_OT_W, 'w');
+   permissions[9] = GET_PERM(mode, MASK_OT_X, 'x');
+
+   permissions[10] = '\0';
+   return permissions;
+}
 
 void printReadableTime(uint32_t time)
 {
@@ -190,38 +208,41 @@ void printReadableTime(uint32_t time)
     printf ("%s", asctime(timeinfo));
 }
 
-void print_inode(minix_t minix)
+void print_inode(minix_t minix, inode_t inode)
 {
    int i;
-   inode_t *inode = minix.inodes
+   /* inode_t *inode = minix.inodes; */
+   char * modeText;
 
    printf("File inode:\n");
 
-   printf("  unsigned short mode %14x    (IDK)", inode->mode);
-   printf("  unsigned short links %14d", inode->links);
-   printf("  unsigned short uid %14d", inode->uid);
-   printf("  unsigned short gid %14d", inode->gid);
+   printf("  unsigned short mode %14x    (%s)", inode.mode,
+         modeText = get_mode(inode.mode));
 
-   printf("  uint32_t  size %9d", inode->size);
+   free(modeText);
 
-   printf("  uint32_t  atime %9d --- ", inode->atime);
-   printReadableTime(inode->atime);
+   printf("  unsigned short links %14d", inode.links);
+   printf("  unsigned short uid %14d", inode.uid);
+   printf("  unsigned short gid %14d", inode.gid);
 
-   printf("  uint32_t  mtime %9d --- ", inode->mtime);
-   printReadableTime(inode->mtime);
+   printf("  uint32_t  size %9d", inode.size);
 
-   printf("  uint32_t  ctime %9d --- ", inode->ctime);
-   printReadableTime(inode->ctime);
+   printf("  uint32_t  atime %9d --- ", inode.atime);
+   printReadableTime(inode.atime);
+
+   printf("  uint32_t  mtime %9d --- ", inode.mtime);
+   printReadableTime(inode.mtime);
+
+   printf("  uint32_t  ctime %9d --- ", inode.ctime);
+   printReadableTime(inode.ctime);
 
    printf("Direct zones:\n");
 
    for(i = 0; i < DIRECT_ZONES; i++)
-      printf("%18s[%d]   = %10d\n", "zone", i, inode->zone[i]);
+      printf("%18s[%d]   = %10d\n", "zone", i, inode.zone[i]);
 
-   printf("   uint32_t  %11s = %10d", "indirect", inode->indirect);
-   printf("   uint32_t  %11s = %10d", "double", inode->two_indirect);
-
-
+   printf("   uint32_t  %11s = %10d", "indirect", inode.indirect);
+   printf("   uint32_t  %11s = %10d", "double", inode.two_indirect);
 }
 
 /*
@@ -285,27 +306,6 @@ void print_superBlock(minix_t minix)
    /* printf("  %s%20d\n", "fileent_size", sb->fileent_size);     */
    /* printf("  %s%20d\n", "max_filename", sb->max_filename);     */
    /* printf("  %s%20d\n", "ent_per_zone", sb->ent_per_zone);     */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
