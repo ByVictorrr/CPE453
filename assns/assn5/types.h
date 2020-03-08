@@ -42,7 +42,7 @@ typedef struct __attribute__ ((__packed__)) dirent{
 typedef struct __attribute__ ((__packed__)) partition{
     uint8_t bootind; /* boot magic number (0x80) if bootable*/
     uint8_t start_head; /* start of partition in CHS*/
-    uint8_t start_sec; 
+    uint8_t start_sec;
     uint8_t start_cyl;
     uint8_t type; /* type of partion (0x81 is minix)*/
     uint8_t end_head; /* end of partion in CHS*/
@@ -90,12 +90,17 @@ partition_t get_partition(FILE *image, uint32_t addr);
 partition_t read_partition(FILE * image, uint32_t offset, uint32_t im_addr);
 /*                   MF                                          */
 partition_t find_minix_partion(FILE *image, int prim_part, int sub_part);
+void print_partition(superblock_t sb, inode_t * inodes);
+
 /*****************************EO PARTITION*************************************************/
 
 /******************************SUPER BLOCK*******************************************/
 /* Given an image at @parm2 start reading SB from there */
 superblock_t get_SB(FILE *image, const uint32_t first_sector);
+void print_superBlock(minix_t minix);
+
 /******************************INODE BLOCK*******************************************/
 inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb);
+void print_inode(minix_t minix);
 
  #endif
