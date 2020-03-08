@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <string.h>
+#include <time.h>
 
 #include "types.h"
 
@@ -41,7 +42,7 @@ void * safe_calloc(size_t nitems, size_t size){
 
 
 /*******************************PARITION FUNCTIONS*******************************************/
-/* 
+/*
 * This function checks to see if the partion table is valid
 */
 bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
@@ -53,18 +54,18 @@ bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
     if(sig != VALID_SIG[0][1]){
         printf("location %d doesnt have signature of %d", VALID_SIG[0][0], VALID_SIG[0][1]);
         return FALSE;
-    }    
+    }
     // step 2 - check at byte 511
     safe_fseek(image, VALID_SIG[1][0]+table_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[1][1]){
         printf("location %d doesnt have signature of %d", VALID_SIG[1][0], VALID_SIG[1][1]);
         return FALSE;
-    } 
+    }
     return TRUE;
 }
 
-/* 
+/*
 * Given and image turn the data at location addr in partition_t
 */
 partition_t get_partition(FILE *image, uint32_t addr){
@@ -88,24 +89,24 @@ partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr){
     return part;
 }
 
-/* 
- Main function for this section, it returns a valid partition or exits (throws msg) 
+/*
+ Main function for this section, it returns a valid partition or exits (throws msg)
 */
 partition_t find_minix_partion(FILE *image, int prim_part, int sub_part){
     partition_t part;
     // step 1 : put @parm2 offset from @parm3 st start of prim part
-    part=read_partition(image, 
+    part=read_partition(image,
         0,
         ADDR_PARTITION_TABLE +  sizeof(partition_t) * prim_part
     );
-    
-    // step 2 : do a similar thing for the sub_partition 
+
+    // step 2 : do a similar thing for the sub_partition
     if(sub_part != -1){
         // @parm2 is how far away if it away from its start addr(the partition)
         part=read_partition(image
             , part.lFirst*SECTOR_SIZE
             , (part.lFirst*SECTOR_SIZE) + ADDR_PARTITION_TABLE
-                                    + sizeof(partition_t)*sub_part 
+                                    + sizeof(partition_t)*sub_part
           );
     }
 
@@ -140,5 +141,171 @@ inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb){
     inode_t *inodes = safe_malloc(sizeof(inode_t)*sb.ninodes);
     safe_fseek(image, LOC, SEEK_SET);
     safe_fread(inodes, sizeof(inode_t), sb.ninodes, image);
-    return inodes; 
+    return inodes;
 }
+
+
+void print_partition(superblock_t sb, inode_t * inodes)
+{
+
+}
+
+/*
+File inode:
+  unsigned short mode         0x41ff    (drwxrwxrwx)
+  unsigned short links             3
+  unsigned short uid               2
+  unsigned short gid               2
+  uint32_t  size            384
+  uint32_t  atime    1141098157 --- Mon Feb 27 19:42:37 2006
+  uint32_t  mtime    1141098157 --- Mon Feb 27 19:42:37 2006
+  uint32_t  ctime    1141098157 --- Mon Feb 27 19:42:37 2006
+
+
+  Direct zones:
+              zone[0]   =         16
+              zone[1]   =          0
+              zone[2]   =          0
+              zone[3]   =          0
+              zone[4]   =          0
+              zone[5]   =          0
+              zone[6]   =          0
+   uint32_t  indirect   =          0
+   uint32_t  double     =          0
+/:
+drwxrwxrwx       384 .
+drwxrwxrwx       384 ..
+-rw-r--r--     73991 Other
+drwxr-xr-x      3200 src
+-rw-r--r--        11 Hello
+
+*/
+
+
+
+void printReadableTime(uint32_t time)
+{
+    time_t raw_time = (time_t) time;
+    struct tm *timeinfo = localtime (&raw_time);
+    printf ("%s", asctime(timeinfo));
+}
+
+void print_inode(minix_t minix)
+{
+   int i;
+   inode_t *inode = minix.inodes
+
+   printf("File inode:\n");
+
+   printf("  unsigned short mode %14x    (IDK)", inode->mode);
+   printf("  unsigned short links %14d", inode->links);
+   printf("  unsigned short uid %14d", inode->uid);
+   printf("  unsigned short gid %14d", inode->gid);
+
+   printf("  uint32_t  size %9d", inode->size);
+
+   printf("  uint32_t  atime %9d --- ", inode->atime);
+   printReadableTime(inode->atime);
+
+   printf("  uint32_t  mtime %9d --- ", inode->mtime);
+   printReadableTime(inode->mtime);
+
+   printf("  uint32_t  ctime %9d --- ", inode->ctime);
+   printReadableTime(inode->ctime);
+
+   printf("Direct zones:\n");
+
+   for(i = 0; i < DIRECT_ZONES; i++)
+      printf("%18s[%d]   = %10d\n", "zone", i, inode->zone[i]);
+
+   printf("   uint32_t  %11s = %10d", "indirect", inode->indirect);
+   printf("   uint32_t  %11s = %10d", "double", inode->two_indirect);
+
+
+}
+
+/*
+
+Superblock Contents:
+Stored Fields:
+  ninodes          768
+  i_blocks           1
+  z_blocks           1
+  firstdata         16
+  log_zone_size      0 (zone size: 4096)
+  max_file  4294967295
+  magic         0x4d5a
+  zones            360
+  blocksize       4096
+  subversion         0
+Computed Fields:
+  version            3
+  firstImap          2
+  firstZmap          3
+  firstIblock        4
+  zonesize        4096
+  ptrs_per_zone   1024
+  ino_per_block     64
+  wrongended         0
+  fileent_size      64
+  max_filename      60
+  ent_per_zone      64
+
+*/
+void print_superBlock(minix_t minix)
+{
+
+   superblock_t sb = minix.sb;
+
+   printf("Superblock Contents:\n");
+
+
+   printf("Stored Fields:\n");
+
+   printf("  %s%20d\n", "ninodes", sb.ninodes);
+   printf("  %s%20d\n", "i_blocks", sb.i_blocks);
+   printf("  %s%20d\n", "z_blocks", sb.z_blocks);
+   printf("  %s%20d\n", "firstdata", sb.firstdata);
+   printf("  %s%20d\n", "log_zone_size", sb.log_zone_size);
+   printf("  %s%20d\n", "max_file", sb.max_file);
+   printf("  %s%20d\n", "magic", sb.magic);
+   printf("  %s%20d\n", "zones", sb.zones);
+   printf("  %s%20d\n", "blocksize", sb.blocksize);
+   printf("  %s%20d\n", "subversion", sb.subversion);
+
+   printf("Computed Fields:\n");
+   /* printf("  %s%20d\n", "version", sb->version);               */
+   /* printf("  %s%20d\n", "firstImap", sb->firstImap);           */
+   /* printf("  %s%20d\n", "firstZmap", sb->firstZmap);           */
+   /* printf("  %s%20d\n", "firstIblock", sb->firstIblock);       */
+   /* printf("  %s%20d\n", "zonesize", sb->zonesize);             */
+   /* printf("  %s%20d\n", "ptrs_per_zone", sb->ptrs_per_zone);   */
+   /* printf("  %s%20d\n", "ino_per_block", sb->ino_per_block);   */
+   /* printf("  %s%20d\n", "wrongended", sb->wrongended);         */
+   /* printf("  %s%20d\n", "fileent_size", sb->fileent_size);     */
+   /* printf("  %s%20d\n", "max_filename", sb->max_filename);     */
+   /* printf("  %s%20d\n", "ent_per_zone", sb->ent_per_zone);     */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
