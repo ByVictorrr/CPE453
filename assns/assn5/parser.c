@@ -71,7 +71,6 @@ void getArgs(int argc, char *argv[], options_t * opt)
 {
    int opt_index = 0;
 
-
    while((opt_index = getopt(argc, argv, ":p:s:vh")) != -1)
       switch(opt_index)
          {
@@ -116,10 +115,6 @@ void getArgs(int argc, char *argv[], options_t * opt)
          }
 
          handleLeftOverArgs(argc, argv, opt);
-
-
-         /* REMOVE: This is for debuging */
-         print_options(minix);
 
 }
 

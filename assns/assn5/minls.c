@@ -46,9 +46,10 @@ void help()
 
 int main(int argc, char *argv[])
 {
-   options_t opt;
-   initOpt(&opt);
-   getArgs(argc, argv, &opt);
+   minix_t minix;
+   initOpt(&minix.opt);
+   getArgs(argc, argv, &minix.opt);
+   set_minix_types(&minix);
 
    return EXIT_SUCCESS;
 }

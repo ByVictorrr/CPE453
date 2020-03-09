@@ -97,39 +97,33 @@ typedef struct minix{
   superblock_t sb;
   bmap_t i_map, z_map;
   inode_t *inodes;
-  options_t *opt;
+  FILE * image;
+  options_t opt;
 }minix_t;
 
+// Wrapper function - so we dont have to worry about mess
 void safe_fseek(FILE *fp, long int offset, int pos);
+// Wrapper function - so we dont have to worry about mess
 void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+// Wrapper function - so we dont have to worry about mess
 void *safe_malloc(size_t size);
-void *safe_calloc(size_t nitems, size_t size);
+void * safe_calloc(size_t nitems, size_t size);
 
 
-/*====================PARTITION================================*/
-
-bool_t is_part_table_valid(FILE *image, uint32_t start_addr);
+/*******************************PARITION FUNCTIONSHELPERS*******************************************/
+bool_t is_part_table_valid(FILE *image, uint32_t table_addr);
 partition_t get_partition(FILE *image, uint32_t addr);
-partition_t read_partition(FILE * image, uint32_t offset, uint32_t im_addr);
-partition_t find_minix_partion(FILE *image, int prim_part, int sub_part);
-void print_partition(superblock_t sb, inode_t * inodes);
-
-/******************************SUPER BLOCK*******************************************/
-/* Given an image at @parm2 start reading SB from there */
-superblock_t get_SB(FILE *image, const uint32_t first_sector);
+partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr);
+/******************************SETTERS*******************************************/
+void set_partition(minix_t *minix);
+void set_SB(minix_t *minix);
+void set_inodes(minix_t *minix);
+void set_minix_types(minix_t *minix);
+/************************PRINT FUNCTIONS ************************************************/
+char *get_mode(uint16_t mode);
+void printReadableTime(uint32_t time);
+void print_inode_metadata(minix_t minix, inode_t inode);
 void print_superBlock(minix_t minix);
-
-/******************************INODE BLOCK*******************************************/
-inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb);
-
-/******************************MINIX structure*******************************************/
-minix_t get_minix(FILE *image, int prim_part, int sub_part);
-
-void print_inode(minix_t minix, inode_t inode);
-
-
-/******************************OPTIONS structure*******************************************/
-
 void print_options(minix_t minix);
 
  #endif

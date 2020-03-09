@@ -41,10 +41,8 @@ void * safe_calloc(size_t nitems, size_t size){
 }
 
 
+/****************************** SETTER FUNCTIONS *******************************************/
 /*******************************PARITION FUNCTIONS*******************************************/
-/*
-* This function checks to see if the partion table is valid
-*/
 bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
     const int VALID_SIG[2][2]={{510, 0x55},{511, 0xAA}};
     uint8_t sig;
@@ -89,109 +87,61 @@ partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr){
     return part;
 }
 
-/*
- Main function for this section, it returns a valid partition or exits (throws msg)
-*/
-partition_t find_minix_partion(FILE *image, int prim_part, int sub_part){
-    partition_t part;
+void set_partition(minix_t *minix){
     // step 1 : put @parm2 offset from @parm3 st start of prim part
-    part=read_partition(image,
+    minix->part=read_partition(minix->image,
         0,
-        ADDR_PARTITION_TABLE +  sizeof(partition_t) * prim_part
+        ADDR_PARTITION_TABLE +  sizeof(partition_t) * minix->opt.part
     );
 
     // step 2 : do a similar thing for the sub_partition
-    if(sub_part != -1){
+    if(minix->opt.subpart != -1){
         // @parm2 is how far away if it away from its start addr(the partition)
-        part=read_partition(image
-            , part.lFirst*SECTOR_SIZE
-            , (part.lFirst*SECTOR_SIZE) + ADDR_PARTITION_TABLE
-                                    + sizeof(partition_t)*sub_part
+        minix->part=read_partition(minix->image
+            , minix->part.lFirst*SECTOR_SIZE
+            , (minix->part.lFirst*SECTOR_SIZE) + ADDR_PARTITION_TABLE
+                                    + sizeof(partition_t)*minix->opt.subpart
           );
     }
-
-    return part;
 }
-
-
-
-
 
 /******************************SUPER BLOCK*******************************************/
 
 /* Given an image at @parm2 start reading SB from there */
-superblock_t get_SB(FILE *image, const uint32_t first_sector){
-    uint32_t LOC = first_sector+BOOT_SIZE;
-    superblock_t sb;
-    safe_fseek(image, LOC, SEEK_SET);
-    safe_fread(&sb, sizeof(superblock_t), 1, image);
-    return sb;
+ void set_SB(minix_t *minix){
+    uint32_t LOC = minix->part.lFirst*SECTOR_SIZE+BOOT_SIZE;
+    safe_fseek(minix->image, LOC, SEEK_SET);
+    safe_fread(&minix->sb, sizeof(superblock_t), 1, minix->image);
 }
 
-/***************************O GET INODE STRUCTS*******************************************/
+/***************************INODE*******************************************/
 /**
  * @parm image file pointer object
  * @parma first_sector absolute value where first sector is
  * @parma sum_blk_maps - sum of sizes of zone and inode maps
  */
-inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb){
-    uint64_t LOC = first_sector
-                    +(2+sb.z_blocks+sb.i_blocks)*sb.blocksize;
-    inode_t *inodes = safe_malloc(sizeof(inode_t)*sb.ninodes);
-    safe_fseek(image, LOC, SEEK_SET);
-    safe_fread(inodes, sizeof(inode_t), sb.ninodes, image);
-    return inodes;
+void set_inodes(minix_t *minix){
+    uint64_t LOC = minix->part.lFirst*SECTOR_SIZE
+                    +(2+minix->sb.z_blocks+minix->sb.i_blocks)*minix->sb.blocksize;
+    minix->inodes = safe_malloc(sizeof(inode_t)*minix->sb.ninodes);
+    safe_fseek(minix->image, LOC, SEEK_SET);
+    safe_fread(minix->inodes, sizeof(inode_t), minix->sb.ninodes, minix->image);
+
 }
 
 /**************************TO GET MINIX STRUCT*****************************************/
-minix_t get_minix(FILE *image, int prim_part, int sub_part){
-    minix_t minix;
-    // step 1 - get minix part
-    minix.part = find_minix_partion(image, prim_part, sub_part);
-    // step 2 - locate the relative address of superblock
-    minix.sb=get_SB(image, minix.part.lFirst*SECTOR_SIZE);
-    // step 3 - skip over inode bit map and zone bit map to get inodes
-    minix.inodes = get_inodes(image, minix.part.lFirst*SECTOR_SIZE, minix.sb);
-    return minix;
+void set_minix_types(minix_t *minix){
+    if((minix->image=fopen(minix->opt.imagefile,"r"))== NULL){
+        printf("No such image exists");
+        exit(EXIT_FAILURE);
+    }
+    set_partition(minix);
+    set_SB(minix);
+    set_inodes(minix);
 }
 
-/**************************************************************************/
+/*****************************END OF SETTER FUNCTION*******************************************/
 
-void print_partition(superblock_t sb, inode_t * inodes)
-{
-
-}
-
-/*
-File inode:
-  unsigned short mode         0x41ff    (drwxrwxrwx)
-  unsigned short links             3
-  unsigned short uid               2
-  unsigned short gid               2
-  uint32_t  size            384
-  uint32_t  atime    1141098157 --- Mon Feb 27 19:42:37 2006
-  uint32_t  mtime    1141098157 --- Mon Feb 27 19:42:37 2006
-  uint32_t  ctime    1141098157 --- Mon Feb 27 19:42:37 2006
-
-
-  Direct zones:
-              zone[0]   =         16
-              zone[1]   =          0
-              zone[2]   =          0
-              zone[3]   =          0
-              zone[4]   =          0
-              zone[5]   =          0
-              zone[6]   =          0
-   uint32_t  indirect   =          0
-   uint32_t  double     =          0
-/:
-drwxrwxrwx       384 .
-drwxrwxrwx       384 ..
--rw-r--r--     73991 Other
-drwxr-xr-x      3200 src
--rw-r--r--        11 Hello
-
-*/
 
 
 /************************PRINT FUNCTIONS ************************************************/
@@ -220,7 +170,7 @@ void printReadableTime(uint32_t time)
     printf ("%s", asctime(timeinfo));
 }
 
-void print_inode(minix_t minix, inode_t inode)
+void print_inode_metadata(minix_t minix, inode_t inode)
 {
    int i;
    /* inode_t *inode = minix.inodes; */
@@ -321,14 +271,13 @@ void print_superBlock(minix_t minix)
 
 }
 
-
 /*
  * This is only called if:
  *     (opt->verbosity > 2)
  */
 void print_options(minix_t minix)
 {
-   options_t *opt = minix.opt;
+   options_t *opt = &minix.opt;
    printf("Options:\n");
 
    printf("  %-15s%-d\n", "otp->part", opt->part);
