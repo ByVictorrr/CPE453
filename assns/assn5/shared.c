@@ -13,10 +13,43 @@
 #define NOT_FOUND -1
 #define DELETED_INODE 0
 #define ROOT_INODE 1
-// used for get_cwd_file
-#define PARENT_INDEX 0
-#define FILE_INDEX 1
-/************************PRINT FUNCTION ************************************************/
+
+
+
+//================================min get===========================================
+void write_file(minix_t *minix, FILE *dest){
+    int src_inode;
+    uint8_t *src_data;
+    char *mode;
+    // step 1 - get inode number of dest
+    if((src_inode = get_inode_num(minix, minix->opt.srcpath)) == NOT_FOUND){
+        printf("destination not found\n");
+        exit(EXIT_FAILURE);
+    }
+    // step 2.1 - check to see its not symlink or directory
+    if(minix->inodes[src_inode].mode & MASK_REG != MASK_REG){
+        // this should be for sym links and dirs
+        printf("Cant get symlinks or directories");
+        exit(EXIT_FAILURE);
+    }
+    // step 2.2 - get contents of src_inode (assumption here is reg file)
+
+
+
+    // step 3 - update minix->inodes[dest_inode] folder with contents
+    safe_fwrite(src_data, sizeof(uint8_t), minix->inodes[src_inode].size, dest);
+}
+
+
+
+// for minget
+uint8_t *get_data(minix_t *minix, int inode_num){
+
+
+}
+
+
+//================================eo min get===========================================
 
 
 /*
@@ -168,10 +201,10 @@ int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
 
 
 // wrapper function of for get INODE_NUM
-int get_inode_num(minix_t *minix){
+int get_inode_num(minix_t *minix, char *_path){
     char *full_path, file_path[1000] = {0};
     char path[1000] = {0};
-    strcpy(file_path, minix->opt.srcpath);
+    strcpy(file_path, path);
     // have to append a / if folder_path isnt given it
     if(file_path[0] != '/'){
         // append it 
@@ -219,7 +252,7 @@ void print_all(minix_t *minix){
     file_t type;
     dirent_t * entrys;
     uint8_t *data;
-    int inode_num = get_inode_num(minix);
+    int inode_num = get_inode_num(minix, minix->opt.srcpath);
 
     
    if((verbosity=minix->opt.verbosity)){

@@ -15,8 +15,9 @@
 #define BOOT_SIZE 1024
 #define SUPER_BLOCK_SIZE BOOT_SIZE
 #define DIRECT_ZONES 7
+#define UNPARITIONED -1
 
-
+#define MASK_REG  0100000
 #define MASK_DIR  0040000
 #define MASK_O_R  0000400
 #define MASK_O_W  0000200
@@ -80,7 +81,7 @@ typedef struct __attribute__ ((__packed__)) super_block {
   uint8_t subversion; /* filesystem sub-version */
 } superblock_t;
 
-typedef uint64_t bmap_t;
+typedef uint8_t* bmap_t;
 
 
 typedef struct {
@@ -109,8 +110,8 @@ void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 // Wrapper function - so we dont have to worry about mess
 void *safe_malloc(size_t size);
 void * safe_calloc(size_t nitems, size_t size);
-
-
+FILE *safe_fopen(char *path, char *RW);
+size_t safe_fwrite(const void *ptr, size_t size, size_t nitems, FILE *stream);
 /*******************************PARITION FUNCTIONSHELPERS*******************************************/
 bool_t is_part_table_valid(FILE *image, uint32_t table_addr);
 partition_t get_partition(FILE *image, uint32_t addr);
@@ -119,6 +120,8 @@ partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr);
 void set_partition(minix_t *minix);
 void set_SB(minix_t *minix);
 void set_inodes(minix_t *minix);
+void set_zmap(minix_t *minix);
+void set_imap(minix_t *minix);
 void set_minix_types(minix_t *minix);
 /************************PRINT FUNCTIONS ************************************************/
 char *get_mode(uint16_t mode);

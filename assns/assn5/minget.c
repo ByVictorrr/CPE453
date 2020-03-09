@@ -11,6 +11,7 @@
 
 #include "types.h"
 #include "parser.h"
+#include "shared.h"
 
 #define NO_EXIT EXIT_SUCCESS
 
@@ -41,7 +42,29 @@ void help()
 
 int main(int argc, char *argv[]) {
 
-   printf("Hello World\n");
+   FILE *output;
+   minix_t minix;
+   // TODO: ethan parse
+   minix.opt.part=UNPARITIONED;
+   minix.opt.subpart=UNPARITIONED;
+   minix.opt.imagefile="Images/TestImage";
+   minix.opt.dstpath="test_get/file1";
+   minix.opt.srcpath="/bin";
+
+   if(minix.opt.dstpath == NULL){
+         output=stdout;
+   }else{
+         output=safe_fopen(minix.opt.dstpath, "w");
+   }
+
+      set_minix_types(&minix);
+
+
+
+
+
+
+
    return 0;
 
 }

@@ -7,7 +7,7 @@
 
 #include "types.h"
 
-#define UNPARITIONED -1
+
 
 // Wrapper function - so we dont have to worry about mess
 void safe_fseek(FILE *fp, long int offset, int pos){
@@ -35,12 +35,27 @@ void *safe_malloc(size_t size){
 void * safe_calloc(size_t nitems, size_t size){
     void *ptr;
     if((ptr=calloc(nitems, size))==NULL){
-        printf("malloc error");
+        printf("calloc error");
         exit(EXIT_FAILURE);
     }
     return ptr;
 }
-
+FILE *safe_fopen(char *path, char *RW){
+    FILE *image;
+    if((image=fopen(path,RW))== NULL){
+        printf("No such image exists");
+        exit(EXIT_FAILURE);
+    }
+    return image;
+}
+size_t safe_fwrite(const void *ptr, size_t size, size_t nitems, FILE *stream){
+    size_t read;
+    if((read=fwrite(ptr, size, nitems, stream)) < nitems){
+        printf("fwrite failed\n");
+        exit(EXIT_FAILURE);
+    }
+    return read;
+}
 
 /****************************** SETTER FUNCTIONS *******************************************/
 /*******************************PARITION FUNCTIONS*******************************************/
@@ -148,15 +163,27 @@ void set_inodes(minix_t *minix){
     safe_fread(minix->inodes+1, sizeof(inode_t), minix->sb.ninodes, minix->image);
 
 }
+/**************************BIT MAPS**************************************************/
+
+void set_zmap(minix_t *minix){
+    minix->z_map = safe_calloc(1, minix->sb.blocksize);
+    safe_fseek(minix->image, 3*minix->sb.blocksize, SEEK_SET);
+    safe_fread(minix->z_map, minix->sb.blocksize, 1, minix->image);
+
+}
+void set_imap(minix_t *minix){
+    minix->i_map = safe_calloc(1, minix->sb.blocksize);
+    safe_fseek(minix->image, 2*minix->sb.blocksize, SEEK_SET);
+    safe_fread(minix->i_map, minix->sb.blocksize, 1, minix->image);
+}
 
 /**************************TO GET MINIX STRUCT*****************************************/
 void set_minix_types(minix_t *minix){
-    if((minix->image=fopen(minix->opt.imagefile,"r"))== NULL){
-        printf("No such image exists");
-        exit(EXIT_FAILURE);
-    }
+    minix->image=safe_fopen(minix->opt.imagefile, "r");
     set_partition(minix);
     set_SB(minix);
+    set_imap(minix);
+    set_zmap(minix);
     set_inodes(minix);
 }
 

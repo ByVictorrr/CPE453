@@ -50,15 +50,18 @@ int main(int argc, char *argv[])
    minix_t minix;
    initOpt(&minix.opt);
    getArgs(argc, argv, &minix.opt);
+
    set_minix_types(&minix);
 
    char default_path[2]  = {'/', 0};
    if(minix.opt.srcpath == NULL){
       minix.opt.srcpath = default_path;
    }
+
    // step 1 - find file output it
    print_all(&minix);
 
+   free(minix.inodes);
    return EXIT_SUCCESS;
 }
 

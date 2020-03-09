@@ -9,7 +9,7 @@ OBJECTS  = $(SOURCES:.c=.o)
 
 
 LS_OBJECTS  = minls.o types.o parser.o path.o shared.o
-GET_OBJECTS  = minget.o types.o parser.o
+GET_OBJECTS  = minget.o types.o parser.o shared.o path.o
 
 TARGETS = minls minget
 
@@ -19,8 +19,8 @@ all: $(TARGETS)
 minls: $(LS_OBJECTS)
 	$(CC) -o $@ $(LDFLAGS) $(LS_OBJECTS)
 
-#minget: $(GET_OBJECTS)
-#	$(CC) -o $@ $(LDFLAGS) $(GET_OBJECTS)
+minget: $(GET_OBJECTS)
+	$(CC) -o $@ $(LDFLAGS) $(GET_OBJECTS)
 
 
 #minls.o: minls.c
@@ -35,8 +35,11 @@ minls: $(LS_OBJECTS)
 $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
-gdb: minls
+gdb_ls: minls
 	gdb -tui --args minls Images/$(image)
+
+gdb_get: minget
+	gdb -tui minget
 
 clean:
 	rm -f $(TARGET) $(TARGETS) $(OBJECTS)
