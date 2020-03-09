@@ -1,19 +1,20 @@
 TARGET   = a.out
 CC       = gcc
 LD       = gcc
-CCFLAGS  = -pedantic -Wall -Werror -fpic -g
+CCFLAGS  = -pedantic -Wall -fpic -g
 LDFLAGS  = -Wall -g -L. -lm
 SOURCES  = $(wildcard *.c)
 INCLUDES = $(wildcard *.h)
 OBJECTS  = $(SOURCES:.c=.o)
 
 
-LS_OBJECTS  = minls.o minfs.o
-GET_OBJECTS  = minget.o minfs.o
+LS_OBJECTS  = minls.o types.o parser.o
+GET_OBJECTS  = minget.o types.o parser.o
+
+TARGETS = minls minget
 
 
-
-all: minls minget
+all: $(TARGETS)
 
 minls: $(LS_OBJECTS)
 	$(CC) -o $@ $(LDFLAGS) $(LS_OBJECTS)
@@ -35,4 +36,4 @@ $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(TARGET) $(TARGETS) $(OBJECTS)

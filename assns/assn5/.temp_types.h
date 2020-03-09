@@ -1,6 +1,7 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 #include <stdint.h>
+#include <stdint.h>
 
 #define LENGTH 1000
 // In bytes
@@ -81,23 +82,12 @@ typedef struct __attribute__ ((__packed__)) super_block {
 
 typedef uint64_t bmap_t;
 
-
-typedef struct {
-   int8_t  part;
-   int8_t  subpart;
-   char     *imagefile;
-   char     *srcpath;
-   char     *dstpath;
-   int8_t  verbosity;
-} options_t;
-
-
 typedef struct minix{
   partition_t part;
   superblock_t sb;
   bmap_t i_map, z_map;
   inode_t *inodes;
-  options_t *opt;
+  options_t opt;
 }minix_t;
 
 void safe_fseek(FILE *fp, long int offset, int pos);
@@ -126,10 +116,5 @@ inode_t *get_inodes(FILE *image,const uint32_t first_sector, superblock_t sb);
 minix_t get_minix(FILE *image, int prim_part, int sub_part);
 
 void print_inode(minix_t minix, inode_t inode);
-
-
-/******************************OPTIONS structure*******************************************/
-
-void print_options(minix_t minix);
 
  #endif

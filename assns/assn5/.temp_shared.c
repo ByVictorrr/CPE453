@@ -4,12 +4,42 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <string.h>
-#include <math.h>
 
 
 #include "types.h"
 #include "path.h"
 #define MIN(a,b) ((a) < (b) ? (a):(b))
+
+#define MASK_DIR  0040000
+#define MASK_O_R  0000400
+#define MASK_O_W  0000200
+#define MASK_O_X  0000100
+#define MASK_G_R  0000040
+#define MASK_G_W  0000020
+#define MASK_G_X  0000010
+#define MASK_OT_R 0000004
+#define MASK_OT_W 0000002
+#define MASK_OT_X 0000001
+#define GET_PERM(mode, mask, c) ( (((mode)&(mask)) == mask) ? c : '-' )
+
+/************************PRINT FUNCTION ************************************************/
+char *get_mode(uint16_t mode)
+{
+   char* permissions = (char *) malloc(sizeof(char) * 11);
+   permissions[0] = GET_PERM(mode, MASK_DIR, 'd');
+   permissions[1] = GET_PERM(mode, MASK_O_R, 'r');
+   permissions[2] = GET_PERM(mode, MASK_O_W, 'w');
+   permissions[3] = GET_PERM(mode, MASK_O_X, 'x');
+   permissions[4] = GET_PERM(mode, MASK_G_R, 'r');
+   permissions[5] = GET_PERM(mode, MASK_G_W, 'w');
+   permissions[6] = GET_PERM(mode, MASK_G_X, 'x');
+   permissions[7] = GET_PERM(mode, MASK_OT_R, 'r');
+   permissions[8] = GET_PERM(mode, MASK_OT_W, 'w');
+   permissions[9] = GET_PERM(mode, MASK_OT_X, 'x');
+
+   permissions[10] = '\0';
+   return permissions;
+}
 
 void print_dir(dirent_t *dir, minix_t minix, int size){
     int i, inode_num;
@@ -24,113 +54,45 @@ void print_dir(dirent_t *dir, minix_t minix, int size){
 
 /************************PRINT FUNCTION ************************************************/
 
-typedef enum{REGULAR, DIRECTORY} file_t;
-/*
-* A general function that where we can read data from zones given by @parm2
-* @parm1 minix structure to give us info we need
-* @parm2 zones[DIRECT_ZONES] giving us the zones to read from
-* @parm3 type of file we are reading from
-* @parm4 image were we read from
-* @parm5 were we are putting all the data
-*
-* @return the amount of size left to read in bytes
-*/
-int read_direct_inode(
-                  const minix_t minix,
-                  uint32_t zones[DIRECT_ZONES],
-                  int size,
-                  file_t type,
-                  FILE * image,
-                  uint8_t *data
-                     ){
 
+typedef enum{REGULAR, DIRECTORY} file_t;
+// returns the data blocks associated with that inode (from)
+void * read_inode(const minix_t minix,
+                  const inode_t from,
+                  file_t type,
+                  FILE * image
+                     ){
     int ZONE_SIZE = minix.sb.blocksize << minix.sb.log_zone_size;
     uint8_t i, data_index, b_left;
-    // to keep track how many block we need to read
+    void *data = safe_calloc(from.size, sizeof(uint8_t));
     int type_size;
-    // step 1 - for the function to return and not read all the direct zones
-    if(size <= 0){
-        return -1;
-    }
-    // step 2 - determine if inode is dirent or reg file
+
+    // step 1 - determine if inode is dirent or reg file
     if(type==DIRECTORY){
        type_size = sizeof(dirent_t);
     }else{
         type_size = sizeof(uint8_t);
     }
-    b_left = size;
+
+    b_left = from.size;
     for (i=0; i< DIRECT_ZONES && b_left; i++){
         // to determine what size to read
         int read_size = MIN(b_left, ZONE_SIZE);
         // index where we are in reading data
-        data_index = size - b_left;
-        if(zones[i] == 0){
+        data_index = from.size - b_left;
+        if(from.zone[i] == 0){
             continue;
         }
         safe_fseek(image,
             minix.part.lFirst*SECTOR_SIZE + // start of part
-            zones[i]*ZONE_SIZE, // zone in bytes
+            from.zone[i]*ZONE_SIZE, // zone in bytes
             SEEK_SET
         );
         safe_fread(data + data_index, type_size, read_size, image);
         b_left = b_left-read_size;
     }
-    return b_left;
-}
-uint32_t *read_indirect_zones(minix_t minix, inode_t from, FILE * image){
-    // step 1 - read from the
-    static uint32_t dir_zones[DIRECT_ZONES];
-    int BLOCKS_PER_ZONE = pow(2.0, minix.sb.log_zone_size);
-    safe_fseek(image,
-        minix.part.lFirst*SECTOR_SIZE+
-        from.indirect
-        ,SEEK_SET
-    );
-    memset(dir_zones, 0, DIRECT_ZONES);
-    // read into dir_zones the data of each direct zone at indirect block
-    safe_fread(dir_zones, minix.sb.blocksize, BLOCKS_PER_ZONE, image);
-    return dir_zones;
-}
-/**
- *
- */
-uint32_t *read_double_indirect_zones(minix_t minix, inode_t from , FILE *image){
-    uint32_t two_indirect = from.two_indirect;
-    uint32_t indirect_zones[DIRECT_ZONES];
-    static uint32_t zones[DIRECT_ZONES*DIRECT_ZONES];
-    int ZONE_SIZE = minix.sb.blocksize << minix.sb.log_zone_size;
-    int BLOCKS_PER_ZONE = pow(2.0, minix.sb.log_zone_size);
-    int i;
-    safe_fseek(image,
-        minix.part.lFirst*SECTOR_SIZE+
-        from.two_indirect
-        ,SEEK_SET
-    );
-    // step 1 - read all direct zones from the double indirect zone
-    safe_fread(indirect_zones, minix.sb.blocksize, BLOCKS_PER_ZONE, image);
-    // step 2 - go through every indirect zone and get the direct one
-    for ( i = 0; i < DIRECT_ZONES; i++){
-        // for each indirect zone read the data from it
-       read_indirect_zones(minix, from, image);
-    }
-    return zones;
-}
 
-// Reads data from direct zones, indirect zones and then double indirect zones
-void *read_inode(const minix_t minix, inode_t from, file_t type, FILE *image){
-    void *data = safe_calloc(from.size, sizeof(uint8_t));
-    unsigned int bytes_left;
-    uint32_t zones[DIRECT_ZONES];
-    // step 1 - read direct zones
-    bytes_left = read_direct_inode(minix,from.zone, from.size, type, image, data);
-    /*
-    // step 2 - read indirect zones and then from that read those
-    memcpy(zones, read_indirect_zones(minix, from, image), 2);
-    bytes_left = read_direct_inode(minix, zones , bytes_left, type, image, data);
-    // step 3 - read double direct zones then read each indirect zones
-    memcpy(zones, read_indirect_zones(minix, from, image), 2);
-    bytes_left = read_direct_inode(minix, "fill in with zones of double indirect",bytes_left, type, image, data);
-    */
+    // TODO : the other zones
     return data;
 }
 
@@ -193,25 +155,29 @@ inode_t find_file(minix_t minix, FILE *image, char *file_path){
 }
 
 
-
-
-
-/**********************************************************************************/
-
 /**
  * This function is used for ls minix
  */
 void read_file(FILE *image, char * src_path, int prim_part, int sub_part){
     uint32_t start_addr; // in bytes
     inode_t dest; // destination data files
+    uint8_t *data;
     minix_t minix;
-    // Step 1 - get sb, partition, inodes store in minix strucutre
-    minix=get_minix(image,prim_part, sub_part);
-    // Step 2 - get inode for src_path
+    // step 1 - get minix part
+    minix.part = find_minix_partion(image, prim_part, sub_part);
+    // absolute first sector of given partition in bytes
+    start_addr=minix.part.lFirst*SECTOR_SIZE;
+    // step 2 - locate the relative address of superblock
+    minix.sb=get_SB(image, start_addr);
+    // step 3 - skip over inode bit map and zone bit map to get inodes
+    minix.inodes = get_inodes(image, start_addr, minix.sb);
+    // step 5 - read file of src_path
     dest = find_file(minix, image, src_path);
-    // step 3 - print out contents of
-    print_inode(minix, dest);
+    // step 6 - print out contents of that inode (this is for reading for the get)
+    print_inode();
 }
+/**********************************************************************************/
+
 
 int main(){
     FILE * image;

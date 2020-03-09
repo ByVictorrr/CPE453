@@ -292,19 +292,19 @@ void print_superBlock(minix_t minix)
 
    printf("Superblock Contents:\n");
 
+
    printf("Stored Fields:\n");
 
-   printf("  %-20s%-d\n", "ninodes", sb.ninodes);
-   printf("  %-20s%-d\n", "i_blocks", sb.i_blocks);
-   printf("  %-20s%-d\n", "z_blocks", sb.z_blocks);
-   printf("  %-20s%-d\n", "firstdata", sb.firstdata);
-   /*ADD (zone size: %d)*/
-   printf("  %-20s%-d\n", "log_zone_size", sb.log_zone_size);
-   printf("  %-20s%-d\n", "max_file", sb.max_file);
-   printf("  %-20s%-d\n", "magic", sb.magic);
-   printf("  %-20s%-d\n", "zones", sb.zones);
-   printf("  %-20s%-d\n", "blocksize", sb.blocksize);
-   printf("  %-20s%-d\n", "subversion", sb.subversion);
+   printf("  %s%20d\n", "ninodes", sb.ninodes);
+   printf("  %s%20d\n", "i_blocks", sb.i_blocks);
+   printf("  %s%20d\n", "z_blocks", sb.z_blocks);
+   printf("  %s%20d\n", "firstdata", sb.firstdata);
+   printf("  %s%20d\n", "log_zone_size", sb.log_zone_size);
+   printf("  %s%20d\n", "max_file", sb.max_file);
+   printf("  %s%20d\n", "magic", sb.magic);
+   printf("  %s%20d\n", "zones", sb.zones);
+   printf("  %s%20d\n", "blocksize", sb.blocksize);
+   printf("  %s%20d\n", "subversion", sb.subversion);
 
    printf("Computed Fields:\n");
    /* printf("  %s%20d\n", "version", sb->version);               */
@@ -321,19 +321,29 @@ void print_superBlock(minix_t minix)
 
 }
 
-
 /*
- * This is only called if:
- *     (opt->verbosity > 2)
- */
-void print_options(minix_t minix)
+Options:
+  opt->part      -1
+  opt->subpart   -1
+  opt->imagefile Images/TestImage
+  opt->srcpath   (null)
+  opt->dstpath   (null)
+
+
+  This is only called if:
+      (opt->verbosity > 2)
+*/
+void print_Options(minix_t minix)
 {
-   options_t *opt = minix.opt;
+
+   options_t opt = minix.opt;
    printf("Options:\n");
 
-   printf("  %-15s%-d\n", "otp->part", opt->part);
-   printf("  %-15s%-d\n", "otp->subpart", opt->subpart);
-   printf("  %-15s%-s\n", "otp->imagefile", opt->imagefile);
-   printf("  %-15s%-s\n", "otp->srcpath", opt->srcpath);
-   printf("  %-15s%-s\n", "otp->dstpath", opt->dstpath);
+   printf("  %s%20d\n", "otp->part", opt->part);
+   printf("  %s%20d\n", "otp->subpart", opt->subpart);
+   printf("  %s%20d\n", "otp->imagefile", opt->imagefile);
+   printf("  %s%20d\n", "otp->srcpath", opt->srcpath);
+   printf("  %s%20d\n", "otp->dstpath", opt->dstpath);
+
+
 }
