@@ -59,6 +59,9 @@ int main(int argc, char *argv[]) {
 
       set_minix_types(&minix);
       write_file(&minix, output);
+      fclose(output);
+      fclose(minix.image);
+      free(minix.inodes);
 
 
 
