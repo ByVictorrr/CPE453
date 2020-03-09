@@ -36,7 +36,7 @@ $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
 gdb: minls
-	gdb -tui --args minls Images/SmallBlocks--1k /DirOne
+	gdb -tui --args minls Images/SmallBlocks--1k /DirOne/FileOne
 
 clean:
 	rm -f $(TARGET) $(TARGETS) $(OBJECTS)

@@ -13,6 +13,7 @@ void basename_path(const char *path, char*base_name_path){
     // case 1 - where root is in path
     if(path[0] == '/'){
         strcpy(base_name_path, path+1);
+        return;
     }
     // case 2 - where name of curr dir then / followed
     for(i=0; i < strlen(path); i++){
@@ -20,4 +21,13 @@ void basename_path(const char *path, char*base_name_path){
             strcpy(base_name_path, path+i+1);
         }
     }
+}
+// wrapper to dirname to help support when return . it will give back the name instead
+char *get_dirname(char *path){
+    char *base_dir_name = safe_calloc(strlen(path), sizeof(char));
+    strcpy(base_dir_name, path);
+    if(strcmp(dirname(base_dir_name), ".")==0){
+        strcpy(base_dir_name, path);
+    }
+    return base_dir_name;
 }
