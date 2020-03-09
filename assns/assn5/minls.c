@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
    print_all(&minix);
 
    free(minix.inodes);
+   fclose(minix.image);
    return EXIT_SUCCESS;
 }
 

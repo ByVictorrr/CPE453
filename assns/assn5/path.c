@@ -19,15 +19,19 @@ void basename_path(const char *path, char*base_name_path){
     for(i=0; i < strlen(path); i++){
         if(path[i]== '/'){
             strcpy(base_name_path, path+i+1);
+            return;
         }
     }
 }
 // wrapper to dirname to help support when return . it will give back the name instead
 char *get_dirname(char *path){
     char *base_dir_name = safe_calloc(strlen(path), sizeof(char));
+    char buff[1000] = {0};
     strcpy(base_dir_name, path);
-    if(strcmp(dirname(base_dir_name), ".")==0){
-        strcpy(base_dir_name, path);
+    strcpy(buff, base_dir_name);
+    while(strcmp(dirname(base_dir_name),".") != 0){
+        strcpy(buff, base_dir_name);
     }
+    strcpy(base_dir_name, buff);
     return base_dir_name;
 }

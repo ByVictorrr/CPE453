@@ -33,7 +33,7 @@ void write_file(minix_t *minix, FILE *dest){
         exit(EXIT_FAILURE);
     }
     // step 2.2 - get contents of src_inode (assumption here is reg file)
-
+    src_data = get_data(minix, &minix->inodes[src_inode]);
 
 
     // step 3 - update minix->inodes[dest_inode] folder with contents
@@ -42,25 +42,20 @@ void write_file(minix_t *minix, FILE *dest){
 
 
 
-// for minget
-uint8_t *get_data(minix_t *minix, int inode_num){
-
-
-}
 
 
 //================================eo min get===========================================
 
-
 /*
-* A general function that allows us to read from an inode
-* returns the index of where entrys is
+* A general function that allows us to read from an inode direct blocks
+* size - size of reading type 
 */
-int set_entrys(const minix_t *minix, uint32_t *zones, int num_zones, int size ,int index, dirent_t * entrys){
+int set_data(const minix_t *minix, uint32_t *zones, 
+             int num_zones, int bleft ,int index, void * data, size_t type_size){
                     
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     int i, j; 
-    uint32_t b_left = size;
+    uint32_t b_left = bleft;
     // go through every direct zones
     for (i=0; i< num_zones && b_left; i++){
         // to determine what size to read
@@ -77,12 +72,17 @@ int set_entrys(const minix_t *minix, uint32_t *zones, int num_zones, int size ,i
         );
         // read each entry in that zone
         while(read_size > 0){
-            safe_fread(entrys+index, sizeof(dirent_t), 1, minix->image);
-            read_size -= sizeof(dirent_t);
+            if(type_size == sizeof(dirent_t)){
+                safe_fread(((dirent_t*)data)+index, type_size, 1, minix->image);
+            }else{
+                safe_fread(((uint8_t*)data)+index, type_size, 1, minix->image);
+            }
+            read_size -= type_size;
             index++;
         }
         b_left = b_left-r_size;
     }
+
     return index;
 }
 uint32_t *read_indirect_zones(const minix_t *minix, uint32_t indirect, int *num_zones){
@@ -108,38 +108,45 @@ uint32_t *read_indirect_zones(const minix_t *minix, uint32_t indirect, int *num_
 }
 
 // wrapper function for get_entrys
-dirent_t *get_entrys(const minix_t *minix, const inode_t *dir){
+void *get_data(const minix_t *minix, const inode_t *inode){
     int index=0, j=0;
-    dirent_t *entrys;
+    void *data;
     uint32_t b_left, *indirect, *two_indirect;
     int num_zones = 0, inner_num_zones=0;
-    entrys=safe_calloc(dir->size, sizeof(dirent_t));
+    size_t type_size;
+    // check if directory or file
+    if(get_type(inode) == DIRECTORY){
+        type_size=sizeof(dirent_t);
+    }else{
+        type_size=sizeof(uint8_t);
+    }
+    data=safe_calloc(inode->size/type_size, type_size);
     // step 1 - go through direct zones
-    index = set_entrys(minix, dir->zone, DIRECT_ZONES, dir->size, index, entrys);
+    index = set_data(minix, inode->zone, DIRECT_ZONES, inode->size, index, data, type_size);
     // check if we need to go through indirect zones
-    if((b_left = dir->size - index*sizeof(dirent_t))!= 0 && dir->indirect){
+    if((b_left = inode->size - index*type_size) != 0 && inode->indirect){
        // step 2 - go through indirect zones if needed
-        indirect = read_indirect_zones(minix, dir->indirect, &num_zones);
-        index = set_entrys(minix, indirect, num_zones, b_left, index, entrys);
-        b_left = dir->size - index*sizeof(dirent_t);
+        indirect = read_indirect_zones(minix, inode->indirect, &num_zones);
+        index = set_data(minix, indirect, num_zones, b_left, index, data, type_size);
+        b_left = inode->size - index*type_size;
         free(indirect);
     }
     // ceck to see if we need go through double indirect
-    if(b_left != 0 && dir->two_indirect){
+    if(b_left != 0 && inode->two_indirect){
         // step 3 - go through every double indirect zones
-        two_indirect = read_indirect_zones(minix, dir->two_indirect, &num_zones);
+        two_indirect = read_indirect_zones(minix, inode->two_indirect, &num_zones);
         for(j=0; j< num_zones && b_left; j++){
             // for each single indirect zone
             indirect = read_indirect_zones(minix, two_indirect[j], &inner_num_zones);
-            index = set_entrys(minix, indirect, inner_num_zones, b_left, index, entrys);
-            b_left = dir->size - index*sizeof(dirent_t);
+            index = set_data(minix, indirect, inner_num_zones, b_left, index, data, type_size);
+            b_left = inode->size - index*type_size;
             free(indirect);
         }
         free(two_indirect);
     }
      
     // size of each indirect address
-    return entrys;
+    return data;
 }
 
 
@@ -187,7 +194,7 @@ int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
         return inode_num;
     }else{
         // step 1 - get entrys from c
-        entrys = get_entrys(minix, &minix->inodes[inode_num]);
+        entrys = get_data(minix, &minix->inodes[inode_num]);
         // step 2 - remove current directory from path
         basename_path(file_path, next_path);
         // step 3 - get the inode num for that next entry
@@ -204,7 +211,7 @@ int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
 int get_inode_num(minix_t *minix, char *_path){
     char *full_path, file_path[1000] = {0};
     char path[1000] = {0};
-    strcpy(file_path, path);
+    strcpy(file_path, _path);
     // have to append a / if folder_path isnt given it
     if(file_path[0] != '/'){
         // append it 
@@ -222,8 +229,8 @@ int get_inode_num(minix_t *minix, char *_path){
 /**********************************************************************************/
 
 
-file_t get_type(inode_t file){
-    if(GET_PERM(file.mode, MASK_DIR, 'd') == 'd'){
+file_t get_type(inode_t *file){
+    if(GET_PERM(file->mode, MASK_DIR, 'd') == 'd'){
         return DIRECTORY;
     }
     return REGULAR;
@@ -265,8 +272,8 @@ void print_all(minix_t *minix){
    }
 
    // print contents of inode
-   if(get_type(minix->inodes[inode_num]) == DIRECTORY){
-       entrys=get_entrys(minix, &minix->inodes[inode_num]);
+   if(get_type(&minix->inodes[inode_num]) == DIRECTORY){
+       entrys=get_data(minix, &minix->inodes[inode_num]);
        // print out each file in that directory
        print_directory(minix, entrys, &minix->inodes[inode_num]);
    }else{

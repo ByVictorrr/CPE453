@@ -45,11 +45,11 @@ int main(int argc, char *argv[]) {
    FILE *output;
    minix_t minix;
    // TODO: ethan parse
-   minix.opt.part=UNPARITIONED;
-   minix.opt.subpart=UNPARITIONED;
-   minix.opt.imagefile="Images/TestImage";
+   minix.opt.part=0;
+   minix.opt.subpart=2;
+   minix.opt.imagefile="Images/HardDisk";
    minix.opt.dstpath="test_get/file1";
-   minix.opt.srcpath="/bin";
+   minix.opt.srcpath="/home/pnico/Message";
 
    if(minix.opt.dstpath == NULL){
          output=stdout;
@@ -58,8 +58,7 @@ int main(int argc, char *argv[]) {
    }
 
       set_minix_types(&minix);
-
-
+      write_file(&minix, output);
 
 
 
