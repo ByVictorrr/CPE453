@@ -7,7 +7,7 @@
  * Takes in a path as a string and then gives you back
  * a base_name_path which is cutting off a directory above the path
  * */
-void basename_path(char *path, char*base_name_path){
+void basename_path(const char *path, char*base_name_path){
     // step 1 - look for "/"" or name till next /
     int i=0;
     // case 1 - where root is in path

@@ -11,6 +11,7 @@
 #define MINIX_PART 0x81
 // minix 3 magic number (little endian)
 #define MINIX_MAGIC 0x4D5A
+#define REV_MINIX_MAGIC 0x5A4D
 #define BOOT_SIZE 1024
 #define SUPER_BLOCK_SIZE BOOT_SIZE
 #define DIRECT_ZONES 7
@@ -122,8 +123,8 @@ void set_minix_types(minix_t *minix);
 /************************PRINT FUNCTIONS ************************************************/
 char *get_mode(uint16_t mode);
 void printReadableTime(uint32_t time);
-void print_inode_metadata(minix_t minix, inode_t inode);
-void print_superBlock(minix_t minix);
-void print_options(minix_t minix);
+void print_inode_metadata(minix_t *minix, inode_t inode);
+void print_superBlock(minix_t *minix);
+void print_options(minix_t *minix);
 
  #endif

@@ -14,6 +14,7 @@
 
 #include "types.h"
 #include "parser.h"
+#include "shared.h"
 
 #define NO_EXIT EXIT_SUCCESS
 
@@ -50,6 +51,13 @@ int main(int argc, char *argv[])
    initOpt(&minix.opt);
    getArgs(argc, argv, &minix.opt);
    set_minix_types(&minix);
+
+   char default_path[2]  = {'/', 0};
+   if(minix.opt.srcpath == NULL){
+      minix.opt.srcpath = default_path;
+   }
+   // step 1 - find file output it
+   print_all(&minix);
 
    return EXIT_SUCCESS;
 }

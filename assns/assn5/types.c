@@ -7,18 +7,19 @@
 
 #include "types.h"
 
+#define UNPARITIONED -1
 
 // Wrapper function - so we dont have to worry about mess
 void safe_fseek(FILE *fp, long int offset, int pos){
     if(fseek(fp, offset,  pos) != 0){
-        printf("seek error");
+        printf("seek error\n");
         exit(EXIT_FAILURE);
     }
 }
 // Wrapper function - so we dont have to worry about mess
 void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
     if(fread(ptr, size,nmemb, stream) < 0){
-        printf("read error");
+        printf("read error\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -26,7 +27,7 @@ void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
 void *safe_malloc(size_t size){
     void *ptr;
     if((ptr=malloc(size))==NULL){
-        printf("malloc error");
+        printf("malloc error\n");
         exit(EXIT_FAILURE);
     }
     return ptr;
@@ -89,13 +90,14 @@ partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr){
 
 void set_partition(minix_t *minix){
     // step 1 : put @parm2 offset from @parm3 st start of prim part
-    minix->part=read_partition(minix->image,
-        0,
-        ADDR_PARTITION_TABLE +  sizeof(partition_t) * minix->opt.part
-    );
-
+    if(minix->opt.part != UNPARITIONED){
+        minix->part=read_partition(minix->image,
+            0,
+            ADDR_PARTITION_TABLE +  sizeof(partition_t) * minix->opt.part
+        );
+    }
     // step 2 : do a similar thing for the sub_partition
-    if(minix->opt.subpart != -1){
+    if(minix->opt.subpart != UNPARITIONED){
         // @parm2 is how far away if it away from its start addr(the partition)
         minix->part=read_partition(minix->image
             , minix->part.lFirst*SECTOR_SIZE
@@ -109,9 +111,20 @@ void set_partition(minix_t *minix){
 
 /* Given an image at @parm2 start reading SB from there */
  void set_SB(minix_t *minix){
-    uint32_t LOC = minix->part.lFirst*SECTOR_SIZE+BOOT_SIZE;
+    uint32_t LOC;
+     // case no -p and -s
+     if(minix->opt.part == UNPARITIONED){
+         LOC=BOOT_SIZE;
+     }else{
+        LOC = minix->part.lFirst*SECTOR_SIZE+BOOT_SIZE;
+     }
     safe_fseek(minix->image, LOC, SEEK_SET);
     safe_fread(&minix->sb, sizeof(superblock_t), 1, minix->image);
+    if(minix->sb.magic != MINIX_MAGIC && minix->sb.magic != REV_MINIX_MAGIC){
+        printf("Bad magic number. (0x0000)\n");
+        printf("This doesn't look like a MINIX filesystem.\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /***************************INODE*******************************************/
@@ -121,11 +134,18 @@ void set_partition(minix_t *minix){
  * @parma sum_blk_maps - sum of sizes of zone and inode maps
  */
 void set_inodes(minix_t *minix){
-    uint64_t LOC = minix->part.lFirst*SECTOR_SIZE
-                    +(2+minix->sb.z_blocks+minix->sb.i_blocks)*minix->sb.blocksize;
-    minix->inodes = safe_malloc(sizeof(inode_t)*minix->sb.ninodes);
+     uint64_t LOC;
+     // case no -p and -s
+    if(minix->opt.part == UNPARITIONED){
+         LOC=(2+minix->sb.z_blocks+minix->sb.i_blocks)*minix->sb.blocksize;
+     }else{
+          LOC = minix->part.lFirst*SECTOR_SIZE
+              +(2+minix->sb.z_blocks+minix->sb.i_blocks)*minix->sb.blocksize;
+     }
+     // add one because inode=0 is nothing
+    minix->inodes = safe_malloc(sizeof(inode_t)*(minix->sb.ninodes+1));
     safe_fseek(minix->image, LOC, SEEK_SET);
-    safe_fread(minix->inodes, sizeof(inode_t), minix->sb.ninodes, minix->image);
+    safe_fread(minix->inodes+1, sizeof(inode_t), minix->sb.ninodes, minix->image);
 
 }
 
@@ -147,20 +167,18 @@ void set_minix_types(minix_t *minix){
 /************************PRINT FUNCTIONS ************************************************/
 char *get_mode(uint16_t mode)
 {
-   char* permissions = (char *) malloc(sizeof(char) * 11);
-   permissions[0] = GET_PERM(mode, MASK_DIR, 'd');
-   permissions[1] = GET_PERM(mode, MASK_O_R, 'r');
-   permissions[2] = GET_PERM(mode, MASK_O_W, 'w');
-   permissions[3] = GET_PERM(mode, MASK_O_X, 'x');
-   permissions[4] = GET_PERM(mode, MASK_G_R, 'r');
-   permissions[5] = GET_PERM(mode, MASK_G_W, 'w');
-   permissions[6] = GET_PERM(mode, MASK_G_X, 'x');
-   permissions[7] = GET_PERM(mode, MASK_OT_R, 'r');
-   permissions[8] = GET_PERM(mode, MASK_OT_W, 'w');
-   permissions[9] = GET_PERM(mode, MASK_OT_X, 'x');
-
-   permissions[10] = '\0';
-   return permissions;
+   char* perms = safe_calloc(11, sizeof(char));
+   perms[0] = GET_PERM(mode, MASK_DIR, 'd');
+   perms[1] = GET_PERM(mode, MASK_O_R, 'r');
+   perms[2] = GET_PERM(mode, MASK_O_W, 'w');
+   perms[3] = GET_PERM(mode, MASK_O_X, 'x');
+   perms[4] = GET_PERM(mode, MASK_G_R, 'r');
+   perms[5] = GET_PERM(mode, MASK_G_W, 'w');
+   perms[6] = GET_PERM(mode, MASK_G_X, 'x');
+   perms[7] = GET_PERM(mode, MASK_OT_R, 'r');
+   perms[8] = GET_PERM(mode, MASK_OT_W, 'w');
+   perms[9] = GET_PERM(mode, MASK_OT_X, 'x');
+   return perms;
 }
 
 void printReadableTime(uint32_t time)
@@ -170,7 +188,7 @@ void printReadableTime(uint32_t time)
     printf ("%s", asctime(timeinfo));
 }
 
-void print_inode_metadata(minix_t minix, inode_t inode)
+void print_inode_metadata(minix_t *minix, inode_t inode)
 {
    int i;
    /* inode_t *inode = minix.inodes; */
@@ -207,38 +225,10 @@ void print_inode_metadata(minix_t minix, inode_t inode)
    printf("   uint32_t  %11s = %10d", "double", inode.two_indirect);
 }
 
-/*
-
-Superblock Contents:
-Stored Fields:
-  ninodes          768
-  i_blocks           1
-  z_blocks           1
-  firstdata         16
-  log_zone_size      0 (zone size: 4096)
-  max_file  4294967295
-  magic         0x4d5a
-  zones            360
-  blocksize       4096
-  subversion         0
-Computed Fields:
-  version            3
-  firstImap          2
-  firstZmap          3
-  firstIblock        4
-  zonesize        4096
-  ptrs_per_zone   1024
-  ino_per_block     64
-  wrongended         0
-  fileent_size      64
-  max_filename      60
-  ent_per_zone      64
-
-*/
-void print_superBlock(minix_t minix)
+void print_superBlock(minix_t *minix)
 {
 
-   superblock_t sb = minix.sb;
+   superblock_t sb = minix->sb;
 
    printf("Superblock Contents:\n");
 
@@ -275,9 +265,9 @@ void print_superBlock(minix_t minix)
  * This is only called if:
  *     (opt->verbosity > 2)
  */
-void print_options(minix_t minix)
+void print_options(minix_t *minix)
 {
-   options_t *opt = &minix.opt;
+   options_t *opt = &(minix->opt);
    printf("Options:\n");
 
    printf("  %-15s%-d\n", "otp->part", opt->part);
@@ -286,3 +276,4 @@ void print_options(minix_t minix)
    printf("  %-15s%-s\n", "otp->srcpath", opt->srcpath);
    printf("  %-15s%-s\n", "otp->dstpath", opt->dstpath);
 }
+
