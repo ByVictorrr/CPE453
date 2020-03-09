@@ -18,31 +18,28 @@
 #define FILE_INDEX 1
 /************************PRINT FUNCTION ************************************************/
 
+
 /*
 * A general function that allows us to read from an inode
+* returns the index of where entrys is
 */
-dirent_t *get_entrys(const minix_t *minix, const inode_t *dir){
+int set_entrys(const minix_t *minix, uint32_t *zones, int num_zones, int size ,int index, dirent_t * entrys){
                     
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     int i, j; 
-    uint32_t b_left, index=0;
-    dirent_t *entrys;
-    entrys=safe_calloc(dir->size, sizeof(dirent_t));
-    b_left = dir->size;
-
-    uint8_t data[10000];
+    uint32_t b_left = size;
     // go through every direct zones
-    for (i=0; i< DIRECT_ZONES && b_left; i++){
+    for (i=0; i< num_zones && b_left; i++){
         // to determine what size to read
         int read_size = MIN(b_left, ZONE_SIZE), r_size=read_size;
         // continue if zone is 0
-        if(dir->zone[i] == 0){
+        if(zones[i] == 0){
             continue;
         }
         // set the cursor for that zone
         safe_fseek(minix->image,
                 minix->part.lFirst*SECTOR_SIZE + // start of part
-                dir->zone[i]*ZONE_SIZE, // zone in bytes
+                zones[i]*ZONE_SIZE, // zone in bytes
                 SEEK_SET
         );
         // read each entry in that zone
@@ -53,8 +50,78 @@ dirent_t *get_entrys(const minix_t *minix, const inode_t *dir){
         }
         b_left = b_left-r_size;
     }
+    return index;
+}
+uint32_t *read_indirect_zones(const minix_t *minix, uint32_t indirect, int *num_zones){
+    // step 1 - go though the one zone and read each
+    int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
+    uint32_t *direct_zones = safe_calloc(ZONE_SIZE/sizeof(uint32_t), sizeof(uint32_t));
+    int index=0;
+    *num_zones=0;
+    safe_fseek(minix->image,
+                minix->part.lFirst*SECTOR_SIZE + // start of part
+                indirect*ZONE_SIZE, // zone in bytes
+                SEEK_SET
+     );
+     
+    // go through each part and 
+    while(ZONE_SIZE > 0){
+        // single addr
+        safe_fread(direct_zones + *num_zones, sizeof(uint32_t), 1, minix->image);
+        ZONE_SIZE-=sizeof(uint32_t);
+        *num_zones++;
+    }
+    return direct_zones;
+}
+
+// wrapper function for get_entrys
+dirent_t *get_entrys(const minix_t *minix, const inode_t *dir){
+    int index=0, j=0;
+    dirent_t *entrys;
+    uint32_t b_left, *indirect, *two_indirect;
+    int num_zones = 0, inner_num_zones=0;
+    entrys=safe_calloc(dir->size, sizeof(dirent_t));
+    // step 1 - go through direct zones
+    index = set_entrys(minix, dir->zone, DIRECT_ZONES, dir->size, index, entrys);
+    // check if we need to go through indirect zones
+    if((b_left = dir->size - index*sizeof(dirent_t))!= 0 && dir->indirect){
+       // step 2 - go through indirect zones if needed
+        indirect = read_indirect_zones(minix, dir->indirect, &num_zones);
+        index = set_entrys(minix, indirect, num_zones, b_left, index, entrys);
+        b_left = dir->size - index*sizeof(dirent_t);
+        free(indirect);
+    }
+    // ceck to see if we need go through double indirect
+    if(b_left != 0 && dir->two_indirect){
+        // step 3 - go through every double indirect zones
+        two_indirect = read_indirect_zones(minix, dir->two_indirect, &num_zones);
+        for(j=0; j< num_zones && b_left; j++){
+            // for each single indirect zone
+            indirect = read_indirect_zones(minix, two_indirect[j], &inner_num_zones);
+            index = set_entrys(minix, indirect, inner_num_zones, b_left, index, entrys);
+            b_left = dir->size - index*sizeof(dirent_t);
+            free(indirect);
+        }
+        free(two_indirect);
+    }
+     
+    // size of each indirect address
     return entrys;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // finds the inode number for the given name
 int find_inode_num(dirent_t *entrys, int size, char *name){
