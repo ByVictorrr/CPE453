@@ -119,8 +119,7 @@ void getArgs(int argc, char *argv[], options_t * opt)
 
 
          /* REMOVE: This is for debuging */
-         minix_t minix;
-         minix.opt = opt;
          print_options(minix);
+
 }
 
