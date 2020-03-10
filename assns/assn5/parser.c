@@ -62,8 +62,7 @@ void getArgs(int argc, char *argv[], options_t * opt)
                break;
 
             case 'p':
-               opt->part = getValue(optarg, argv); /* getValue handles type error
-                                                   (badly formed Integer)*/
+               opt->part = getValue(optarg, argv);
                if(opt->part < 0 || opt->part > 3) {
                   fprintf(stderr, "Partition %d out of range.  %s\n",
                         opt->part, "Must be 0..3.");
@@ -73,8 +72,7 @@ void getArgs(int argc, char *argv[], options_t * opt)
 
             /* NEEDED */
             case 's':
-               opt->subpart = getValue(optarg, argv); /* getValue handles type error
-                                                   (badly formed Integer)*/
+               opt->subpart = getValue(optarg, argv); 
                if(opt->subpart < 0 || opt->subpart > 3) {
                   fprintf(stderr, "Subpartition %d out of range.  %s\n",
                         opt->subpart, "Must be 0..3.");

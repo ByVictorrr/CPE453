@@ -36,7 +36,7 @@ $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
 gdb_ls: minls
-	gdb -tui --args minls Images/$(image)
+	gdb -tui --args minls Images/$(image) /Level1/Level2
 
 gdb_get: minget
 	gdb -tui minget

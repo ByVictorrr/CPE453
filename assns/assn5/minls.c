@@ -21,7 +21,9 @@
 
 void usage(int doExit, char * argv[])
 {
-   printf("usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n", argv[0]);
+   char *usage=
+   "usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n";
+   printf(usage ,argv[0]);
 
    if(doExit == EXIT_FAILURE)
       exit(EXIT_FAILURE);

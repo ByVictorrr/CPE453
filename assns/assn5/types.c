@@ -57,8 +57,8 @@ size_t safe_fwrite(const void *ptr, size_t size, size_t nitems, FILE *stream){
     return read;
 }
 
-/****************************** SETTER FUNCTIONS *******************************************/
-/*******************************PARITION FUNCTIONS*******************************************/
+/******* SETTER FUNCTIONS *************************/
+/*******************PARITION FUNCTIONS**************/
 bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
     const int VALID_SIG[2][2]={{510, 0x55},{511, 0xAA}};
     uint8_t sig;
@@ -66,14 +66,16 @@ bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
     safe_fseek(image, VALID_SIG[0][0]+table_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[0][1]){
-        fprintf(stderr, "location %d doesnt have signature of %d", VALID_SIG[0][0], VALID_SIG[0][1]);
+        fprintf(stderr, "location %d doesnt have signature of %d", 
+                VALID_SIG[0][0], VALID_SIG[0][1]);
         return FALSE;
     }
     // step 2 - check at byte 511
     safe_fseek(image, VALID_SIG[1][0]+table_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[1][1]){
-        fprintf(stderr, "location %d doesnt have signature of %d", VALID_SIG[1][0], VALID_SIG[1][1]);
+        fprintf(stderr, "location %d doesnt have signature of %d", 
+                VALID_SIG[1][0], VALID_SIG[1][1]);
         return FALSE;
     }
     return TRUE;
@@ -122,7 +124,7 @@ void set_partition(minix_t *minix){
     }
 }
 
-/******************************SUPER BLOCK*******************************************/
+/*************SUPER BLOCK*********************/
 
 /* Given an image at @parm2 start reading SB from there */
  void set_SB(minix_t *minix){
@@ -160,10 +162,11 @@ void set_inodes(minix_t *minix){
      // add one because inode=0 is nothing
     minix->inodes = safe_malloc(sizeof(inode_t)*(minix->sb.ninodes+1));
     safe_fseek(minix->image, LOC, SEEK_SET);
-    safe_fread(minix->inodes+1, sizeof(inode_t), minix->sb.ninodes, minix->image);
+    safe_fread(minix->inodes+1, sizeof(inode_t), 
+                minix->sb.ninodes, minix->image);
 
 }
-/**************************BIT MAPS**************************************************/
+/*************BIT MAPS************************************/
 
 void set_zmap(minix_t *minix){
     minix->z_map = safe_calloc(1, minix->sb.blocksize);
@@ -177,7 +180,7 @@ void set_imap(minix_t *minix){
     safe_fread(minix->i_map, minix->sb.blocksize, 1, minix->image);
 }
 
-/**************************TO GET MINIX STRUCT*****************************************/
+/***************TO GET MINIX STRUCT******************/
 void set_minix_types(minix_t *minix){
     minix->image=safe_fopen(minix->opt.imagefile, "r");
     set_partition(minix);
@@ -187,11 +190,11 @@ void set_minix_types(minix_t *minix){
     set_inodes(minix);
 }
 
-/*****************************END OF SETTER FUNCTION*******************************************/
+/*******************END OF SETTER FUNCTION******/
 
 
 
-/************************PRINT FUNCTIONS ************************************************/
+/************PRINT FUNCTIONS *********************/
 char *get_mode(uint16_t mode)
 {
    char* perms = safe_calloc(11, sizeof(char));

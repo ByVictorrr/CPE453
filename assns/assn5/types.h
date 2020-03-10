@@ -112,18 +112,18 @@ void *safe_malloc(size_t size);
 void * safe_calloc(size_t nitems, size_t size);
 FILE *safe_fopen(char *path, char *RW);
 size_t safe_fwrite(const void *ptr, size_t size, size_t nitems, FILE *stream);
-/*******************************PARITION FUNCTIONSHELPERS*******************************************/
+/*******************PARITION FUNCTIONSHELPERS********************/
 bool_t is_part_table_valid(FILE *image, uint32_t table_addr);
 partition_t get_partition(FILE *image, uint32_t addr);
 partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr);
-/******************************SETTERS*******************************************/
+/**********************SETTERS*****************************/
 void set_partition(minix_t *minix);
 void set_SB(minix_t *minix);
 void set_inodes(minix_t *minix);
 void set_zmap(minix_t *minix);
 void set_imap(minix_t *minix);
 void set_minix_types(minix_t *minix);
-/************************PRINT FUNCTIONS ************************************************/
+/************************PRINT FUNCTIONS ************************/
 char *get_mode(uint16_t mode);
 void printReadableTime(uint32_t time);
 void print_inode_metadata(minix_t *minix, inode_t inode);

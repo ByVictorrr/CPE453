@@ -16,7 +16,6 @@
 
 
 
-//================================min get===========================================
 void write_file(minix_t *minix, FILE *dest){
     int src_inode;
     uint8_t *src_data;
@@ -35,7 +34,6 @@ void write_file(minix_t *minix, FILE *dest){
     // step 2.2 - get contents of src_inode (assumption here is reg file)
     src_data = get_data(minix, &minix->inodes[src_inode]);
 
-
     // step 3 - update minix->inodes[dest_inode] folder with contents
     safe_fwrite(src_data, sizeof(uint8_t), minix->inodes[src_inode].size, dest);
 }
@@ -44,14 +42,13 @@ void write_file(minix_t *minix, FILE *dest){
 
 
 
-//================================eo min get===========================================
-
 /*
 * A general function that allows us to read from an inode direct blocks
 * size - size of reading type 
 */
 int set_data(const minix_t *minix, uint32_t *zones, 
-             int num_zones, int bleft ,int index, void * data, size_t type_size){
+             int num_zones, int bleft ,int index, void * data
+             ,size_t type_size){
                     
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     int i, j; 
@@ -85,11 +82,13 @@ int set_data(const minix_t *minix, uint32_t *zones,
 
     return index;
 }
-uint32_t *read_indirect_zones(const minix_t *minix, uint32_t indirect, int *num_zones){
+uint32_t *read_indirect_zones(const minix_t *minix, 
+                              uint32_t indirect, 
+                              int *num_zones){
     // step 1 - go though the one zone and read each
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
-    uint32_t *direct_zones = safe_calloc(ZONE_SIZE/sizeof(uint32_t), sizeof(uint32_t));
-    int index=0;
+    uint32_t *direct_zones = safe_calloc(ZONE_SIZE/sizeof(uint32_t)
+                                          ,sizeof(uint32_t));
     *num_zones=0;
     safe_fseek(minix->image,
                 minix->part.lFirst*SECTOR_SIZE + // start of part
@@ -100,9 +99,15 @@ uint32_t *read_indirect_zones(const minix_t *minix, uint32_t indirect, int *num_
     // go through each part and 
     while(ZONE_SIZE > 0){
         // single addr
-        safe_fread(direct_zones + *num_zones, sizeof(uint32_t), 1, minix->image);
-        ZONE_SIZE-=sizeof(uint32_t);
-        *num_zones++;
+        safe_fread(direct_zones + *num_zones, 
+                    sizeof(uint32_t), 1, minix->image);
+        if(direct_zones[*num_zones] == 0){
+            ZONE_SIZE-=sizeof(uint32_t);
+            continue;
+        }else{
+            ZONE_SIZE-=sizeof(uint32_t);
+            *num_zones=*num_zones+1;
+        }
     }
     return direct_zones;
 }
@@ -122,23 +127,28 @@ void *get_data(const minix_t *minix, const inode_t *inode){
     }
     data=safe_calloc(inode->size/type_size, type_size);
     // step 1 - go through direct zones
-    index = set_data(minix, inode->zone, DIRECT_ZONES, inode->size, index, data, type_size);
+    index = set_data(minix, inode->zone, DIRECT_ZONES, 
+                     inode->size, index, data, type_size);
     // check if we need to go through indirect zones
     if((b_left = inode->size - index*type_size) != 0 && inode->indirect){
        // step 2 - go through indirect zones if needed
         indirect = read_indirect_zones(minix, inode->indirect, &num_zones);
-        index = set_data(minix, indirect, num_zones, b_left, index, data, type_size);
+        index = set_data(minix, indirect, num_zones, b_left, 
+                        index, data, type_size);
         b_left = inode->size - index*type_size;
         free(indirect);
     }
     // ceck to see if we need go through double indirect
     if(b_left != 0 && inode->two_indirect){
         // step 3 - go through every double indirect zones
-        two_indirect = read_indirect_zones(minix, inode->two_indirect, &num_zones);
+        two_indirect = read_indirect_zones(minix, inode->two_indirect, 
+                                            &num_zones);
         for(j=0; j< num_zones && b_left; j++){
             // for each single indirect zone
-            indirect = read_indirect_zones(minix, two_indirect[j], &inner_num_zones);
-            index = set_data(minix, indirect, inner_num_zones, b_left, index, data, type_size);
+            indirect = read_indirect_zones(minix, two_indirect[j], 
+                                            &inner_num_zones);
+            index = set_data(minix, indirect, inner_num_zones, 
+                              b_left, index, data, type_size);
             b_left = inode->size - index*type_size;
             free(indirect);
         }
@@ -198,7 +208,8 @@ int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
         // step 2 - remove current directory from path
         basename_path(file_path, next_path);
         // step 3 - get the inode num for that next entry
-        next_inode=find_inode_num(entrys, minix->inodes[inode_num].size, (base_dir=get_dirname(next_path)));
+        next_inode=find_inode_num(entrys, minix->inodes[inode_num].size, 
+                                (base_dir=get_dirname(next_path)));
         free(entrys);
         free(base_dir);
         // step 4 - recurse
@@ -226,8 +237,6 @@ int get_inode_num(minix_t *minix, char *_path){
 }
 
 
-/**********************************************************************************/
-
 
 file_t get_type(inode_t *file){
     if(GET_PERM(file->mode, MASK_DIR, 'd') == 'd'){
@@ -243,14 +252,14 @@ void print_directory(minix_t *minix, dirent_t *entrys, inode_t *folder){
         // print out non 
         if((inode_num=entrys[i].inode) != DELETED_INODE){
             mode = get_mode(minix->inodes[inode_num].mode);
-            printf(" %s, %d, %s,\n", mode, entrys[i].inode, entrys[i].name);
+            printf(" %s  %d %s \n", mode, entrys[i].inode, entrys[i].name);
             free(mode);
         }
     }
 }
 void print_regular_file(minix_t *minix, int inode_num){
         char *mode = get_mode(minix->inodes[inode_num].mode);
-        printf("%s, %d, %s,\n", mode, inode_num, minix->opt.srcpath);
+        printf("%s %d %s\n", mode, inode_num, minix->opt.srcpath);
         free(mode);
 }
 
