@@ -164,15 +164,6 @@ void *get_data(const minix_t *minix, const inode_t *inode){
 
 
 
-
-
-
-
-
-
-
-
-
 // finds the inode number for the given name
 int find_inode_num(dirent_t *entrys, int size, char *name){
     int i;
@@ -252,14 +243,14 @@ void print_directory(minix_t *minix, dirent_t *entrys, inode_t *folder){
         // print out non 
         if((inode_num=entrys[i].inode) != DELETED_INODE){
             mode = get_mode(minix->inodes[inode_num].mode);
-            printf(" %s  %d %s \n", mode, entrys[i].inode, entrys[i].name);
+            printf(" %s  %d %s \n", mode, minix->inodes[inode_num].size, entrys[i].name);
             free(mode);
         }
     }
 }
 void print_regular_file(minix_t *minix, int inode_num){
         char *mode = get_mode(minix->inodes[inode_num].mode);
-        printf("%s %d %s\n", mode, inode_num, minix->opt.srcpath);
+        printf("%s %d %s\n", mode, minix->inodes[inode_num].size, minix->opt.srcpath);
         free(mode);
 }
 
