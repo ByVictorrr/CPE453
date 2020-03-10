@@ -15,58 +15,70 @@
 
 #define NO_EXIT EXIT_SUCCESS
 
-void usage(int doExit)
+void usage(int doExit, char * argv[])
 {
-   printf("usage: ./minls  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n");
+   fprintf(stderr, "usage: %s  [ -v ] [ -p num [ -s num ] ] %s", argv[0],
+         "imagefile minixpath [ hostpath ]\n");
 
    if(doExit == EXIT_FAILURE)
       exit(EXIT_FAILURE);
 }
 
-void help()
+void help(char *argv[])
 {
-   usage(NO_EXIT);
+   usage(NO_EXIT, argv);
 
-   printf("Options:\n");
-   printf("%7s %-8s %-7s %s\n", "", "-p", "part",
+   fprintf(stderr, "Options:\n");
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-p", "part",
          "--- select partition for filesystem (default: none)" );
-   printf("%7s %-8s %-7s %s\n", "", "-s", "sub",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-s", "sub",
          "--- select subpartition for filesystem (default: none)" );
-   printf("%7s %-8s %-7s %s\n", "", "-h", "help",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-h", "help",
          "--- print usage information and exit" );
-   printf("%7s %-8s %-7s %s\n", "", "-v", "verbose",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-v", "verbose",
          "--- increase verbosity level" );
 
    exit(EXIT_FAILURE);
 }
 
+
+void handleLeftOverArgs(int argc, char *argv[], options_t * opt)
+{
+   int i;
+
+   /* handle non-option args */
+   for(i = 0 ; optind < argc; i++, optind++){
+      if(i == 0)
+         opt->imagefile = argv[optind];
+      if(i == 1)
+         opt->srcpath = argv[optind];
+      if(i == 2)
+         opt->dstpath = argv[optind];
+   }
+   if(i > 3 || i < 2)
+      help(argv);
+}
+
+
 int main(int argc, char *argv[]) {
 
    FILE *output;
    minix_t minix;
-   // TODO: ethan parse
-   minix.opt.part=0;
-   minix.opt.subpart=2;
-   minix.opt.imagefile="Images/HardDisk";
-   minix.opt.dstpath="test_get/file1";
-   minix.opt.srcpath="/home/pnico/Message";
+
+   initOpt(&minix.opt);
+   getArgs(argc, argv, &minix.opt);
 
    if(minix.opt.dstpath == NULL){
-         output=stdout;
+      output=stdout;
    }else{
-         output=safe_fopen(minix.opt.dstpath, "w");
+      output=safe_fopen(minix.opt.dstpath, "w");
    }
 
-      set_minix_types(&minix);
-      write_file(&minix, output);
-      fclose(output);
-      fclose(minix.image);
-      free(minix.inodes);
+   set_minix_types(&minix);
+   write_file(&minix, output);
+   fclose(output);
+   fclose(minix.image);
+   free(minix.inodes);
 
-
-
-
-
-   return 0;
-
+   return EXIT_SUCCESS;
 }

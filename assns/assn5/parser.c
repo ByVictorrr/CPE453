@@ -13,13 +13,12 @@
 #include <errno.h>
 
 #include "types.h"
+#include "parser.h"
 
 #define NO_EXIT EXIT_SUCCESS
 
-void usage(int doExit);
-void help();
 
-long getValue(char *input)
+long getValue(char *input, char *argv[])
 {
    char *ptr = input;
    long val = -1;
@@ -30,7 +29,7 @@ long getValue(char *input)
       }
       else {
          fprintf(stderr, "%s: badly formed integer.\n", input);
-         help();
+         help(argv);
          ptr++;
       }
    }
@@ -47,26 +46,6 @@ void initOpt(options_t * opt)
    opt->verbosity = 0;
 }
 
-
-void handleLeftOverArgs(int argc, char *argv[], options_t * opt)
-{
-   int i;
-
-   if(opt->subpart != -1 && opt->part == -1)
-      fprintf(stderr, "Cannot have a subpartition without a partition.");
-
-   /* handle non-option args */
-   for(i = 0 ; optind < argc; i++, optind++){
-      if(i == 0)
-         opt->imagefile = argv[optind];
-      if(i == 1)
-         opt->srcpath = argv[optind];
-      if(i == 2)
-         opt->dstpath = argv[optind];
-      printf("extra arguments: %s\n", argv[optind]);
-   }
-}
-
 void getArgs(int argc, char *argv[], options_t * opt)
 {
    int opt_index = 0;
@@ -75,7 +54,7 @@ void getArgs(int argc, char *argv[], options_t * opt)
       switch(opt_index)
          {
             case 'h':
-               help();
+               help(argv);
                break;
 
             case 'v':
@@ -83,23 +62,23 @@ void getArgs(int argc, char *argv[], options_t * opt)
                break;
 
             case 'p':
-               opt->part = getValue(optarg); /* getValue handles type error
+               opt->part = getValue(optarg, argv); /* getValue handles type error
                                                    (badly formed Integer)*/
                if(opt->part < 0 || opt->part > 3) {
                   fprintf(stderr, "Partition %d out of range.  %s\n",
                         opt->part, "Must be 0..3.");
-                  help();
+                  help(argv);
                }
                break;
 
             /* NEEDED */
             case 's':
-               opt->subpart = getValue(optarg); /* getValue handles type error
+               opt->subpart = getValue(optarg, argv); /* getValue handles type error
                                                    (badly formed Integer)*/
                if(opt->subpart < 0 || opt->subpart > 3) {
                   fprintf(stderr, "Subpartition %d out of range.  %s\n",
                         opt->subpart, "Must be 0..3.");
-                  help();
+                  help(argv);
                }
                printf("subpart: %s\n", optarg);
                break;
@@ -110,11 +89,13 @@ void getArgs(int argc, char *argv[], options_t * opt)
 
             case '?':
                printf("unknown option: %c\n", optopt);
-               usage(EXIT_FAILURE);
+               usage(EXIT_FAILURE, argv);
                break;
          }
 
-         handleLeftOverArgs(argc, argv, opt);
+         if(opt->subpart != -1 && opt->part == -1)
+            fprintf(stderr, "Cannot have a subpartition without a partition.");
 
+         handleLeftOverArgs(argc, argv, opt);
 }
 

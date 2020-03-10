@@ -19,35 +19,52 @@
 #define NO_EXIT EXIT_SUCCESS
 
 
-void usage(int doExit)
+void usage(int doExit, char * argv[])
 {
-   printf("usage: ./minls  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n");
+   printf("usage: %s  [ -v ] [ -p num [ -s num ] ] imagefile [ path ]\n", argv[0]);
 
    if(doExit == EXIT_FAILURE)
       exit(EXIT_FAILURE);
 }
 
-void help()
+void help(char *argv[])
 {
-   usage(NO_EXIT);
+   usage(NO_EXIT, argv);
 
-   printf("Options:\n");
-   printf("%7s %-8s %-7s %s\n", "", "-p", "part",
+   fprintf(stderr, "Options:\n");
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-p", "part",
          "--- select partition for filesystem (default: none)" );
-   printf("%7s %-8s %-7s %s\n", "", "-s", "sub",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-s", "sub",
          "--- select subpartition for filesystem (default: none)" );
-   printf("%7s %-8s %-7s %s\n", "", "-h", "help",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-h", "help",
          "--- print usage information and exit" );
-   printf("%7s %-8s %-7s %s\n", "", "-v", "verbose",
+   fprintf(stderr, "%7s %-8s %-7s %s\n", "", "-v", "verbose",
          "--- increase verbosity level" );
 
    exit(EXIT_FAILURE);
 }
 
 
+void handleLeftOverArgs(int argc, char *argv[], options_t * opt)
+{
+   int i;
+
+   /* handle non-option args */
+   for(i = 0 ; optind < argc; i++, optind++){
+      if(i == 0)
+         opt->imagefile = argv[optind];
+      if(i == 1)
+         opt->srcpath = argv[optind];
+   }
+   if(i > 2 || i < 1)
+      help(argv);
+}
+
+
 int main(int argc, char *argv[])
 {
    minix_t minix;
+
    initOpt(&minix.opt);
    getArgs(argc, argv, &minix.opt);
 

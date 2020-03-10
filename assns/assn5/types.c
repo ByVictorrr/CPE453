@@ -12,14 +12,14 @@
 // Wrapper function - so we dont have to worry about mess
 void safe_fseek(FILE *fp, long int offset, int pos){
     if(fseek(fp, offset,  pos) != 0){
-        printf("seek error\n");
+        fprintf(stderr, "seek error\n");
         exit(EXIT_FAILURE);
     }
 }
 // Wrapper function - so we dont have to worry about mess
 void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
     if(fread(ptr, size,nmemb, stream) < 0){
-        printf("read error\n");
+        fprintf(stderr, "read error\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -27,7 +27,7 @@ void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
 void *safe_malloc(size_t size){
     void *ptr;
     if((ptr=malloc(size))==NULL){
-        printf("malloc error\n");
+        fprintf(stderr, "malloc error\n");
         exit(EXIT_FAILURE);
     }
     return ptr;
@@ -35,7 +35,7 @@ void *safe_malloc(size_t size){
 void * safe_calloc(size_t nitems, size_t size){
     void *ptr;
     if((ptr=calloc(nitems, size))==NULL){
-        printf("calloc error");
+        fprintf(stderr, "calloc error");
         exit(EXIT_FAILURE);
     }
     return ptr;
@@ -43,7 +43,7 @@ void * safe_calloc(size_t nitems, size_t size){
 FILE *safe_fopen(char *path, char *RW){
     FILE *image;
     if((image=fopen(path,RW))== NULL){
-        printf("No such image exists");
+        fprintf(stderr, "No such image exists");
         exit(EXIT_FAILURE);
     }
     return image;
@@ -51,7 +51,7 @@ FILE *safe_fopen(char *path, char *RW){
 size_t safe_fwrite(const void *ptr, size_t size, size_t nitems, FILE *stream){
     size_t read;
     if((read=fwrite(ptr, size, nitems, stream)) < nitems){
-        printf("fwrite failed\n");
+        fprintf(stderr, "fwrite failed\n");
         exit(EXIT_FAILURE);
     }
     return read;
@@ -66,14 +66,14 @@ bool_t is_part_table_valid(FILE *image, uint32_t table_addr){
     safe_fseek(image, VALID_SIG[0][0]+table_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[0][1]){
-        printf("location %d doesnt have signature of %d", VALID_SIG[0][0], VALID_SIG[0][1]);
+        fprintf(stderr, "location %d doesnt have signature of %d", VALID_SIG[0][0], VALID_SIG[0][1]);
         return FALSE;
     }
     // step 2 - check at byte 511
     safe_fseek(image, VALID_SIG[1][0]+table_addr, SEEK_SET);
     safe_fread(&sig, sizeof(uint8_t), 1, image);
     if(sig != VALID_SIG[1][1]){
-        printf("location %d doesnt have signature of %d", VALID_SIG[1][0], VALID_SIG[1][1]);
+        fprintf(stderr, "location %d doesnt have signature of %d", VALID_SIG[1][0], VALID_SIG[1][1]);
         return FALSE;
     }
     return TRUE;
@@ -93,11 +93,11 @@ partition_t read_partition(FILE * image, uint32_t part_table, uint32_t im_addr){
     partition_t part;
     // step 1 - make sure its valid
     if(!is_part_table_valid(image, part_table)){
-        printf("Not a valid partition table");
+        fprintf(stderr, "Not a valid partition table");
         exit(EXIT_FAILURE);
     }
     if((part = get_partition(image, im_addr)).type != MINIX_PART){
-        printf("not a minix partition");
+        fprintf(stderr, "not a minix partition");
         exit(EXIT_FAILURE);
     }
     return part;
@@ -136,8 +136,8 @@ void set_partition(minix_t *minix){
     safe_fseek(minix->image, LOC, SEEK_SET);
     safe_fread(&minix->sb, sizeof(superblock_t), 1, minix->image);
     if(minix->sb.magic != MINIX_MAGIC && minix->sb.magic != REV_MINIX_MAGIC){
-        printf("Bad magic number. (0x0000)\n");
-        printf("This doesn't look like a MINIX filesystem.\n");
+        fprintf(stderr, "Bad magic number. (0x0000)\n");
+        fprintf(stderr, "This doesn't look like a MINIX filesystem.\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -212,7 +212,7 @@ void printReadableTime(uint32_t time)
 {
     time_t raw_time = (time_t) time;
     struct tm *timeinfo = localtime (&raw_time);
-    printf ("%s", asctime(timeinfo));
+    fprintf(stderr, "%s", asctime(timeinfo));
 }
 
 void print_inode_metadata(minix_t *minix, inode_t inode)
@@ -221,35 +221,35 @@ void print_inode_metadata(minix_t *minix, inode_t inode)
    /* inode_t *inode = minix.inodes; */
    char * modeText;
 
-   printf("File inode:\n");
+   fprintf(stderr, "File inode:\n");
 
-   printf("  unsigned short mode %14x    (%s)", inode.mode,
+   fprintf(stderr, "  unsigned short mode %14x    (%s)", inode.mode,
          modeText = get_mode(inode.mode));
 
    free(modeText);
 
-   printf("  unsigned short links %14d", inode.links);
-   printf("  unsigned short uid %14d", inode.uid);
-   printf("  unsigned short gid %14d", inode.gid);
+   fprintf(stderr, "  unsigned short links %14d", inode.links);
+   fprintf(stderr, "  unsigned short uid %14d", inode.uid);
+   fprintf(stderr, "  unsigned short gid %14d", inode.gid);
 
-   printf("  uint32_t  size %9d", inode.size);
+   fprintf(stderr, "  uint32_t  size %9d", inode.size);
 
-   printf("  uint32_t  atime %9d --- ", inode.atime);
+   fprintf(stderr, "  uint32_t  atime %9d --- ", inode.atime);
    printReadableTime(inode.atime);
 
-   printf("  uint32_t  mtime %9d --- ", inode.mtime);
+   fprintf(stderr, "  uint32_t  mtime %9d --- ", inode.mtime);
    printReadableTime(inode.mtime);
 
-   printf("  uint32_t  ctime %9d --- ", inode.ctime);
+   fprintf(stderr, "  uint32_t  ctime %9d --- ", inode.ctime);
    printReadableTime(inode.ctime);
 
-   printf("Direct zones:\n");
+   fprintf(stderr, "Direct zones:\n");
 
    for(i = 0; i < DIRECT_ZONES; i++)
-      printf("%18s[%d]   = %10d\n", "zone", i, inode.zone[i]);
+      fprintf(stderr, "%18s[%d]   = %10d\n", "zone", i, inode.zone[i]);
 
-   printf("   uint32_t  %11s = %10d", "indirect", inode.indirect);
-   printf("   uint32_t  %11s = %10d", "double", inode.two_indirect);
+   fprintf(stderr, "   uint32_t  %11s = %10d", "indirect", inode.indirect);
+   fprintf(stderr, "   uint32_t  %11s = %10d", "double", inode.two_indirect);
 }
 
 void print_superBlock(minix_t *minix)
@@ -257,34 +257,34 @@ void print_superBlock(minix_t *minix)
 
    superblock_t sb = minix->sb;
 
-   printf("Superblock Contents:\n");
+   fprintf(stderr, "Superblock Contents:\n");
 
-   printf("Stored Fields:\n");
+   fprintf(stderr, "Stored Fields:\n");
 
-   printf("  %-20s%-d\n", "ninodes", sb.ninodes);
-   printf("  %-20s%-d\n", "i_blocks", sb.i_blocks);
-   printf("  %-20s%-d\n", "z_blocks", sb.z_blocks);
-   printf("  %-20s%-d\n", "firstdata", sb.firstdata);
+   fprintf(stderr, "  %-20s%-d\n", "ninodes", sb.ninodes);
+   fprintf(stderr, "  %-20s%-d\n", "i_blocks", sb.i_blocks);
+   fprintf(stderr, "  %-20s%-d\n", "z_blocks", sb.z_blocks);
+   fprintf(stderr, "  %-20s%-d\n", "firstdata", sb.firstdata);
    /*ADD (zone size: %d)*/
-   printf("  %-20s%-d\n", "log_zone_size", sb.log_zone_size);
-   printf("  %-20s%-d\n", "max_file", sb.max_file);
-   printf("  %-20s%-d\n", "magic", sb.magic);
-   printf("  %-20s%-d\n", "zones", sb.zones);
-   printf("  %-20s%-d\n", "blocksize", sb.blocksize);
-   printf("  %-20s%-d\n", "subversion", sb.subversion);
+   fprintf(stderr, "  %-20s%-d\n", "log_zone_size", sb.log_zone_size);
+   fprintf(stderr, "  %-20s%-d\n", "max_file", sb.max_file);
+   fprintf(stderr, "  %-20s%-d\n", "magic", sb.magic);
+   fprintf(stderr, "  %-20s%-d\n", "zones", sb.zones);
+   fprintf(stderr, "  %-20s%-d\n", "blocksize", sb.blocksize);
+   fprintf(stderr, "  %-20s%-d\n", "subversion", sb.subversion);
 
-   printf("Computed Fields:\n");
-   /* printf("  %s%20d\n", "version", sb->version);               */
-   /* printf("  %s%20d\n", "firstImap", sb->firstImap);           */
-   /* printf("  %s%20d\n", "firstZmap", sb->firstZmap);           */
-   /* printf("  %s%20d\n", "firstIblock", sb->firstIblock);       */
-   /* printf("  %s%20d\n", "zonesize", sb->zonesize);             */
-   /* printf("  %s%20d\n", "ptrs_per_zone", sb->ptrs_per_zone);   */
-   /* printf("  %s%20d\n", "ino_per_block", sb->ino_per_block);   */
-   /* printf("  %s%20d\n", "wrongended", sb->wrongended);         */
-   /* printf("  %s%20d\n", "fileent_size", sb->fileent_size);     */
-   /* printf("  %s%20d\n", "max_filename", sb->max_filename);     */
-   /* printf("  %s%20d\n", "ent_per_zone", sb->ent_per_zone);     */
+   fprintf(stderr, "Computed Fields:\n");
+   /* fprintf(stderr, "  %s%20d\n", "version", sb->version);               */
+   /* fprintf(stderr, "  %s%20d\n", "firstImap", sb->firstImap);           */
+   /* fprintf(stderr, "  %s%20d\n", "firstZmap", sb->firstZmap);           */
+   /* fprintf(stderr, "  %s%20d\n", "firstIblock", sb->firstIblock);       */
+   /* fprintf(stderr, "  %s%20d\n", "zonesize", sb->zonesize);             */
+   /* fprintf(stderr, "  %s%20d\n", "ptrs_per_zone", sb->ptrs_per_zone);   */
+   /* fprintf(stderr, "  %s%20d\n", "ino_per_block", sb->ino_per_block);   */
+   /* fprintf(stderr, "  %s%20d\n", "wrongended", sb->wrongended);         */
+   /* fprintf(stderr, "  %s%20d\n", "fileent_size", sb->fileent_size);     */
+   /* fprintf(stderr, "  %s%20d\n", "max_filename", sb->max_filename);     */
+   /* fprintf(stderr, "  %s%20d\n", "ent_per_zone", sb->ent_per_zone);     */
 
 }
 
@@ -295,12 +295,12 @@ void print_superBlock(minix_t *minix)
 void print_options(minix_t *minix)
 {
    options_t *opt = &(minix->opt);
-   printf("Options:\n");
+   fprintf(stderr, "Options:\n");
 
-   printf("  %-15s%-d\n", "otp->part", opt->part);
-   printf("  %-15s%-d\n", "otp->subpart", opt->subpart);
-   printf("  %-15s%-s\n", "otp->imagefile", opt->imagefile);
-   printf("  %-15s%-s\n", "otp->srcpath", opt->srcpath);
-   printf("  %-15s%-s\n", "otp->dstpath", opt->dstpath);
+   fprintf(stderr, "  %-15s%-d\n", "otp->part", opt->part);
+   fprintf(stderr, "  %-15s%-d\n", "otp->subpart", opt->subpart);
+   fprintf(stderr, "  %-15s%-s\n", "otp->imagefile", opt->imagefile);
+   fprintf(stderr, "  %-15s%-s\n", "otp->srcpath", opt->srcpath);
+   fprintf(stderr, "  %-15s%-s\n", "otp->dstpath", opt->dstpath);
 }
 
