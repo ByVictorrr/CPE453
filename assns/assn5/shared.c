@@ -107,13 +107,9 @@ uint32_t *read_indirect_zones(const minix_t *minix,
         // single addr
         safe_fread(direct_zones + *num_zones, 
                     sizeof(uint32_t), 1, minix->image);
-        if(direct_zones[*num_zones] == 0){
-            ZONE_SIZE-=sizeof(uint32_t);
-            continue;
-        }else{
+
             ZONE_SIZE-=sizeof(uint32_t);
             *num_zones=*num_zones+1;
-        }
     }
     return direct_zones;
 }
