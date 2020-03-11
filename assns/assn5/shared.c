@@ -25,12 +25,12 @@ void write_file(minix_t *minix, FILE *dest){
         printf("destination not found\n");
         exit(EXIT_FAILURE);
     }
-    // step 2.1 - check to see its not symlink or directory
-    if(minix->inodes[src_inode].mode & MASK_REG != MASK_REG){
-        // this should be for sym links and dirs
-        printf("Cant get symlinks or directories");
+    // step 2.1 - check to see if directory/symlink
+    if((minix->inodes[src_inode].mode & MASK_REG) != MASK_REG){
+        printf("%s: Not a regular file.\n", minix->opt.srcpath);
         exit(EXIT_FAILURE);
     }
+
     // step 2.2 - get contents of src_inode (assumption here is reg file)
     src_data = get_data(minix, &minix->inodes[src_inode]);
 

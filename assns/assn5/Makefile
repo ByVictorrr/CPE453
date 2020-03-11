@@ -1,7 +1,7 @@
 TARGET   = a.out
 CC       = gcc
 LD       = gcc
-CCFLAGS  = -pedantic -Wall -fpic -g -lm
+CCFLAGS  = -pedantic -Wall -fpic -g3 -lm
 LDFLAGS  = -Wall -g -L. -lm
 SOURCES  = $(wildcard *.c)
 INCLUDES = $(wildcard *.h)
@@ -39,7 +39,7 @@ gdb_ls: minls
 	gdb -tui --args minls Images/ReallyBigZones-64k /./.././../DirTwo/FileOne 
 
 gdb_get: minget
-	gdb -tui minget
+	gdb -tui --args minget Images/Files /Files
 
 clean:
 	rm -f $(TARGET) $(TARGETS) $(OBJECTS)
