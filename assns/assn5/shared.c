@@ -135,7 +135,8 @@ void debug_two_indirect(uint32_t * two_indirect, int num_zones){
 void *get_data(const minix_t *minix, const inode_t *inode){
     uint32_t index=0, j, k;
     void *data;
-    uint64_t b_left, *indirect, *two_indirect;
+    uint64_t b_left;
+    uint32_t *indirect, *two_indirect;
     int num_zones = 0, inner_num_zones=0;
     size_t type_size;
     // check if directory or file
@@ -183,7 +184,6 @@ void *get_data(const minix_t *minix, const inode_t *inode){
                indirect = read_indirect_zones(minix, two_indirect[j], 
                                             &inner_num_zones); 
             }
-                //debug_two_indirect(indirect, inner_num_zones);
             index = set_data(minix, indirect, inner_num_zones, 
                               b_left, index, data, type_size);
             b_left = inode->size - index*type_size;
