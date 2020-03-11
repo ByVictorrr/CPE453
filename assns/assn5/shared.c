@@ -19,17 +19,27 @@
 void write_file(minix_t *minix, FILE *dest){
     int src_inode;
     uint8_t *src_data;
-    char *mode;
+    uint16_t mode;
     // step 1 - get inode number of dest
     if((src_inode = get_inode_num(minix, minix->opt.srcpath)) == NOT_FOUND){
         printf("destination not found\n");
         exit(EXIT_FAILURE);
-    }
-    // step 2.1 - check to see if directory/symlink
-    if((minix->inodes[src_inode].mode & MASK_REG) != MASK_REG){
-        printf("%s: Not a regular file.\n", minix->opt.srcpath);
+    // step 3.3 - check to  see if file is deleted
+    }else if(src_inode == DELETED_INODE || 
+            minix->inodes[src_inode].size == 0){
+        printf("%s: File not found.\n", minix->opt.srcpath);
         exit(EXIT_FAILURE);
     }
+    // step 2.1 - check to see if directory
+    if(((mode=minix->inodes[src_inode].mode) & FILE_TYPE) == MASK_DIR){
+        printf("%s: Not a regular file.\n", minix->opt.srcpath);
+        exit(EXIT_FAILURE);
+    // step 2.2 - check to see if symlink
+    }else if((mode & FILE_TYPE) == MASK_SYM){
+        printf("SymLink: Not a regular file.\n");
+        exit(EXIT_FAILURE);
+    }
+
 
     // step 2.2 - get contents of src_inode (assumption here is reg file)
     src_data = get_data(minix, &minix->inodes[src_inode]);
@@ -113,6 +123,14 @@ uint32_t *read_indirect_zones(const minix_t *minix,
     }
     return direct_zones;
 }
+void debug_two_indirect(uint32_t * two_indirect, int num_zones){
+    int i;
+    for(i=0; i < num_zones; i++){
+        printf("%d\n",two_indirect[i]);
+    }
+}
+
+
 
 // wrapper function for get_entrys
 void *get_data(const minix_t *minix, const inode_t *inode){
@@ -145,23 +163,27 @@ void *get_data(const minix_t *minix, const inode_t *inode){
         // step 3 - go through every double indirect zones
         two_indirect = read_indirect_zones(minix, inode->two_indirect, 
                                             &num_zones);
+        //debug_two_indirect(two_indirect, num_zones);
         for(j=0; j< num_zones && b_left; j++){
             // for each single indirect zone
-            indirect = read_indirect_zones(minix, two_indirect[j], 
+            if(two_indirect[j]!=0){
+                indirect = read_indirect_zones(minix, two_indirect[j], 
                                             &inner_num_zones);
-            index = set_data(minix, indirect, inner_num_zones, 
+                
+                //debug_two_indirect(indirect, inner_num_zones);
+                index = set_data(minix, indirect, inner_num_zones, 
                               b_left, index, data, type_size);
-            b_left = inode->size - index*type_size;
-            free(indirect);
+                b_left = inode->size - index*type_size;
+                free(indirect);
+            }
         }
+
         free(two_indirect);
     }
      
     // size of each indirect address
     return data;
 }
-
-
 
 
 

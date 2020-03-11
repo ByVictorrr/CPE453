@@ -17,8 +17,12 @@
 #define DIRECT_ZONES 7
 #define UNPARITIONED -1
 
+#define FILE_TYPE 0170000
+
 #define MASK_REG  0100000
 #define MASK_DIR  0040000
+#define MASK_SYM  0120000
+
 #define MASK_O_R  0000400
 #define MASK_O_W  0000200
 #define MASK_O_X  0000100
