@@ -27,12 +27,16 @@ void basename_path(const char *path, char*base_name_path){
 // it will give back the name instead
 char *get_dirname(char *path){
     char *base_dir_name = safe_calloc(strlen(path), sizeof(char));
-    char buff[1000] = {0};
-    strcpy(base_dir_name, path);
-    strcpy(buff, base_dir_name);
-    while(strcmp(dirname(base_dir_name),".") != 0){
-        strcpy(buff, base_dir_name);
+    char buff[1000] = {0}, next_buff[1000] = {0};
+    strcpy(next_buff, path);
+    strcpy(buff, next_buff);
+    while(strcmp(dirname(next_buff),".") != 0){
+        strcpy(buff, next_buff);
     }
-    strcpy(base_dir_name, buff);
+    // incase the doesnt contain '.'
+    if(buff[0] != '.'){
+        strcpy(next_buff, buff);
+    }
+    strcpy(base_dir_name, next_buff);
     return base_dir_name;
 }

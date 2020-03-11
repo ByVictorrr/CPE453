@@ -36,7 +36,7 @@ $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
 gdb_ls: minls
-	gdb -tui --args minls -p 0 -s 0 Images/HardDisk /home/pnico/Message
+	gdb -tui --args minls Images/ReallyBigZones-64k /./.././../DirTwo/FileOne 
 
 gdb_get: minget
 	gdb -tui minget
