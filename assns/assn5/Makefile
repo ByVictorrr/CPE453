@@ -36,7 +36,7 @@ $(OBJECTS): $(SOURCES) $(INCLUDES)
 	$(CC) -c $(CCFLAGS) $(SOURCES)
 
 gdb_ls: minls
-	gdb -tui --args minls Images/$(image) /Level1/Level2
+	gdb -tui --args minls -p 0 -s 0 Images/HardDisk /home/pnico/Message
 
 gdb_get: minget
 	gdb -tui minget

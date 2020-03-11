@@ -262,8 +262,15 @@ void print_all(minix_t *minix){
     file_t type;
     dirent_t * entrys;
     uint8_t *data;
-    int inode_num = get_inode_num(minix, minix->opt.srcpath);
+    int inode_num;
 
+    // case where file isnt found 
+    if((inode_num=get_inode_num(minix, minix->opt.srcpath)) == NOT_FOUND || 
+        inode_num == DELETED_INODE
+    ){
+        fprintf(stderr, "%s: File not found.\n", minix->opt.srcpath);
+        exit(EXIT_FAILURE);
+    }
     
    if((verbosity=minix->opt.verbosity)){
       if(verbosity == 2) {
