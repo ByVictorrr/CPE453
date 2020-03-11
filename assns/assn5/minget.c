@@ -79,6 +79,8 @@ int main(int argc, char *argv[]) {
    fclose(output);
    fclose(minix.image);
    free(minix.inodes);
+   free(minix.z_map);
+   free(minix.i_map);
 
    return EXIT_SUCCESS;
 }

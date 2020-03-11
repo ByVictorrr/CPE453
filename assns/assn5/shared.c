@@ -39,7 +39,6 @@ void write_file(minix_t *minix, FILE *dest){
         exit(EXIT_FAILURE);
     }
 
-
     // step 2.2 - get contents of src_inode (assumption here is reg file)
     src_data = get_data(minix, &minix->inodes[src_inode]);
 
@@ -56,12 +55,12 @@ void write_file(minix_t *minix, FILE *dest){
 * A general function that allows us to read from an inode direct blocks
 * size - size of reading type 
 */
-uint32_t set_data(const minix_t *minix, uint32_t *zones, 
+uint32_t set_data(const minix_t *minix, const uint32_t *zones, 
              int num_zones, uint64_t bleft ,int index, void * data
              ,size_t type_size){
                     
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
-    int i, j; 
+    int i;
     uint64_t b_left = bleft;
     // go through every direct zones
     for (i=0; i< num_zones && b_left; i++){
@@ -133,12 +132,14 @@ void debug_two_indirect(uint32_t * two_indirect, int num_zones){
 
 // wrapper function for get_entrys
 void *get_data(const minix_t *minix, const inode_t *inode){
-    uint32_t index=0, j, k;
+    uint32_t index=0, j;
     void *data;
     uint64_t b_left;
     uint32_t *indirect, *two_indirect;
     int num_zones = 0, inner_num_zones=0;
     size_t type_size;
+
+    int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     // check if directory or file
     if(get_type(inode) == DIRECTORY){
         type_size=sizeof(dirent_t);
@@ -153,7 +154,6 @@ void *get_data(const minix_t *minix, const inode_t *inode){
     if((b_left = inode->size - index*type_size) != 0){
             // we have to padd holes with zeros to get to two_indirect
             if(!inode->indirect && inode->two_indirect){
-               int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
                indirect = safe_calloc(ZONE_SIZE/sizeof(uint32_t), 
                                             sizeof(uint32_t));
                num_zones= ZONE_SIZE/sizeof(uint32_t);
@@ -176,7 +176,6 @@ void *get_data(const minix_t *minix, const inode_t *inode){
             // for each single indirect zone
             if(two_indirect[j] == 0){
                 // tell indirect to memset to all zeros
-               int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
                indirect = safe_calloc(ZONE_SIZE/sizeof(uint32_t)
                                           ,sizeof(uint32_t));
                 inner_num_zones= ZONE_SIZE/sizeof(uint32_t);
@@ -189,7 +188,6 @@ void *get_data(const minix_t *minix, const inode_t *inode){
             b_left = inode->size - index*type_size;
             free(indirect);
         }
-
         free(two_indirect);
     }
      
@@ -247,7 +245,7 @@ int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
 
 // wrapper function of for get INODE_NUM
 int get_inode_num(minix_t *minix, char *_path){
-    char *full_path, file_path[1000] = {0};
+    char file_path[1000] = {0};
     char path[1000] = {0};
     strcpy(file_path, _path);
     // have to append a / if folder_path isnt given it
@@ -265,7 +263,7 @@ int get_inode_num(minix_t *minix, char *_path){
 
 
 
-file_t get_type(inode_t *file){
+file_t get_type(const inode_t *file){
     if(GET_PERM(file->mode, MASK_DIR, 'd') == 'd'){
         return DIRECTORY;
     }
@@ -273,7 +271,6 @@ file_t get_type(inode_t *file){
 }
 void print_directory(minix_t *minix, dirent_t *entrys, inode_t *folder){
     int i, inode_num;
-    inode_t inode_entry;
     char *mode;
     printf("%s:\n", minix->opt.srcpath);
     for(i=0; i< (folder->size)/sizeof(dirent_t); i++){
@@ -295,9 +292,7 @@ void print_regular_file(minix_t *minix, int inode_num){
 
 void print_all(minix_t *minix){
     int verbosity;
-    file_t type;
     dirent_t * entrys;
-    uint8_t *data;
     int inode_num;
 
     // case where file isnt found 
