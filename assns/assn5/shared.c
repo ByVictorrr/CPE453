@@ -25,8 +25,7 @@ void write_file(minix_t *minix, FILE *dest){
         printf("destination not found\n");
         exit(EXIT_FAILURE);
     // step 3.3 - check to  see if file is deleted
-    }else if(src_inode == DELETED_INODE || 
-            minix->inodes[src_inode].size == 0){
+    }else if(src_inode == DELETED_INODE){
         printf("%s: File not found.\n", minix->opt.srcpath);
         exit(EXIT_FAILURE);
     }
@@ -57,13 +56,13 @@ void write_file(minix_t *minix, FILE *dest){
 * A general function that allows us to read from an inode direct blocks
 * size - size of reading type 
 */
-int set_data(const minix_t *minix, uint32_t *zones, 
-             int num_zones, int bleft ,int index, void * data
+uint32_t set_data(const minix_t *minix, uint32_t *zones, 
+             int num_zones, uint64_t bleft ,int index, void * data
              ,size_t type_size){
                     
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     int i, j; 
-    uint32_t b_left = bleft;
+    uint64_t b_left = bleft;
     // go through every direct zones
     for (i=0; i< num_zones && b_left; i++){
         // to determine what size to read
@@ -134,9 +133,9 @@ void debug_two_indirect(uint32_t * two_indirect, int num_zones){
 
 // wrapper function for get_entrys
 void *get_data(const minix_t *minix, const inode_t *inode){
-    int index=0, j=0;
+    uint32_t index=0, j, k;
     void *data;
-    uint32_t b_left, *indirect, *two_indirect;
+    uint64_t b_left, *indirect, *two_indirect;
     int num_zones = 0, inner_num_zones=0;
     size_t type_size;
     // check if directory or file
@@ -150,9 +149,18 @@ void *get_data(const minix_t *minix, const inode_t *inode){
     index = set_data(minix, inode->zone, DIRECT_ZONES, 
                      inode->size, index, data, type_size);
     // check if we need to go through indirect zones
-    if((b_left = inode->size - index*type_size) != 0 && inode->indirect){
+    if((b_left = inode->size - index*type_size) != 0){
+            // we have to padd holes with zeros to get to two_indirect
+            if(!inode->indirect && inode->two_indirect){
+               int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
+               indirect = safe_calloc(ZONE_SIZE/sizeof(uint32_t), 
+                                            sizeof(uint32_t));
+               num_zones= ZONE_SIZE/sizeof(uint32_t);
+            }else{
+                indirect = read_indirect_zones(minix, inode->indirect, 
+                                                &num_zones);
+            }
        // step 2 - go through indirect zones if needed
-        indirect = read_indirect_zones(minix, inode->indirect, &num_zones);
         index = set_data(minix, indirect, num_zones, b_left, 
                         index, data, type_size);
         b_left = inode->size - index*type_size;
@@ -163,19 +171,23 @@ void *get_data(const minix_t *minix, const inode_t *inode){
         // step 3 - go through every double indirect zones
         two_indirect = read_indirect_zones(minix, inode->two_indirect, 
                                             &num_zones);
-        //debug_two_indirect(two_indirect, num_zones);
         for(j=0; j< num_zones && b_left; j++){
             // for each single indirect zone
-            if(two_indirect[j]!=0){
-                indirect = read_indirect_zones(minix, two_indirect[j], 
-                                            &inner_num_zones);
-                
-                //debug_two_indirect(indirect, inner_num_zones);
-                index = set_data(minix, indirect, inner_num_zones, 
-                              b_left, index, data, type_size);
-                b_left = inode->size - index*type_size;
-                free(indirect);
+            if(two_indirect[j] == 0){
+                // tell indirect to memset to all zeros
+               int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
+               indirect = safe_calloc(ZONE_SIZE/sizeof(uint32_t)
+                                          ,sizeof(uint32_t));
+                inner_num_zones= ZONE_SIZE/sizeof(uint32_t);
+            }else{
+               indirect = read_indirect_zones(minix, two_indirect[j], 
+                                            &inner_num_zones); 
             }
+                //debug_two_indirect(indirect, inner_num_zones);
+            index = set_data(minix, indirect, inner_num_zones, 
+                              b_left, index, data, type_size);
+            b_left = inode->size - index*type_size;
+            free(indirect);
         }
 
         free(two_indirect);
