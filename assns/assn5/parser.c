@@ -78,7 +78,8 @@ void getArgs(int argc, char *argv[], options_t * opt)
                         opt->subpart, "Must be 0..3.");
                   help(argv);
                }
-               printf("subpart: %s\n", optarg);
+               /* printf("subpart: %s\n", optarg); 
+               ETHAN it shouldnt be printed i think unless verbose*/
                break;
 
             case ':':

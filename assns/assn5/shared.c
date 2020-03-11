@@ -239,18 +239,21 @@ void print_directory(minix_t *minix, dirent_t *entrys, inode_t *folder){
     int i, inode_num;
     inode_t inode_entry;
     char *mode;
+    printf("%s:\n", minix->opt.srcpath);
     for(i=0; i< (folder->size)/sizeof(dirent_t); i++){
         // print out non 
         if((inode_num=entrys[i].inode) != DELETED_INODE){
             mode = get_mode(minix->inodes[inode_num].mode);
-            printf(" %s  %d %s \n", mode, minix->inodes[inode_num].size, entrys[i].name);
+            printf("%s%10d %s\n", mode, minix->inodes[inode_num].size, 
+                            entrys[i].name);
             free(mode);
         }
     }
 }
 void print_regular_file(minix_t *minix, int inode_num){
         char *mode = get_mode(minix->inodes[inode_num].mode);
-        printf("%s %d %s\n", mode, minix->inodes[inode_num].size, minix->opt.srcpath);
+        printf("%s%10d %s\n", mode, minix->inodes[inode_num].size, 
+                            minix->opt.srcpath);
         free(mode);
 }
 
@@ -270,6 +273,7 @@ void print_all(minix_t *minix){
           print_inode_metadata(minix, minix->inodes[inode_num]);
       }
    }
+
 
    // print contents of inode
    if(get_type(&minix->inodes[inode_num]) == DIRECTORY){
