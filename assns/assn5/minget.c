@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
    if(minix.opt.dstpath == NULL){
       output=stdout;
    }else{
-      output=safe_fopen(minix.opt.dstpath, "w");
+      output=safe_fopen(minix.opt.dstpath, "wb+");
    }
 
    set_minix_types(&minix);

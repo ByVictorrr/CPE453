@@ -36,6 +36,7 @@ void write_file(minix_t *minix, FILE *dest){
 
     // step 3 - update minix->inodes[dest_inode] folder with contents
     safe_fwrite(src_data, sizeof(uint8_t), minix->inodes[src_inode].size, dest);
+    free(src_data);
 }
 
 
@@ -57,8 +58,13 @@ int set_data(const minix_t *minix, uint32_t *zones,
     for (i=0; i< num_zones && b_left; i++){
         // to determine what size to read
         int read_size = MIN(b_left, ZONE_SIZE), r_size=read_size;
-        // continue if zone is 0
-        if(zones[i] == 0){
+
+        // case where zone[i] is zero but the others are adjacent and not(HOLE)
+        if(zones[i] == 0 && type_size == sizeof(uint8_t) && b_left){
+            // pad with zeros if this if not adjacent zones
+            memset((uint8_t*)data+index, 0, read_size);
+            index+=read_size;
+            b_left-= read_size;
             continue;
         }
         // set the cursor for that zone

@@ -39,7 +39,6 @@ gdb_ls: minls
 	gdb -tui --args minls Images/ReallyBigZones-64k /./.././../DirTwo/FileOne 
 
 gdb_get: minget
-	gdb -tui --args minget Images/Files /Files
-
+	gdb -tui --args minget Images/Files /Holes/into-indirect  /dev/stdout
 clean:
 	rm -f $(TARGET) $(TARGETS) $(OBJECTS)
