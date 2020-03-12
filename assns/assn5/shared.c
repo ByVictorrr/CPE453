@@ -132,12 +132,12 @@ void debug_two_indirect(uint32_t * two_indirect, int num_zones){
 
 // wrapper function for get_entrys
 void *get_data(const minix_t *minix, const inode_t *inode){
-    uint32_t index=0, j;
-    void *data;
-    uint64_t b_left;
-    uint32_t *indirect, *two_indirect;
+    uint32_t index=0, j = 0;
+    void *data = NULL;
+    uint64_t b_left = 0;
+    uint32_t *indirect = NULL, *two_indirect = NULL;
     int num_zones = 0, inner_num_zones=0;
-    size_t type_size;
+    size_t type_size = 0;
 
     int ZONE_SIZE = minix->sb.blocksize << minix->sb.log_zone_size;
     // check if directory or file
@@ -219,9 +219,9 @@ int find_inode_num(dirent_t *entrys, int size, char *name){
  */
 int Get_Inode_Num(const minix_t *minix, int inode_num, char *file_path){
 
-    dirent_t *entrys;
+    dirent_t *entrys = NULL;
     // index Pair<cwd inode num, file inode>
-    char next_path[1000] = {0}, *base_dir;
+    char next_path[1000] = {0}, *base_dir = NULL;
     int next_inode;
 
     // base case stop when we find the basename(path) = filename
@@ -291,9 +291,9 @@ void print_regular_file(minix_t *minix, int inode_num){
 }
 
 void print_all(minix_t *minix){
-    int verbosity;
-    dirent_t * entrys;
-    int inode_num;
+    int verbosity = 0;
+    dirent_t * entrys = NULL;
+    int inode_num = 0;
 
     // case where file isnt found 
     if((inode_num=get_inode_num(minix, minix->opt.srcpath)) == NOT_FOUND || 

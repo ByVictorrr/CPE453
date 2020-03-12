@@ -26,8 +26,9 @@ void basename_path(const char *path, char*base_name_path){
 // wrapper to dirname to help support when return . 
 // it will give back the name instead
 char *get_dirname(char *path){
-    char *base_dir_name = safe_calloc(strlen(path), sizeof(char));
+    char *base_dir_name = NULL;
     char buff[1000] = {0}, next_buff[1000] = {0};
+    base_dir_name = safe_calloc(strlen(path)+1, sizeof(char));
     strcpy(next_buff, path);
     strcpy(buff, next_buff);
     while(strcmp(dirname(next_buff),".") != 0){

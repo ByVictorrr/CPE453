@@ -25,7 +25,7 @@ void safe_fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
 }
 // Wrapper function - so we dont have to worry about mess
 void *safe_malloc(size_t size){
-    void *ptr;
+    void *ptr = NULL;
     if((ptr=malloc(size))==NULL){
         fprintf(stderr, "malloc error\n");
         exit(EXIT_FAILURE);
@@ -33,7 +33,7 @@ void *safe_malloc(size_t size){
     return ptr;
 }
 void * safe_calloc(size_t nitems, size_t size){
-    void *ptr;
+    void *ptr = NULL;
     if((ptr=calloc(nitems, size))==NULL){
         fprintf(stderr, "calloc error");
         exit(EXIT_FAILURE);
@@ -41,7 +41,7 @@ void * safe_calloc(size_t nitems, size_t size){
     return ptr;
 }
 FILE *safe_fopen(char *path, char *RW){
-    FILE *image;
+    FILE *image = NULL;
     if((image=fopen(path,RW))== NULL){
         fprintf(stderr, "No such image exists");
         exit(EXIT_FAILURE);
